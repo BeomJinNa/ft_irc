@@ -13,75 +13,70 @@
 #include <cerrno>
 #include "Server.hpp"
 
-/* TODO
- * 런타임 도중 kevent실패시 자원해제(소켓 해지)후 throw
- * run_server에서 kevent에 딜레이 설정 (시스템 콜 무한 호출 방지)
- * read, write 버퍼시스템 포함해서 구현하기 (get_next_line과 같은 형태)
- * 훅 구현하기
- */
 namespace
 {
 	struct timespec	make_timespec(long seconds, long nanoseconds);
-	int				xKevent(int kq, const struct kevent *changelist, int nchanges,
+	int				xKevent(int mKq, const struct kevent *changelist, int nchanges,
 							struct kevent *eventlist, int nevents, const struct timespec *timeout);
 }
 
 Server::Server(int port)
 {
-	server_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if (server_fd == -1)
+	mServerFd = socket(AF_INET, SOCK_STREAM, 0);
+	if (mServerFd == -1)
 	{
 		throw std::runtime_error("Socket creation failed");
 	}
-	fcntl(server_fd, F_SETFL, O_NONBLOCK);
+	fcntl(mServerFd, F_SETFL, O_NONBLOCK);
 
 	struct sockaddr_in	address;
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(port);
 
-	if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0)
+	if (bind(mServerFd, (struct sockaddr*)&address, sizeof(address)) < 0)
 	{
-		close(server_fd);
+		close(mServerFd);
 		throw std::runtime_error("Bind failed");
 	}
 
-	if (listen(server_fd, 10) < 0)
+	if (listen(mServerFd, 10) < 0)
 	{
-		close(server_fd);
+		close(mServerFd);
 		throw std::runtime_error("Listen failed");
 	}
 
-	kq = kqueue();
-	if (kq == -1)
+	mKq = kqueue();
+	if (mKq == -1)
 	{
-		close(server_fd);
-		throw std::runtime_error("Failed to create kqueue");
+		close(mServerFd);
+		throw std::runtime_error("Failed to create mKqueue");
 	}
 
 	struct kevent	ev;
-	EV_SET(&ev, server_fd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
-	if (xKevent(kq, &ev, 1, NULL, 0, NULL) == -1)
+	EV_SET(&ev, mServerFd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+	if (xKevent(mKq, &ev, 1, NULL, 0, NULL) == -1)
 	{
-		close(server_fd);
-		close(kq);
-		throw std::runtime_error("Failed to add server socket event to kqueue");
+		close(mServerFd);
+		close(mKq);
+		throw std::runtime_error("Failed to add server socket event to mKqueue");
 	}
 }
 
 Server::~Server(void)
 {
-	if (server_fd != -1)
+	if (mServerFd != -1)
 	{
-		close(server_fd);
+		close(mServerFd);
 	}
-	if (kq != -1)
+	if (mKq != -1)
 	{
-		close(kq);
+		close(mKq);
 	}
+	Server::CloseAllClientConnection();
 }
 
-void Server::run_server(void)
+void	Server::RunServer(void)
 {
 	while (true)
 	{
@@ -89,17 +84,45 @@ void Server::run_server(void)
 	}
 }
 
-void Server::waitEvent(void)
+void	Server::SendMessageToClient(int fd, const char* data, size_t length)
 {
-	const int		MAX_EVENTS = 10;
-	struct kevent	events[MAX_EVENTS];
-	int				nev = xKevent(kq, NULL, 0, events, MAX_EVENTS, NULL); //딜레이 설정 필요
+	mWriteBuffers[fd].append(data, length);
 
+	struct kevent	ev;
+	EV_SET(&ev, fd, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
+	mWriteEvents.push_back(ev);
+}
+
+void	Server::CloseClientConnection(int fd)
+{
+	close(fd);
+	mClientFds.erase(fd);
+	mReadBuffers.erase(fd);
+	mReadSocketBuffers.erase(fd);
+	mWriteBuffers.erase(fd);
+}
+
+void	Server::CloseAllClientConnection(void)
+{
+	for (std::set<int>::iterator it = mClientFds.begin(); it != mClientFds.end(); ++it)
+	{
+		Server::CloseClientConnection(*it);
+	}
+}
+
+void	Server::waitEvent(void)
+{
+	const int				MAX_EVENTS = 10;
+	struct kevent			events[MAX_EVENTS];
+	int						nev = xKevent(mKq, &mWriteEvents[0], mWriteEvents.size(),
+										  events, MAX_EVENTS, NULL);
+
+	mWriteEvents.clear();
 	for (int i = 0; i < nev; i++)
 	{
 		if (events[i].filter == EVFILT_READ)
 		{
-			if (events[i].ident == static_cast<uintptr_t>(server_fd))
+			if (events[i].ident == static_cast<uintptr_t>(mServerFd))
 			{
 				acceptConnection();
 			}
@@ -117,49 +140,70 @@ void Server::waitEvent(void)
 
 void Server::acceptConnection(void)
 {
-	struct sockaddr_in	client_addr;
-	socklen_t			client_len = sizeof(client_addr);
-	int					client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_len);
+	struct sockaddr_in	clientAddr;
+	socklen_t			clientLen = sizeof(clientAddr);
+	int					clientFd = accept(mServerFd, (struct sockaddr*)&clientAddr, &clientLen);
 
-	if (client_fd >= 0)
+	if (clientFd >= 0)
 	{
-		fcntl(client_fd, F_SETFL, O_NONBLOCK);
+		fcntl(clientFd, F_SETFL, O_NONBLOCK);
 
 		struct kevent	ev;
-		EV_SET(&ev, client_fd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
-		xKevent(kq, &ev, 1, NULL, 0, NULL);
+		EV_SET(&ev, clientFd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+		xKevent(mKq, &ev, 1, NULL, 0, NULL);
+		mClientFds.insert(clientFd);
 	}
 }
 
 void Server::handleRead(int fd)
 {
+	static const size_t		bufferSize = 1024;
+	ssize_t					bytes_read = read(fd, mReadSocketBuffers[fd], bufferSize - 1);
+
+	mReadSocketBuffers[fd][bytes_read] = '\0';
+
+	if (bytes_read > 0)
+	{
+		mReadBuffers[fd].append(mReadSocketBuffers[fd]);
+		size_t	end_of_msg = mReadBuffers[fd].find("\r\n");
+		if (end_of_msg == std::string::npos || mReadBuffers[fd].size() > 512)
+		{
+			CloseClientConnection(fd);
+			return ;
+		}
+		std::string message = mReadBuffers[fd].substr(0, end_of_msg);
+		mReadBuffers[fd].erase(0, end_of_msg + 2);
+		executeHooks(fd, message);
+	}
+	else
+	{
+		CloseClientConnection(fd);
+	}
 }
 
-void Server::prepareWrite(int fd, const char* data, size_t length)
+/* TODO
+ * 훅 구현하기
+ */
+void	Server::executeHooks(int clientFd, std::string message)
 {
-	write_buffers[fd].append(data, length);
-
-	struct kevent	ev;
-	EV_SET(&ev, fd, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
-	xKevent(kq, &ev, 1, NULL, 0, NULL);
 }
 
-void Server::handleWrite(int fd)
+void	Server::handleWrite(int fd)
 {
-	std::string&	buffer = write_buffers[fd];
+	std::string&	buffer = mWriteBuffers[fd];
 
 	if (!buffer.empty())
 	{
-		ssize_t	bytes_sent = write(fd, buffer.c_str(), buffer.size());
-		if (bytes_sent > 0)
+		ssize_t	bytesSent = write(fd, buffer.c_str(), buffer.size());
+		if (bytesSent > 0)
 		{
-			buffer.erase(0, bytes_sent);
+			buffer.erase(0, bytesSent);
 		}
 		if (buffer.empty())
 		{
 			struct kevent	ev;
 			EV_SET(&ev, fd, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
-			xKevent(kq, &ev, 1, NULL, 0, NULL);
+			xKevent(mKq, &ev, 1, NULL, 0, NULL);
 		}
 	}
 }
@@ -176,10 +220,10 @@ namespace
 		return (ts);
 	}
 
-	int xKevent(int kq, const struct kevent *changelist, int nchanges,
+	int	xKevent(int mKq, const struct kevent *changelist, int nchanges,
 			struct kevent *eventlist, int nevents, const struct timespec *timeout)
 	{
-		int	retval = kevent(kq, changelist, nchanges, eventlist, nevents, timeout);
+		int	retval = kevent(mKq, changelist, nchanges, eventlist, nevents, timeout);
 		if (retval == -1)
 		{
 			throw std::runtime_error("kevent failed: " + std::string(strerror(errno)));

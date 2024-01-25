@@ -10,6 +10,8 @@
 # include <fcntl.h>
 # include <string>
 # include <map>
+# include <set>
+# include <vector>
 
 class Server
 {
@@ -17,21 +19,28 @@ class Server
 		Server(int port);
 		~Server(void);
 
-		void run_server(void);
-		void prepareWrite(int fd, const char* data, size_t length);
+		void	RunServer(void);
+		void	SendMessageToClient(int fd, const char* data, size_t length);
+		void	CloseClientConnection(int fd);
+		void	CloseAllClientConnection(void);
+
 	private:
 		Server(void);
 		Server(const Server& source);
 		Server&	operator=(const Server& source);
 
-		void waitEvent(void);
-		void acceptConnection(void);
-		void handleRead(int fd);
-		void handleWrite(int fd);
+		void	waitEvent(void);
+		void	acceptConnection(void);
+		void	handleRead(int fd);
+		void	executeHooks(int clientFd, std::string message);
+		void	handleWrite(int fd);
 
-		int							server_fd;
-		int							kq;
-		std::map<int, std::string>	write_buffers;
+		int							mServerFd;
+		int							mKq;
+		std::map<int, char[1024]>	mReadSocketBuffers;
+		std::map<int, std::string>	mReadBuffers;
+		std::map<int, std::string>	mWriteBuffers;
+		std::set<int>				mClientFds;
+		std::vector<struct kevent>	mWriteEvents;
 };
 #endif
-
