@@ -1,23 +1,22 @@
 #include <sys/socket.h>
-#include <stdexcept>
-#include <string>
+#include <sys/event.h>
+#include <sys/types.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <netinet/in.h>
-#include <sys/event.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include <ctime>
 #include <cerrno>
+#include <stdexcept>
+#include <string>
 #include "Server.hpp"
+#include "Message/Message.hpp"
 
 namespace
 {
 	struct timespec	make_timespec(long seconds, long nanoseconds);
-	int				xKevent(int mKq, const struct kevent *changelist, int nchanges,
-							struct kevent *eventlist, int nevents, const struct timespec *timeout);
+	int				xKevent(int mKq, const struct kevent *changelist,
+							int nchanges, struct kevent *eventlist,
+							int nevents, const struct timespec *timeout);
 }
 
 Server::Server(int port)
@@ -84,22 +83,22 @@ void	Server::RunServer(void)
 	}
 }
 
-void	Server::SendMessageToClient(int fd, const char* data, size_t length)
+void	Server::SendMessageToClient(int clientFd, const char* data, size_t length)
 {
-	mWriteBuffers[fd].append(data, length);
+	mWriteBuffers[clientFd].append(data, length);
 
 	struct kevent	ev;
-	EV_SET(&ev, fd, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
+	EV_SET(&ev, clientFd, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
 	mWriteEvents.push_back(ev);
 }
 
-void	Server::CloseClientConnection(int fd)
+void	Server::CloseClientConnection(int clientFd)
 {
-	close(fd);
-	mClientFds.erase(fd);
-	mReadBuffers.erase(fd);
-	mReadSocketBuffers.erase(fd);
-	mWriteBuffers.erase(fd);
+	close(clientFd);
+	mClientFds.erase(clientFd);
+	mReadBuffers.erase(clientFd);
+	mReadSocketBuffers.erase(clientFd);
+	mWriteBuffers.erase(clientFd);
 }
 
 void	Server::CloseAllClientConnection(void)
@@ -112,10 +111,10 @@ void	Server::CloseAllClientConnection(void)
 
 void	Server::waitEvent(void)
 {
-	const int				MAX_EVENTS = 10;
-	struct kevent			events[MAX_EVENTS];
-	int						nev = xKevent(mKq, &mWriteEvents[0], mWriteEvents.size(),
-										  events, MAX_EVENTS, NULL);
+	const int		MAX_EVENTS = 10;
+	struct kevent	events[MAX_EVENTS];
+	int				nev = xKevent(mKq, &mWriteEvents[0], mWriteEvents.size(),
+								  events, MAX_EVENTS, NULL);
 
 	mWriteEvents.clear();
 	for (int i = 0; i < nev; i++)
@@ -142,7 +141,8 @@ void Server::acceptConnection(void)
 {
 	struct sockaddr_in	clientAddr;
 	socklen_t			clientLen = sizeof(clientAddr);
-	int					clientFd = accept(mServerFd, (struct sockaddr*)&clientAddr, &clientLen);
+	int					clientFd = accept(mServerFd, (struct sockaddr*)&clientAddr,
+										  &clientLen);
 
 	if (clientFd >= 0)
 	{
@@ -155,46 +155,50 @@ void Server::acceptConnection(void)
 	}
 }
 
-void Server::handleRead(int fd)
+void Server::handleRead(int clientFd)
 {
-	static const size_t		bufferSize = 1024;
-	ssize_t					bytes_read = read(fd, mReadSocketBuffers[fd], bufferSize - 1);
+	static const size_t		bufferSize = M_READ_BUFFER_SIZE;
+	ssize_t					bytes_read = read(clientFd, mReadSocketBuffers[clientFd],
+											  bufferSize - 1);
 
-	mReadSocketBuffers[fd][bytes_read] = '\0';
+	mReadSocketBuffers[clientFd][bytes_read] = '\0';
 
 	if (bytes_read > 0)
 	{
-		mReadBuffers[fd].append(mReadSocketBuffers[fd]);
-		size_t	end_of_msg = mReadBuffers[fd].find("\r\n");
-		if (end_of_msg == std::string::npos || mReadBuffers[fd].size() > 512)
+		mReadBuffers[clientFd].append(mReadSocketBuffers[clientFd]);
+		size_t	end_of_msg = mReadBuffers[clientFd].find("\r\n");
+		if (end_of_msg == std::string::npos || mReadBuffers[clientFd].size() > 512)
 		{
-			CloseClientConnection(fd);
+			CloseClientConnection(clientFd);
 			return ;
 		}
-		std::string message = mReadBuffers[fd].substr(0, end_of_msg);
-		mReadBuffers[fd].erase(0, end_of_msg + 2);
-		executeHooks(fd, message);
+		std::string message = mReadBuffers[clientFd].substr(0, end_of_msg);
+		mReadBuffers[clientFd].erase(0, end_of_msg + 2);
+		executeHooks(clientFd, message);
 	}
 	else
 	{
-		CloseClientConnection(fd);
+		CloseClientConnection(clientFd);
 	}
 }
 
-/* TODO
- * 훅 구현하기
- */
 void	Server::executeHooks(int clientFd, std::string message)
 {
+	Message	parser;
+
+	if (parser.ParseMessage(message))
+	{
+		//훅 처리
+	}
 }
 
-void	Server::handleWrite(int fd)
+void	Server::handleWrite(int clientFd)
 {
-	std::string&	buffer = mWriteBuffers[fd];
+	std::string&	buffer = mWriteBuffers[clientFd];
 
 	if (!buffer.empty())
 	{
-		ssize_t	bytesSent = write(fd, buffer.c_str(), buffer.size());
+		ssize_t	bytesSent = write(clientFd, buffer.c_str(), buffer.size());
 		if (bytesSent > 0)
 		{
 			buffer.erase(0, bytesSent);
@@ -202,7 +206,7 @@ void	Server::handleWrite(int fd)
 		if (buffer.empty())
 		{
 			struct kevent	ev;
-			EV_SET(&ev, fd, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
+			EV_SET(&ev, clientFd, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
 			xKevent(mKq, &ev, 1, NULL, 0, NULL);
 		}
 	}

@@ -13,6 +13,11 @@
 # include <set>
 # include <vector>
 
+enum ServerConstants
+{
+	M_READ_BUFFER_SIZE = 1024,
+};
+
 class Server
 {
 	public:
@@ -20,8 +25,8 @@ class Server
 		~Server(void);
 
 		void	RunServer(void);
-		void	SendMessageToClient(int fd, const char* data, size_t length);
-		void	CloseClientConnection(int fd);
+		void	SendMessageToClient(int clientFd, const char* data, size_t length);
+		void	CloseClientConnection(int clientFd);
 		void	CloseAllClientConnection(void);
 
 	private:
@@ -31,16 +36,16 @@ class Server
 
 		void	waitEvent(void);
 		void	acceptConnection(void);
-		void	handleRead(int fd);
+		void	handleRead(int clientFd);
 		void	executeHooks(int clientFd, std::string message);
-		void	handleWrite(int fd);
+		void	handleWrite(int clientFd);
 
-		int							mServerFd;
-		int							mKq;
-		std::map<int, char[1024]>	mReadSocketBuffers;
-		std::map<int, std::string>	mReadBuffers;
-		std::map<int, std::string>	mWriteBuffers;
-		std::set<int>				mClientFds;
-		std::vector<struct kevent>	mWriteEvents;
+		int										mServerFd;
+		int										mKq;
+		std::set<int>							mClientFds;
+		std::map<int, char[M_READ_BUFFER_SIZE]>	mReadSocketBuffers;
+		std::map<int, std::string>				mReadBuffers;
+		std::map<int, std::string>				mWriteBuffers;
+		std::vector<struct kevent>				mWriteEvents;
 };
 #endif
