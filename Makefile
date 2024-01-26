@@ -7,12 +7,17 @@ CXXFLAGS	= $(COMMONFLAGS) -Wall -Wextra -Werror -std=c++98
 LDFLAGS		= $(COMMONFLAGS)
 
 NAME	= ircserv
-INCLUDE	=
+INCLUDE	= includes/
 
 
 #sources=======================================================================
 
-SRCS	= main.cpp
+SRCS	= srcs/main.cpp \
+		  srcs/Command/Command.cpp \
+		  srcs/server/FixedBufferArray.cpp \
+		  srcs/server/Message/Message.cpp \
+		  srcs/server/Server.cpp
+
 
 OBJS	= $(SRCS:.cpp=.o)
 

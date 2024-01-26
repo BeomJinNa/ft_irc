@@ -2,6 +2,8 @@
 #include "Command.hpp"
 #include "Message.hpp"
 
+std::map<std::string, Command::CommandFunction> Command::mHookList;
+
 Command::Command(void) {}
 Command::Command(const std::string& command) : mCommand(command) {}
 Command::Command(const Command& source) : mCommand(source.mCommand) {}

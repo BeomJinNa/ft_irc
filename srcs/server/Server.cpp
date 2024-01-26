@@ -11,10 +11,11 @@
 #include "Server.hpp"
 #include "Message.hpp"
 #include "Command.hpp"
+#include "FixedBufferArray.hpp"
+#include "Constant.hpp"
 
 namespace
 {
-	struct timespec	make_timespec(long seconds, long nanoseconds);
 	int				xKevent(int mKq, const struct kevent *changelist,
 							int nchanges, struct kevent *eventlist,
 							int nevents, const struct timespec *timeout);
@@ -41,7 +42,7 @@ Server::Server(int port)
 		throw std::runtime_error("Bind failed");
 	}
 
-	if (listen(mServerFd, 10) < 0)
+	if (listen(mServerFd, M_SERVER_LISTEN_BACKLOG_QUEUE_SIZE) < 0)
 	{
 		close(mServerFd);
 		throw std::runtime_error("Listen failed");
@@ -127,7 +128,7 @@ Server& Server::GetInstance(void)
 
 void	Server::waitEvent(void)
 {
-	const int		MAX_EVENTS = 10;
+	const int		MAX_EVENTS = M_SERVER_KQUEUE_EVENT_BUFFER_SIZE;
 	struct kevent	events[MAX_EVENTS];
 	int				nev = xKevent(mKq, &mWriteEvents[0], mWriteEvents.size(),
 								  events, MAX_EVENTS, NULL);
@@ -173,15 +174,15 @@ void Server::acceptConnection(void)
 
 void Server::handleRead(int clientFd)
 {
-	static const size_t		bufferSize = M_READ_BUFFER_SIZE;
-	ssize_t					bytes_read = read(clientFd, mReadSocketBuffers[clientFd],
+	static const size_t		bufferSize = M_SERVER_READ_BUFFER_SIZE;
+	ssize_t					bytes_read = read(clientFd, mReadSocketBuffers[clientFd].buffer,
 											  bufferSize - 1);
 
-	mReadSocketBuffers[clientFd][bytes_read] = '\0';
+	mReadSocketBuffers[clientFd].buffer[bytes_read] = '\0';
 
 	if (bytes_read > 0)
 	{
-		mReadBuffers[clientFd].append(mReadSocketBuffers[clientFd]);
+		mReadBuffers[clientFd].append(mReadSocketBuffers[clientFd].buffer);
 		size_t	end_of_msg = mReadBuffers[clientFd].find("\r\n");
 		if (end_of_msg == std::string::npos || mReadBuffers[clientFd].size() > 512)
 		{
@@ -232,16 +233,6 @@ void	Server::handleWrite(int clientFd)
 
 namespace
 {
-	struct timespec	make_timespec(long seconds, long nanoseconds)
-	{
-		struct timespec	ts;
-
-		ts.tv_sec = seconds;
-		ts.tv_nsec = nanoseconds;
-
-		return (ts);
-	}
-
 	int	xKevent(int mKq, const struct kevent *changelist, int nchanges,
 			struct kevent *eventlist, int nevents, const struct timespec *timeout)
 	{

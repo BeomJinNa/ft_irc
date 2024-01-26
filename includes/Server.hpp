@@ -13,10 +13,7 @@
 # include <set>
 # include <vector>
 
-enum ServerConstants
-{
-	M_READ_BUFFER_SIZE = 1024,
-};
+class FixedBufferArray;
 
 class Server
 {
@@ -45,14 +42,14 @@ class Server
 		void	executeHooks(int clientFd, std::string message);
 		void	handleWrite(int clientFd);
 
-		int										mServerFd;
-		int										mKq;
-		std::set<int>							mClientFds;
-		std::map<int, char[M_READ_BUFFER_SIZE]>	mReadSocketBuffers;
-		std::map<int, std::string>				mReadBuffers;
-		std::map<int, std::string>				mWriteBuffers;
-		std::vector<struct kevent>				mWriteEvents;
+		int								mServerFd;
+		int								mKq;
+		std::set<int>					mClientFds;
+		std::map<int, FixedBufferArray>	mReadSocketBuffers;
+		std::map<int, std::string>		mReadBuffers;
+		std::map<int, std::string>		mWriteBuffers;
+		std::vector<struct kevent>		mWriteEvents;
 
-		std::string								mPassword;
+		std::string						mPassword;
 };
 #endif
