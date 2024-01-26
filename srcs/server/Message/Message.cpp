@@ -24,17 +24,25 @@ Message&	Message::operator=(const Message& source)
 
 Message::~Message(void) {}
 
-std::string&				Message::GetPrefix(void)		{ return (mPrefix); }
-std::string&				Message::GetCommand(void)		{ return (mCommand); }
-std::vector<std::string>&	Message::GetParameters(void)	{ return (mParameters); }
-std::string&				Message::GetTrailing(void)		{ return (mTrailing); }
+int								Message::GetClientFd(void)				{ return (mClientFd); }
+std::string&					Message::GetPrefix(void)				{ return (mPrefix); }
+const std::string&				Message::GetPrefix(void) const			{ return (mPrefix); }
+std::string&					Message::GetCommand(void)				{ return (mCommand); }
+const std::string&				Message::GetCommand(void) const			{ return (mCommand); }
+std::vector<std::string>&		Message::GetParameters(void)			{ return (mParameters); }
+const std::vector<std::string>&	Message::GetParameters(void) const		{ return (mParameters); }
+std::string&					Message::GetTrailing(void)				{ return (mTrailing); }
+const std::string&				Message::GetTrailing(void) const		{ return (mTrailing); }
+std::string&					Message::GetRawMessageData(void)		{ return (mRawMessage); }
+const std::string&				Message::GetRawMessageData(void) const	{ return (mRawMessage); }
 
-bool	Message::ParseMessage(std::string& message)
+bool	Message::ParseMessage(int clientFd, std::string& message)
 {
 	std::istringstream	iss(message);
 	std::string			token;
 
-
+	mRawMessage = message;
+	mClientFd = clientFd;
 	if (!message.empty() && message[0] == ':')
 	{
 		std::getline(iss, mPrefix, ' ');
@@ -47,6 +55,7 @@ bool	Message::ParseMessage(std::string& message)
 		mCommand.clear();
 		mParameters.clear();
 		mTrailing.clear();
+		mRawMessage.clear();
 		return (false);
 	}
 

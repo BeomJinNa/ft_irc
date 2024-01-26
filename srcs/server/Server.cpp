@@ -9,7 +9,8 @@
 #include <stdexcept>
 #include <string>
 #include "Server.hpp"
-#include "Message/Message.hpp"
+#include "Message.hpp"
+#include "Command.hpp"
 
 namespace
 {
@@ -17,6 +18,7 @@ namespace
 	int				xKevent(int mKq, const struct kevent *changelist,
 							int nchanges, struct kevent *eventlist,
 							int nevents, const struct timespec *timeout);
+	Server*			TouchInstanceData(Server* address);
 }
 
 Server::Server(int port)
@@ -60,6 +62,7 @@ Server::Server(int port)
 		close(mKq);
 		throw std::runtime_error("Failed to add server socket event to mKqueue");
 	}
+	TouchInstanceData(this);
 }
 
 Server::~Server(void)
@@ -107,6 +110,19 @@ void	Server::CloseAllClientConnection(void)
 	{
 		Server::CloseClientConnection(*it);
 	}
+}
+
+void				Server::SetServerPassword(const std::string& password) { mPassword = password; }
+std::string&		Server::GetServerPassword(void) { return (mPassword); }
+const std::string&	Server::GetServerPassword(void) const { return (mPassword); }
+
+Server& Server::GetInstance(void)
+{
+	Server*	output = TouchInstanceData(NULL);
+
+	if (output == NULL)
+		throw std::runtime_error("Server Not Found");
+	return (*output);
 }
 
 void	Server::waitEvent(void)
@@ -186,9 +202,11 @@ void	Server::executeHooks(int clientFd, std::string message)
 {
 	Message	parser;
 
-	if (parser.ParseMessage(message))
+	bool	parsingSuccess = parser.ParseMessage(clientFd, message);
+
+	if (parsingSuccess)
 	{
-		//훅 처리
+		Command::ExecuteCommand(parser);
 	}
 }
 
@@ -233,6 +251,19 @@ namespace
 			throw std::runtime_error("kevent failed: " + std::string(strerror(errno)));
 		}
 		return (retval);
+	}
+
+	Server*	TouchInstanceData(Server* address)
+	{
+		static Server*	ServerGlobal = NULL;
+
+		if (address != NULL)
+		{
+			ServerGlobal = address;
+			return (NULL);
+		}
+
+		return (ServerGlobal);
 	}
 }
 

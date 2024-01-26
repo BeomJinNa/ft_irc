@@ -24,10 +24,15 @@ class Server
 		Server(int port);
 		~Server(void);
 
-		void	RunServer(void);
-		void	SendMessageToClient(int clientFd, const char* data, size_t length);
-		void	CloseClientConnection(int clientFd);
-		void	CloseAllClientConnection(void);
+		void				RunServer(void);
+		void				SendMessageToClient(int clientFd, const char* data, size_t length);
+		void				CloseClientConnection(int clientFd);
+		void				CloseAllClientConnection(void);
+		void				SetServerPassword(const std::string& password);
+		std::string&		GetServerPassword(void);
+		const std::string&	GetServerPassword(void) const;
+
+		static Server&	GetInstance(void);
 
 	private:
 		Server(void);
@@ -47,5 +52,7 @@ class Server
 		std::map<int, std::string>				mReadBuffers;
 		std::map<int, std::string>				mWriteBuffers;
 		std::vector<struct kevent>				mWriteEvents;
+
+		std::string								mPassword;
 };
 #endif
