@@ -18,9 +18,9 @@ class UserDB
 		~UserDB(void);
 
 		void				DoNothing(void) const;
-		void				ConnectUser(int clientFd);
+		void				ConnectUser(int clientFd); //Server에서 호출 전용
 
-		void				RemoveUserData(int clientFd);
+		void				RemoveUserData(int clientFd); //Server에서 호출 전용
 		void				DisconnectUser(int clientFd);
 
 		void				SetLoginStatus(int clientFd, bool value);

@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <string>
 #include "Server.hpp"
+#include "UserDB.hpp"
 #include "Message.hpp"
 #include "Command.hpp"
 #include "FixedBufferArray.hpp"
@@ -174,6 +175,7 @@ void Server::acceptConnection(void)
 		EV_SET(&ev, clientFd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
 		xKevent(mKq, &ev, 1, NULL, 0, NULL);
 		mClientFds.insert(clientFd);
+		UserDB::GetInstance().ConnectUser(clientFd);
 	}
 }
 
@@ -183,13 +185,13 @@ void Server::handleRead(int clientFd)
 	ssize_t					bytes_read = read(clientFd, mReadSocketBuffers[clientFd].buffer,
 											  bufferSize - 1);
 
-	mReadSocketBuffers[clientFd].buffer[bytes_read] = '\0';
-
 	if (bytes_read > 0)
 	{
+		mReadSocketBuffers[clientFd].buffer[bytes_read] = '\0';
 		mReadBuffers[clientFd].append(mReadSocketBuffers[clientFd].buffer);
 		size_t	end_of_msg = mReadBuffers[clientFd].find("\r\n");
-		if (end_of_msg == std::string::npos || mReadBuffers[clientFd].size() > 512)
+		if (end_of_msg == std::string::npos
+			|| mReadBuffers[clientFd].size() > M_IRC_MAX_MESSAGE_LENGTH)
 		{
 			CloseClientConnection(clientFd);
 			return ;
@@ -198,8 +200,11 @@ void Server::handleRead(int clientFd)
 		mReadBuffers[clientFd].erase(0, end_of_msg + 2);
 		executeHooks(clientFd, message);
 	}
-	else
+	else if (bytes_read == 0 || (bytes_read == -1 && errno == ECONNRESET))
 	{
+		UserDB::GetInstance().RemoveUserData(clientFd);
+		//TODO
+		//Channel DB에도 자원 회수 요청을 해야함
 		CloseClientConnection(clientFd);
 	}
 }
