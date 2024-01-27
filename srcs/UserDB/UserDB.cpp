@@ -28,9 +28,6 @@ void	UserDB::RemoveUserData(int clientFd)
 
 	if (it != mDataBase.end())
 	{
-		//TODO
-		//Channel DB에 해당 유저의 자원 회수 요청이 이 부분에 추가되어야 함
-
 		mReferenceTableNickName.erase(it->second.GetNickName());
 		mReferenceTableUserName.erase(it->second.GetUserName());
 		mDataBase.erase(it);
@@ -40,6 +37,8 @@ void	UserDB::RemoveUserData(int clientFd)
 void	UserDB::DisconnectUser(int clientFd)
 {
 	RemoveUserData(clientFd);
+	//TODO
+	//Channel DB에 해당 유저의 자원 회수 요청이 이 부분에 추가되어야 함
 
 	Server& ircServer = Server::GetInstance();
 	ircServer.CloseClientConnection(clientFd);

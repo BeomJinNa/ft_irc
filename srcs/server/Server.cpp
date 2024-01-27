@@ -182,7 +182,8 @@ void Server::acceptConnection(void)
 void Server::handleRead(int clientFd)
 {
 	static const size_t		bufferSize = M_SERVER_READ_BUFFER_SIZE;
-	ssize_t					bytes_read = read(clientFd, mReadSocketBuffers[clientFd].buffer,
+	ssize_t					bytes_read = read(clientFd,
+											  mReadSocketBuffers[clientFd].buffer,
 											  bufferSize - 1);
 
 	if (bytes_read > 0)

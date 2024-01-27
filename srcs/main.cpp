@@ -2,6 +2,7 @@
 #include <sstream>
 #include "Server.hpp"
 #include "UserDB.hpp"
+#include "ChannelDB.hpp"
 #include "Command.hpp"
 
 namespace
@@ -9,6 +10,7 @@ namespace
 	int		parsePortNumber(char* argv[]);
 	bool	initServer(Server* server, int port);
 	bool	initUserDatabase(UserDB* Database);
+	bool	initChannelDatabase(ChannelDB* Database);
 	void	addHooks(void);
 }
 
@@ -44,11 +46,21 @@ int	main(int argc, char* argv[])
 		return (1);
 	}
 
+	ChannelDB*	channelDB = NULL;
+	errorOccured = initChannelDatabase(channelDB);
+	if (errorOccured)
+	{
+		delete userDB;
+		delete ircServer;
+		return (1);
+	}
+
 	addHooks();
 
 	ircServer->SetServerPassword(password);
 	ircServer->RunServer();
 
+	delete channelDB;
 	delete userDB;
 	delete ircServer;
 
@@ -103,6 +115,23 @@ namespace
 		catch (const std::exception& e)
 		{
 			std::cerr << "User Database initialization failed: "
+					  << e.what() << std::endl;
+			return (true);
+		}
+
+		Database->DoNothing();
+		return (false);
+	}
+
+	bool	initChannelDatabase(ChannelDB* Database)
+	{
+		try
+		{
+			Database = new ChannelDB();
+		}
+		catch (const std::exception& e)
+		{
+			std::cerr << "Channel Database initialization failed: "
 					  << e.what() << std::endl;
 			return (true);
 		}

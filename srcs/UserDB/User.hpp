@@ -45,9 +45,4 @@ class User
 		std::string				mNickName;
 		std::vector<Channel*>	mJoinedChannels;
 };
-/*
- * std::map의 사용 조건을 충족하기 위해 복사 생성자와 복사 대입 연산자가 구현되어
- * 있습니다. 특별한 목적이 아니라면 User 객체의 복사 생성자 혹은 복사 대입 연산자
- * 사용은 하지 않는 것이 좋습니다.
- */
 #endif
