@@ -9,14 +9,17 @@ LDFLAGS		= $(COMMONFLAGS)
 NAME	= ircserv
 INCLUDE	= includes/
 
-
 #sources=======================================================================
 
 SRCS	= srcs/main.cpp \
 		  srcs/Command/Command.cpp \
-		  srcs/server/FixedBufferArray.cpp \
-		  srcs/server/Message/Message.cpp \
-		  srcs/server/Server.cpp
+		  srcs/ConstString.cpp \
+		  srcs/Server/FixedBufferArray.cpp \
+		  srcs/Server/Message/Message.cpp \
+		  srcs/Server/Server.cpp \
+		  srcs/UserDB/User.cpp \
+		  srcs/UserDB/UserDB.cpp \
+		  srcs/hooks/JOIN/join.cpp
 
 
 OBJS	= $(SRCS:.cpp=.o)

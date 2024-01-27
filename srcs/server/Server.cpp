@@ -87,9 +87,10 @@ void	Server::RunServer(void)
 	}
 }
 
-void	Server::SendMessageToClient(int clientFd, const char* data, size_t length)
+void	Server::SendMessageToClient(int clientFd, const char* data,
+									size_t dataLength)
 {
-	mWriteBuffers[clientFd].append(data, length);
+	mWriteBuffers[clientFd].append(data, dataLength);
 
 	struct kevent	ev;
 	EV_SET(&ev, clientFd, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
@@ -98,22 +99,26 @@ void	Server::SendMessageToClient(int clientFd, const char* data, size_t length)
 
 void	Server::CloseClientConnection(int clientFd)
 {
-	close(clientFd);
-	mClientFds.erase(clientFd);
-	mReadBuffers.erase(clientFd);
-	mReadSocketBuffers.erase(clientFd);
-	mWriteBuffers.erase(clientFd);
+	if (close(clientFd) == 0)
+	{
+		mClientFds.erase(clientFd);
+		mReadBuffers.erase(clientFd);
+		mReadSocketBuffers.erase(clientFd);
+		mWriteBuffers.erase(clientFd);
+	}
 }
 
 void	Server::CloseAllClientConnection(void)
 {
-	for (std::set<int>::iterator it = mClientFds.begin(); it != mClientFds.end(); ++it)
+	for (std::set<int>::iterator it = mClientFds.begin();
+		 it != mClientFds.end(); ++it)
 	{
 		Server::CloseClientConnection(*it);
 	}
 }
 
-void				Server::SetServerPassword(const std::string& password) { mPassword = password; }
+void				Server::SetServerPassword(const std::string& password)
+						{ mPassword = password; }
 std::string&		Server::GetServerPassword(void) { return (mPassword); }
 const std::string&	Server::GetServerPassword(void) const { return (mPassword); }
 
@@ -258,6 +263,7 @@ namespace
 	}
 }
 
+void	Server::DoNothing(void) const {}
 Server::Server(void) {}
 Server::Server(const Server& source) { (void)source; }
 Server&	Server::operator=(const Server& source)
