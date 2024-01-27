@@ -13,14 +13,13 @@ INCLUDE	= includes/
 
 SRCS	= srcs/main.cpp \
 		  srcs/Command/Command.cpp \
+		  srcs/Command/hooks/JOIN/join.cpp \
 		  srcs/ConstString.cpp \
 		  srcs/Server/FixedBufferArray.cpp \
 		  srcs/Server/Message/Message.cpp \
 		  srcs/Server/Server.cpp \
 		  srcs/UserDB/User.cpp \
-		  srcs/UserDB/UserDB.cpp \
-		  srcs/hooks/JOIN/join.cpp
-
+		  srcs/UserDB/UserDB.cpp
 
 OBJS	= $(SRCS:.cpp=.o)
 
