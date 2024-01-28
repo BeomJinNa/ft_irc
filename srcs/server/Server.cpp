@@ -204,8 +204,6 @@ void Server::handleRead(int clientFd)
 	else if (bytes_read == 0 || (bytes_read == -1 && errno == ECONNRESET))
 	{
 		UserDB::GetInstance().RemoveUserData(clientFd);
-		//TODO
-		//Channel DB에도 자원 회수 요청을 해야함
 		CloseClientConnection(clientFd);
 	}
 }

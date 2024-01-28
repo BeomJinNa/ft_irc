@@ -12,9 +12,12 @@ INCLUDE	= includes/
 #sources=======================================================================
 
 SRCS	= srcs/main.cpp \
+		  srcs/ChannelDB/Channel.cpp \
+		  srcs/ChannelDB/ChannelDB.cpp \
 		  srcs/Command/Command.cpp \
 		  srcs/Command/hooks/JOIN/join.cpp \
 		  srcs/ConstString.cpp \
+		  srcs/IndexManager/IndexManager.cpp \
 		  srcs/Server/FixedBufferArray.cpp \
 		  srcs/Server/Message/Message.cpp \
 		  srcs/Server/Server.cpp \

@@ -3,14 +3,16 @@
 
 User::User(void)
 	: mClientFd(-1)
+	, mSocketFd(-1)
 	, mIsLoggedIn(false)
 	, mIsUserNameSet(false)
 	, mIsNickNameSet(false)
 {
 }
 
-User::User(int clientFd)
+User::User(int clientFd, int socketFd)
 	: mClientFd(clientFd)
+	, mSocketFd(socketFd)
 	, mIsLoggedIn(false)
 	, mIsUserNameSet(false)
 	, mIsNickNameSet(false)
@@ -19,6 +21,7 @@ User::User(int clientFd)
 
 User::User(const User& source)
 	: mClientFd(source.mClientFd)
+	, mSocketFd(source.mSocketFd)
 	, mIsLoggedIn(source.mIsLoggedIn)
 	, mIsUserNameSet(source.mIsUserNameSet)
 	, mIsNickNameSet(source.mIsNickNameSet)
@@ -33,6 +36,7 @@ User&	User::operator=(const User& source)
 	if (this != &source)
 	{
 		mClientFd = source.mClientFd;
+		mSocketFd = source.mSocketFd;
 		mIsLoggedIn = source.mIsLoggedIn;
 		mIsUserNameSet = source.mIsUserNameSet;
 		mIsNickNameSet = source.mIsNickNameSet;
@@ -48,6 +52,9 @@ User::~User(void) {}
 
 void				User::SetClientFd(int value) { mClientFd = value; }
 int					User::GetClientFd(void) const { return (mClientFd); }
+
+void				User::SetSocketFd(int value) { mSocketFd = value; }
+int					User::GetSocketFd(void) const { return (mSocketFd); }
 
 void				User::SetLoginStatus(bool value) { mIsLoggedIn = value; }
 bool				User::GetLoginStatus(void) const { return (mIsLoggedIn); }

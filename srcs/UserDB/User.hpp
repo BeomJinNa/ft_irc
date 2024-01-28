@@ -11,13 +11,16 @@ class User
 {
 	public:
 		User(void);
-		User(int clientFd);
+		User(int clientFd, int socketFd);
 		User(const User& source);
 		User&	operator=(const User& source);
 		~User(void);
 
 		void				SetClientFd(int value);
 		int					GetClientFd(void) const;
+
+		void				SetSocketFd(int value);
+		int					GetSocketFd(void) const;
 
 		void				SetLoginStatus(bool value);
 		bool				GetLoginStatus(void) const;
@@ -38,6 +41,7 @@ class User
 
 	private:
 		int						mClientFd;
+		int						mSocketFd;
 		bool					mIsLoggedIn;
 		bool					mIsUserNameSet;
 		bool					mIsNickNameSet;

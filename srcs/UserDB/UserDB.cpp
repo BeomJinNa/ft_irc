@@ -8,40 +8,54 @@ namespace
 }
 
 UserDB::UserDB(void)
+	: mIndex(100000)
 {
 	TouchInstanceData(this);
 }
 
 UserDB::~UserDB(void) {}
 
-void	UserDB::ConnectUser(int clientFd)
+void	UserDB::ConnectUser(int socketFd)
 {
-	if (clientFd >= 0)
+	if (socketFd >= 0)
 	{
+		int clientFd = mIndex.GetNewIndex();
 		mDataBase[clientFd].SetClientFd(clientFd);
+		mDataBase[clientFd].SetSocketFd(socketFd);
 	}
 }
 
-void	UserDB::RemoveUserData(int clientFd)
+int	UserDB::RemoveUserData(int clientFd)
 {
 	const DB::iterator&	it = mDataBase.find(clientFd);
+	int					socketFd;
 
 	if (it != mDataBase.end())
 	{
+		socketFd = it->second.GetSocketFd();
+
+	//TODO
+	//Channel DB에 해당 유저의 자원 회수 요청이 이 부분에 추가되어야 함
+
 		mReferenceTableNickName.erase(it->second.GetNickName());
 		mReferenceTableUserName.erase(it->second.GetUserName());
 		mDataBase.erase(it);
+		mIndex.DeactivateIndex(clientFd);
+
+		return (socketFd);
 	}
+	return (-1);
 }
 
 void	UserDB::DisconnectUser(int clientFd)
 {
-	RemoveUserData(clientFd);
-	//TODO
-	//Channel DB에 해당 유저의 자원 회수 요청이 이 부분에 추가되어야 함
+	int	socketFd = RemoveUserData(clientFd);
 
-	Server& ircServer = Server::GetInstance();
-	ircServer.CloseClientConnection(clientFd);
+	if (socketFd >= 0)
+	{
+		Server& ircServer = Server::GetInstance();
+		ircServer.CloseClientConnection(socketFd);
+	}
 }
 
 int	UserDB::GetClientFdByUserName(const std::string& userName) const
