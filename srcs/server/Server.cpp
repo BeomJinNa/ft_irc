@@ -175,7 +175,12 @@ void Server::acceptConnection(void)
 		EV_SET(&ev, clientFd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
 		xKevent(mKq, &ev, 1, NULL, 0, NULL);
 		mClientFds.insert(clientFd);
-		UserDB::GetInstance().ConnectUser(clientFd);
+
+		bool isConnectionAvailable = UserDB::GetInstance().ConnectUser(clientFd);
+		if (isConnectionAvailable == false)
+		{
+			close(clientFd);
+		}
 	}
 }
 

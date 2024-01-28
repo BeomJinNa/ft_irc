@@ -3,7 +3,7 @@
 # define USER_HPP
 
 # include <string>
-# include <vector>
+# include <set>
 
 class Channel;
 
@@ -39,14 +39,17 @@ class User
 		void				SetFlagNickNameSet(bool value);
 		bool				GetFlagNickNameSet(void) const;
 
+		void				AddChannelInJoinnedList(int channelId);
+		void				RemoveChannelInJoinnedList(int channelId);
+
 	private:
-		int						mClientFd;
-		int						mSocketFd;
-		bool					mIsLoggedIn;
-		bool					mIsUserNameSet;
-		bool					mIsNickNameSet;
-		std::string				mUserName;
-		std::string				mNickName;
-		std::vector<Channel*>	mJoinedChannels;
+		int				mClientFd;
+		int				mSocketFd;
+		bool			mIsLoggedIn;
+		bool			mIsUserNameSet;
+		bool			mIsNickNameSet;
+		std::string		mUserName;
+		std::string		mNickName;
+		std::set<int>	mJoinedChannels;
 };
 #endif

@@ -1,4 +1,5 @@
 #include <string>
+#include <algorithm>
 #include "User.hpp"
 
 User::User(void)
@@ -72,3 +73,29 @@ bool				User::GetFlagUserNameSet(void) const { return (mIsUserNameSet); }
 
 void				User::SetFlagNickNameSet(bool value) { mIsNickNameSet = value; }
 bool				User::GetFlagNickNameSet(void) const { return (mIsNickNameSet); }
+
+void	User::AddChannelInJoinnedList(int channelId)
+{
+	std::set<int>::iterator	it = std::find(mJoinedChannels.begin(),
+										   mJoinedChannels.end(),
+									  	   channelId);
+
+	if (it == mJoinedChannels.end())
+	{
+		return ;
+	}
+	mJoinedChannels.insert(channelId);
+}
+
+void	User::RemoveChannelInJoinnedList(int channelId)
+{
+	std::set<int>::iterator	it = std::find(mJoinedChannels.begin(),
+										   mJoinedChannels.end(),
+										   channelId);
+
+	if (it == mJoinedChannels.end())
+	{
+		return ;
+	}
+	mJoinedChannels.erase(it);
+}

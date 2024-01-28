@@ -1,6 +1,7 @@
 #include "UserDB.hpp"
 #include "User.hpp"
 #include "Server.hpp"
+#include "ChannelDB.hpp"
 
 namespace
 {
@@ -15,41 +16,46 @@ UserDB::UserDB(void)
 
 UserDB::~UserDB(void) {}
 
-void	UserDB::ConnectUser(int socketFd)
+bool	UserDB::ConnectUser(int socketFd)
 {
 	if (socketFd >= 0)
 	{
-		int clientFd = mIndex.GetNewIndex();
-		mDataBase[clientFd].SetClientFd(clientFd);
-		mDataBase[clientFd].SetSocketFd(socketFd);
+		int userId = mIndex.GetNewIndex();
+		if (userId < 0)
+		{
+			return (false);
+		}
+		mDataBase[userId].SetClientFd(userId);
+		mDataBase[userId].SetSocketFd(socketFd);
+		return (true);
 	}
+	return (false);
 }
 
-int	UserDB::RemoveUserData(int clientFd)
+int	UserDB::RemoveUserData(int userId)
 {
-	const DB::iterator&	it = mDataBase.find(clientFd);
+	const DB::iterator&	it = mDataBase.find(userId);
 	int					socketFd;
 
 	if (it != mDataBase.end())
 	{
 		socketFd = it->second.GetSocketFd();
 
-	//TODO
-	//Channel DB에 해당 유저의 자원 회수 요청이 이 부분에 추가되어야 함
-
 		mReferenceTableNickName.erase(it->second.GetNickName());
 		mReferenceTableUserName.erase(it->second.GetUserName());
 		mDataBase.erase(it);
-		mIndex.DeactivateIndex(clientFd);
+		mIndex.DeactivateIndex(userId);
+
+		ChannelDB::GetInstance().DeleteUserInAllChannels(userId);
 
 		return (socketFd);
 	}
 	return (-1);
 }
 
-void	UserDB::DisconnectUser(int clientFd)
+void	UserDB::DisconnectUser(int userId)
 {
-	int	socketFd = RemoveUserData(clientFd);
+	int	socketFd = RemoveUserData(userId);
 
 	if (socketFd >= 0)
 	{
@@ -58,7 +64,46 @@ void	UserDB::DisconnectUser(int clientFd)
 	}
 }
 
-int	UserDB::GetClientFdByUserName(const std::string& userName) const
+void	UserDB::WriteChannelInUserData(int userId, int channelId)
+{
+	DB::iterator	it = mDataBase.find(userId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+	it->second.AddChannelInJoinnedList(channelId);
+}
+
+bool	UserDB::AddChannelInUserList(int userId, int channelId)
+{
+	bool	IsUserInChannel
+	= ChannelDB::GetInstance().AddUserInChannel(channelId, userId);
+
+	return (IsUserInChannel);
+}
+
+void	UserDB::RemoveChannelInUserList(int userId, int channelId)
+{
+	DB::iterator	it = mDataBase.find(userId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+	it->second.RemoveChannelInJoinnedList(channelId);
+	ChannelDB::GetInstance().RemoveUserInChannel(channelId, userId);
+}
+
+void	UserDB::RemoveChannelInAllUsers(int channelId)
+{
+	for (DB::iterator it = mDataBase.begin(); it != mDataBase.end(); ++it)
+	{
+		it->second.RemoveChannelInJoinnedList(channelId);
+	}
+}
+
+int	UserDB::GetUserIdByUserName(const std::string& userName) const
 {
 	const RefDB::const_iterator&	it
 		= mReferenceTableUserName.find(userName);
@@ -71,7 +116,7 @@ int	UserDB::GetClientFdByUserName(const std::string& userName) const
 	return (-1);
 }
 
-int	UserDB::GetClientFdByNickName(const std::string& nickName) const
+int	UserDB::GetUserIdByNickName(const std::string& nickName) const
 {
 	const RefDB::const_iterator&	it
 		= mReferenceTableNickName.find(nickName);
@@ -84,9 +129,9 @@ int	UserDB::GetClientFdByNickName(const std::string& nickName) const
 	return (-1);
 }
 
-void	UserDB::SetLoginStatus(int clientFd, bool value)
+void	UserDB::SetLoginStatus(int userId, bool value)
 {
-	const DB::iterator&	it = mDataBase.find(clientFd);
+	const DB::iterator&	it = mDataBase.find(userId);
 
 	if (it != mDataBase.end())
 	{
@@ -94,9 +139,9 @@ void	UserDB::SetLoginStatus(int clientFd, bool value)
 	}
 }
 
-bool	UserDB::GetLoginStatus(int clientFd) const
+bool	UserDB::GetLoginStatus(int userId) const
 {
-	const DB::const_iterator&	it = mDataBase.find(clientFd);
+	const DB::const_iterator&	it = mDataBase.find(userId);
 
 	if (it != mDataBase.end())
 	{
@@ -105,24 +150,24 @@ bool	UserDB::GetLoginStatus(int clientFd) const
 	return (false);
 }
 
-void	UserDB::SetUserName(int clientFd, const std::string& name)
+void	UserDB::SetUserName(int userId, const std::string& name)
 {
-	const DB::iterator&	it = mDataBase.find(clientFd);
+	const DB::iterator&	it = mDataBase.find(userId);
 
 	if (it != mDataBase.end())
 	{
 		it->second.SetUserName(name);
 		it->second.SetFlagUserNameSet(true);
-		if (clientFd >= 0)
+		if (userId >= 0)
 		{
-			mReferenceTableUserName[name] = clientFd;
+			mReferenceTableUserName[name] = userId;
 		}
 	}
 }
 
-const std::string&	UserDB::GetUserName(int clientFd) const
+const std::string&	UserDB::GetUserName(int userId) const
 {
-	const DB::const_iterator&	it = mDataBase.find(clientFd);
+	const DB::const_iterator&	it = mDataBase.find(userId);
 
 	if (it != mDataBase.end())
 	{
@@ -132,24 +177,24 @@ const std::string&	UserDB::GetUserName(int clientFd) const
 }
 
 
-void	UserDB::SetNickName(int clientFd, const std::string& name)
+void	UserDB::SetNickName(int userId, const std::string& name)
 {
-	const DB::iterator&	it = mDataBase.find(clientFd);
+	const DB::iterator&	it = mDataBase.find(userId);
 
 	if (it != mDataBase.end())
 	{
 		it->second.SetNickName(name);
 		it->second.SetFlagNickNameSet(true);
-		if (clientFd >= 0)
+		if (userId >= 0)
 		{
-			mReferenceTableNickName[name] = clientFd;
+			mReferenceTableNickName[name] = userId;
 		}
 	}
 }
 
-const std::string&	UserDB::GetNickName(int clientFd) const
+const std::string&	UserDB::GetNickName(int userId) const
 {
-	const DB::const_iterator&	it = mDataBase.find(clientFd);
+	const DB::const_iterator&	it = mDataBase.find(userId);
 
 	if (it != mDataBase.end())
 	{
@@ -158,9 +203,9 @@ const std::string&	UserDB::GetNickName(int clientFd) const
 	throw std::out_of_range("Can not get nickname that doesn't exist");
 }
 
-bool	UserDB::IsUserAuthorized(int clientFd) const
+bool	UserDB::IsUserAuthorized(int userId) const
 {
-	const DB::const_iterator&	it = mDataBase.find(clientFd);
+	const DB::const_iterator&	it = mDataBase.find(userId);
 
 	if (it != mDataBase.end())
 		return (it->second.GetFlagUserNameSet()

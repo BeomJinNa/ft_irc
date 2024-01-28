@@ -9,21 +9,37 @@
 class Channel
 {
 	public:
+		typedef std::set<int>	DB;
+
 		Channel(void);
-		Channel(const std::string& channelName);
+		Channel(int channelId, const std::string& channelName);
 		Channel(const Channel& source);
 		Channel&	operator=(const Channel& source);
 		~Channel(void);
 
-		std::vector<int>	GetActiveUserList(void) const;
-		std::vector<int>	GetOperatorList(void) const;
-		std::vector<int>	GetBanUserList(void) const;
+							//성공 여부 반환
+		bool				SetMaxActiveUsers(unsigned int maxUsers);
+		unsigned int		GetMaxActiveUsers(void) const;
+
+		void				RemoveUserData(int userId);
+							//성공 여부 반환
+		bool				AddActiveUser(int userId);
+		void				RemoveActiveUser(int userId);
+
+							//성공 여부 반환
+		bool				AddOperator(int userId);
+		void				RemoveOperator(int userId);
+		bool				IsUserOperator(int userId) const;
+
+		void				AddBanUser(int userId);
+		void				RemoveBanUser(int userId);
+		bool				IsUserBanned(int userId) const;
+
+		void				SetChannelId(int id);
+		unsigned int		GetChannelId(void) const;
 
 		void				SetChannelMode(unsigned int mode);
 		unsigned int		GetChannelMode(void) const;
-
-		void				SetMaxActiveUsers(unsigned int maxUsers);
-		unsigned int		GetMaxActiveUsers(void) const;
 
 		void				SetPassword(const std::string& password);
 		std::string&		GetPassword(void);
@@ -33,30 +49,21 @@ class Channel
 		std::string&		GetTopic(void);
 		const std::string&	GetTopic(void) const;
 
-		void				AddActiveUser(int userId);
-		void				RemoveActiveUser(int userId);
-
-		void				AddOperator(int userId);
-		void				RemoveOperator(int userId);
-
-		void				AddBanUser(int userId);
-		void				RemoveBanUser(int userId);
+		std::vector<int>	GetActiveUserList(void) const;
+		std::vector<int>	GetOperatorList(void) const;
+		std::vector<int>	GetBanUserList(void) const;
 
 	private:
+		int				mChannelId;
 		std::string		mName;
 		unsigned int	mChannelMode;
 		unsigned int	mMaxActiveUsers;
+		unsigned int	mCurrentActiveUsers;
 		std::string		mPassword;
 		std::string		mTopic;
 
-		std::set<int>	mActiveUserList;
-		std::set<int>	mOperatorList;
-		std::set<int>	mBanUserList;
-};
-
-enum ChannelMode
-{
-	M_FLAG_CHANNEL_INVITE_ONLY			= 1 << 0,
-	M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY	= 1 << 1,
+		DB				mActiveUserList;
+		DB				mOperatorList;
+		DB				mBanUserList;
 };
 #endif

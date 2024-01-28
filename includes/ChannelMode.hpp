@@ -1,0 +1,11 @@
+#pragma once
+#ifndef CHANNELMODE_HPP
+# define CHANNELMODE_HPP
+
+enum ChannelMode
+{
+	M_FLAG_CHANNEL_DOES_NOT_EXIST		= 1 << 0,
+	M_FLAG_CHANNEL_INVITE_ONLY			= 1 << 1,
+	M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY	= 1 << 2,
+};
+#endif
