@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <cstddef>
 #include "ChannelDB.hpp"
 #include "Channel.hpp"
@@ -51,7 +52,7 @@ void	ChannelDB::DeleteChannel(int channelId)
 	{
 		return ;
 	}
-	mIndex.DeactivateIndex(it->second.GetChannelId());
+	mIndex.DeactivateIndex(channelId);
 
 	mDataBase.erase(it);
 	UserDB::GetInstance().RemoveChannelInAllUsers(channelId);
@@ -115,7 +116,7 @@ void	ChannelDB::SetChannelFlag(int channelId, unsigned int flag)
 	{
 		return ;
 	}
-	it->second.SetChannelId(flag);
+	it->second.SetChannelMode(flag);
 }
 
 unsigned int	ChannelDB::GetChannelFlag(int channelId) const
@@ -127,6 +128,16 @@ unsigned int	ChannelDB::GetChannelFlag(int channelId) const
 		return (M_FLAG_CHANNEL_DOES_NOT_EXIST);
 	}
 	return (it->second.GetChannelMode());
+}
+
+void	ChannelDB::AddChannelFlag(int channelId, unsigned int flag)
+{
+	SetChannelFlag(channelId, GetChannelFlag(channelId) | flag);
+}
+
+void	ChannelDB::RemoveChannelFlag(int channelId, unsigned int flag)
+{
+	SetChannelFlag(channelId, GetChannelFlag(channelId) & ~flag);
 }
 
 ChannelDB& ChannelDB::GetInstance(void)

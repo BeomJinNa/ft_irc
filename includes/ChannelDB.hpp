@@ -31,6 +31,9 @@ class ChannelDB
 		void			SetChannelFlag(int channelId, unsigned int flag);
 		unsigned int	GetChannelFlag(int channelId) const;
 
+		void			AddChannelFlag(int channelId, unsigned int flag);
+		void			RemoveChannelFlag(int channelId, unsigned int flag);
+
 		static ChannelDB&	GetInstance(void);
 	private:
 		ChannelDB(const ChannelDB& source);
