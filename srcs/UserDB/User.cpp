@@ -60,11 +60,20 @@ int					User::GetSocketFd(void) const { return (mSocketFd); }
 void				User::SetLoginStatus(bool value) { mIsLoggedIn = value; }
 bool				User::GetLoginStatus(void) const { return (mIsLoggedIn); }
 
-void				User::SetUserName(const std::string& name) { mUserName = name; }
+void				User::SetUserName(const std::string& name)
+{
+	mIsUserNameSet = true;
+	mUserName = name;
+}
+
 std::string&		User::GetUserName(void) { return (mUserName); }
 const std::string&	User::GetUserName(void) const { return (mUserName); }
 
-void				User::SetNickName(const std::string& name) { mNickName = name; }
+void				User::SetNickName(const std::string& name)
+{
+	mIsNickNameSet = true;
+	mNickName = name;
+}
 std::string&		User::GetNickName(void) { return (mNickName); }
 const std::string&	User::GetNickName(void) const { return (mNickName); }
 

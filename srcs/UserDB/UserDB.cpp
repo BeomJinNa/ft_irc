@@ -150,59 +150,6 @@ bool	UserDB::GetLoginStatus(int userId) const
 	return (false);
 }
 
-void	UserDB::SetUserName(int userId, const std::string& name)
-{
-	const DB::iterator&	it = mDataBase.find(userId);
-
-	if (it != mDataBase.end())
-	{
-		it->second.SetUserName(name);
-		it->second.SetFlagUserNameSet(true);
-		if (userId >= 0)
-		{
-			mReferenceTableUserName[name] = userId;
-		}
-	}
-}
-
-const std::string&	UserDB::GetUserName(int userId) const
-{
-	const DB::const_iterator&	it = mDataBase.find(userId);
-
-	if (it != mDataBase.end())
-	{
-		return (it->second.GetUserName());
-	}
-	throw std::out_of_range("Can not get username that doesn't exist");
-}
-
-
-void	UserDB::SetNickName(int userId, const std::string& name)
-{
-	const DB::iterator&	it = mDataBase.find(userId);
-
-	if (it != mDataBase.end())
-	{
-		it->second.SetNickName(name);
-		it->second.SetFlagNickNameSet(true);
-		if (userId >= 0)
-		{
-			mReferenceTableNickName[name] = userId;
-		}
-	}
-}
-
-const std::string&	UserDB::GetNickName(int userId) const
-{
-	const DB::const_iterator&	it = mDataBase.find(userId);
-
-	if (it != mDataBase.end())
-	{
-		return (it->second.GetNickName());
-	}
-	throw std::out_of_range("Can not get nickname that doesn't exist");
-}
-
 bool	UserDB::IsUserAuthorized(int userId) const
 {
 	const DB::const_iterator&	it = mDataBase.find(userId);
@@ -213,6 +160,62 @@ bool	UserDB::IsUserAuthorized(int userId) const
 	return (false);
 }
 
+void	UserDB::SetUserName(int userId, const std::string& name)
+{
+	const DB::iterator&	it = mDataBase.find(userId);
+
+	if (it != mDataBase.end())
+	{
+		RefDB::iterator	rit = mReferenceTableUserName.find(name);
+		if (rit != mReferenceTableUserName.end())
+		{
+			mReferenceTableUserName.erase(rit);
+		}
+		it->second.SetUserName(name);
+		it->second.SetFlagUserNameSet(true);
+		mReferenceTableUserName[name] = userId;
+	}
+}
+
+std::string	UserDB::GetUserName(int userId) const
+{
+	const DB::const_iterator&	it = mDataBase.find(userId);
+
+	if (it == mDataBase.end())
+	{
+		return ("");
+	}
+	return (it->second.GetUserName());
+}
+
+
+void	UserDB::SetNickName(int userId, const std::string& name)
+{
+	const DB::iterator&	it = mDataBase.find(userId);
+
+	if (it != mDataBase.end())
+	{
+		RefDB::iterator	rit = mReferenceTableNickName.find(name);
+		if (rit != mReferenceTableNickName.end())
+		{
+			mReferenceTableNickName.erase(rit);
+		}
+		it->second.SetNickName(name);
+		it->second.SetFlagNickNameSet(true);
+		mReferenceTableNickName[name] = userId;
+	}
+}
+
+std::string	UserDB::GetNickName(int userId) const
+{
+	const DB::const_iterator&	it = mDataBase.find(userId);
+
+	if (it == mDataBase.end())
+	{
+		return ("");
+	}
+	return (it->second.GetNickName());
+}
 
 UserDB& UserDB::GetInstance(void)
 {

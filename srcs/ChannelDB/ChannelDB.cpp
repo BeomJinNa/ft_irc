@@ -26,20 +26,21 @@ int	ChannelDB::CreateChannel(const std::string& name)
 		return (-1);
 	}
 
-	int	Id = mIndex.GetNewIndex();
+	int	channelId = mIndex.GetNewIndex();
 
-	if (Id < 0)
+	if (channelId < 0)
 	{
 		return (-1);
 	}
 
 	std::pair<DB::iterator, bool>	result
-		= mDataBase.insert(std::make_pair(Id, Channel(Id, name)));
+		= mDataBase.insert(std::make_pair(channelId,
+										  Channel(channelId, name)));
 
 	if (result.second)
 	{
-		mReferenceTableName[name] = Id;
-		return (Id);
+		mReferenceTableName[name] = channelId;
+		return (channelId);
 	}
 	return (-1);
 }
@@ -58,7 +59,7 @@ void	ChannelDB::DeleteChannel(int channelId)
 	UserDB::GetInstance().RemoveChannelInAllUsers(channelId);
 }
 
-bool	ChannelDB::AddUserInChannel(int channelId, int userId)
+bool	ChannelDB::AddUserIntoChannel(int channelId, int userId)
 {
 	DB::iterator	it = mDataBase.find(channelId);
 
@@ -66,18 +67,18 @@ bool	ChannelDB::AddUserInChannel(int channelId, int userId)
 	{
 		return (false);
 	}
-	bool IsUserInChannel = it->second.AddActiveUser(userId);
-	if (IsUserInChannel)
+	bool isUserInChannel = it->second.AddActiveUser(userId);
+	if (isUserInChannel)
 	{
 		//User가 가지고 있는 입장 채널 목록은 std::map으로 관리되므로
 		//이미 입장되어 있는 상태에서도 중복 추가되는 문제가 발생하지 않음.
 		UserDB::GetInstance().WriteChannelInUserData(userId, channelId);
 	}
 
-	return (IsUserInChannel);
+	return (isUserInChannel);
 }
 
-void	ChannelDB::RemoveUserInChannel(int channelId, int userId)
+void	ChannelDB::RemoveUserIntoChannel(int channelId, int userId)
 {
 	DB::iterator	it = mDataBase.find(channelId);
 
@@ -87,6 +88,74 @@ void	ChannelDB::RemoveUserInChannel(int channelId, int userId)
 	}
 	it->second.RemoveUserData(userId);
 	UserDB::GetInstance().RemoveChannelInUserList(userId, channelId);
+}
+
+bool	ChannelDB::AddOperatorIntoChannel(int channelId, int userId)
+{
+	DB::iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (false);
+	}
+
+	bool isUserOperator = it->second.AddOperator(userId);
+	return (isUserOperator);
+}
+
+void	ChannelDB::RemoveOperatorIntoChannel(int channelId, int userId)
+{
+	DB::iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+	it->second.RemoveOperator(userId);
+}
+
+bool	ChannelDB::IsUserOperator(int channelId, int userId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (false);
+	}
+	return (it->second.IsUserOperator(userId));
+}
+
+void	ChannelDB::AddBanIntoChannel(int channelId, int userId)
+{
+	DB::iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+	it->second.AddBanUser(userId);
+}
+
+void	ChannelDB::RemoveBanIntoChannel(int channelId, int userId)
+{
+	DB::iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+	it->second.RemoveBanUser(userId);
+}
+
+bool	ChannelDB::IsUserBanned(int channelId, int userId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (false);
+	}
+	return (it->second.IsUserBanned(userId));
 }
 
 void	ChannelDB::DeleteUserInAllChannels(int userId)
@@ -138,6 +207,52 @@ void	ChannelDB::AddChannelFlag(int channelId, unsigned int flag)
 void	ChannelDB::RemoveChannelFlag(int channelId, unsigned int flag)
 {
 	SetChannelFlag(channelId, GetChannelFlag(channelId) & ~flag);
+}
+
+void	ChannelDB::SetChannelTopic(int channelId, const std::string& topic)
+{
+	DB::iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+	it->second.SetTopic(topic);
+}
+
+std::string	ChannelDB::GetChannelTopic(int channelId)
+{
+	DB::iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ("");
+	}
+	return (it->second.GetTopic());
+}
+
+bool	ChannelDB::SetMaxUsersInChannel(int channelId,
+										unsigned int limit)
+{
+	DB::iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (false);
+	}
+	bool	isValueSetSuccessful = it->second.SetMaxActiveUsers(limit);
+	return (isValueSetSuccessful);
+}
+
+unsigned int	ChannelDB::GetMaxUsersInChannel(int channelId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (-1);
+	}
+	return (it->second.GetMaxActiveUsers());
 }
 
 ChannelDB& ChannelDB::GetInstance(void)

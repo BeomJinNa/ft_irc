@@ -26,12 +26,12 @@ class UserDB
 
 		void				SetLoginStatus(int userId, bool value);
 		bool				GetLoginStatus(int userId) const;
+		bool				IsUserAuthorized(int userId) const;
 
 		void				SetUserName(int userId, const std::string& name);
-		const std::string&	GetUserName(int userId) const;
+		std::string			GetUserName(int userId) const;
 		void				SetNickName(int userId, const std::string& name);
-		const std::string&	GetNickName(int userId) const;
-		bool				IsUserAuthorized(int userId) const;
+		std::string			GetNickName(int userId) const;
 
 		int					GetUserIdByUserName(const std::string& userName) const;
 		int					GetUserIdByNickName(const std::string& nickName) const;
@@ -80,10 +80,10 @@ class UserDB
  *							마쳤는지 여부를 반환합니다.
  *
  * GetUserName:				존재하지 않는 userId를 입력할 경우
- *							std::out_of_range를 던집니다.
+ *							빈 문자열을 반환합니다.
  *
  * GetNickName:				존재하지 않는 userId를 입력할 경우
- *							std::out_of_range를 던집니다.
+ *							빈 문자열을 반환합니다.
  *
  * GetClientFdByUserName:	설정된 유저 이름을 기준으로 해당 유저의 userId를
  *							반환 합니다. 존재하지 않는 이름일 경우 -1을
