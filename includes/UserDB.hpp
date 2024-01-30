@@ -14,6 +14,7 @@ class UserDB
 	public:
 		typedef std::map<int, User>			DB;
 		typedef std::map<std::string, int>	RefDB;
+		typedef std::map<int, int>			SocketRefDB;
 
 		UserDB(void);
 		~UserDB(void);
@@ -41,6 +42,7 @@ class UserDB
 							//Server에서 호출 전용
 		bool				ConnectUser(int userId);
 		int					RemoveUserData(int userId);
+		int					GetUserIdBySocketId(int socketId) const;
 
 							//ChannelDB에서 호출 전용
 		void				WriteChannelInUserData(int userId, int channelId);
@@ -54,6 +56,7 @@ class UserDB
 		DB				mDataBase;
 		RefDB			mReferenceTableUserName;
 		RefDB			mReferenceTableNickName;
+		SocketRefDB		mReferenceTableSocket;
 		IndexManager	mIndex;
 };
 

@@ -13,7 +13,7 @@ class Message
 		Message&	operator=(const Message& source);
 		~Message(void);
 
-		int								GetClientFd(void);
+		int								GetUserId(void) const;
 		std::string&					GetPrefix(void);
 		const std::string&				GetPrefix(void) const;
 		std::string&					GetCommand(void);
@@ -28,7 +28,7 @@ class Message
 		bool							ParseMessage(int clientFd, std::string& message);
 
 	private:
-		int							mClientFd;
+		int							mUserId;
 		std::string					mPrefix;
 		std::string					mCommand;
 		std::vector<std::string>	mParameters;

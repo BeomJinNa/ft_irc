@@ -24,7 +24,7 @@ Message&	Message::operator=(const Message& source)
 
 Message::~Message(void) {}
 
-int								Message::GetClientFd(void)				{ return (mClientFd); }
+int								Message::GetUserId(void) const			{ return (mUserId); }
 std::string&					Message::GetPrefix(void)				{ return (mPrefix); }
 const std::string&				Message::GetPrefix(void) const			{ return (mPrefix); }
 std::string&					Message::GetCommand(void)				{ return (mCommand); }
@@ -36,13 +36,13 @@ const std::string&				Message::GetTrailing(void) const		{ return (mTrailing); }
 std::string&					Message::GetRawMessageData(void)		{ return (mRawMessage); }
 const std::string&				Message::GetRawMessageData(void) const	{ return (mRawMessage); }
 
-bool	Message::ParseMessage(int clientFd, std::string& message)
+bool	Message::ParseMessage(int userId, std::string& message)
 {
 	std::istringstream	iss(message);
 	std::string			token;
 
 	mRawMessage = message;
-	mClientFd = clientFd;
+	mUserId = userId;
 	if (!message.empty() && message[0] == ':')
 	{
 		std::getline(iss, mPrefix, ' ');

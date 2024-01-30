@@ -206,7 +206,7 @@ void Server::handleRead(int clientFd)
 			}
 			std::string message = mReadBuffers[clientFd].substr(0, end_of_msg);
 			mReadBuffers[clientFd].erase(0, end_of_msg + 2);
-			executeHooks(clientFd, message);
+			executeHooks(UserDB::GetInstance().GetUserIdBySocketId(clientFd), message);
 		}
 	}
 	else if (bytes_read == 0 || (bytes_read == -1 && errno == ECONNRESET))
@@ -216,11 +216,11 @@ void Server::handleRead(int clientFd)
 	}
 }
 
-void	Server::executeHooks(int clientFd, std::string message)
+void	Server::executeHooks(int userId, std::string message)
 {
 	Message	parser;
 
-	bool	parsingSuccess = parser.ParseMessage(clientFd, message);
+	bool	parsingSuccess = parser.ParseMessage(userId, message);
 
 	if (parsingSuccess)
 	{

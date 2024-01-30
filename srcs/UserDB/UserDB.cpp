@@ -27,6 +27,7 @@ bool	UserDB::ConnectUser(int socketFd)
 		}
 		mDataBase[userId].SetClientFd(userId);
 		mDataBase[userId].SetSocketFd(socketFd);
+		mReferenceTableSocket[socketFd] = userId;
 		return (true);
 	}
 	return (false);
@@ -43,6 +44,7 @@ int	UserDB::RemoveUserData(int userId)
 
 		mReferenceTableNickName.erase(it->second.GetNickName());
 		mReferenceTableUserName.erase(it->second.GetUserName());
+		mReferenceTableSocket.erase(it->second.GetSocketFd());
 		mDataBase.erase(it);
 		mIndex.DeactivateIndex(userId);
 
@@ -78,7 +80,7 @@ void	UserDB::WriteChannelInUserData(int userId, int channelId)
 bool	UserDB::AddChannelInUserList(int userId, int channelId)
 {
 	bool	IsUserInChannel
-	= ChannelDB::GetInstance().AddUserInChannel(channelId, userId);
+	= ChannelDB::GetInstance().AddUserIntoChannel(channelId, userId);
 
 	return (IsUserInChannel);
 }
@@ -92,7 +94,7 @@ void	UserDB::RemoveChannelInUserList(int userId, int channelId)
 		return ;
 	}
 	it->second.RemoveChannelInJoinnedList(channelId);
-	ChannelDB::GetInstance().RemoveUserInChannel(channelId, userId);
+	ChannelDB::GetInstance().RemoveUserIntoChannel(channelId, userId);
 }
 
 void	UserDB::RemoveChannelInAllUsers(int channelId)
@@ -122,6 +124,19 @@ int	UserDB::GetUserIdByNickName(const std::string& nickName) const
 		= mReferenceTableNickName.find(nickName);
 
 	if (it != mReferenceTableNickName.end())
+	{
+		return (it->second);
+	}
+
+	return (-1);
+}
+
+int	UserDB::GetUserIdBySocketId(int socketId) const
+{
+	const SocketRefDB::const_iterator&	it
+		= mReferenceTableSocket.find(socketId);
+
+	if (it != mReferenceTableSocket.end())
 	{
 		return (it->second);
 	}

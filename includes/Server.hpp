@@ -41,7 +41,7 @@ class Server
 		void	waitEvent(void);
 		void	acceptConnection(void);
 		void	handleRead(int clientFd);
-		void	executeHooks(int clientFd, std::string message);
+		void	executeHooks(int userId, std::string message);
 		void	handleWrite(int clientFd);
 
 		int								mServerFd;
