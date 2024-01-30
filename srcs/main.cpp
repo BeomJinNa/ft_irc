@@ -9,9 +9,9 @@
 namespace
 {
 	int		parsePortNumber(char* argv[]);
-	bool	initServer(Server* server, int port);
-	bool	initUserDatabase(UserDB* Database);
-	bool	initChannelDatabase(ChannelDB* Database);
+	bool	initServer(Server** server, int port);
+	bool	initUserDatabase(UserDB** Database);
+	bool	initChannelDatabase(ChannelDB** Database);
 	void	addHooks(void);
 }
 
@@ -33,14 +33,14 @@ int	main(int argc, char* argv[])
 	}
 
 	Server*	ircServer = NULL;
-	errorOccured = initServer(ircServer, port);
+	errorOccured = initServer(&ircServer, port);
 	if (errorOccured)
 	{
 		return (1);
 	}
 
 	UserDB*	userDB = NULL;
-	errorOccured = initUserDatabase(userDB);
+	errorOccured = initUserDatabase(&userDB);
 	if (errorOccured)
 	{
 		delete ircServer;
@@ -48,7 +48,7 @@ int	main(int argc, char* argv[])
 	}
 
 	ChannelDB*	channelDB = NULL;
-	errorOccured = initChannelDatabase(channelDB);
+	errorOccured = initChannelDatabase(&channelDB);
 	if (errorOccured)
 	{
 		delete userDB;
@@ -91,11 +91,11 @@ namespace
 		return (port);
 	}
 
-	bool	initServer(Server* server, int port)
+	bool	initServer(Server** server, int port)
 	{
 		try
 		{
-			server = new Server(port);
+			*server = new Server(port);
 		}
 		catch (const std::exception& e)
 		{
@@ -103,15 +103,15 @@ namespace
 			return (true);
 		}
 
-		server->DoNothing();
+		(*server)->DoNothing();
 		return (false);
 	}
 
-	bool	initUserDatabase(UserDB* Database)
+	bool	initUserDatabase(UserDB** Database)
 	{
 		try
 		{
-			Database = new UserDB();
+			*Database = new UserDB();
 		}
 		catch (const std::exception& e)
 		{
@@ -120,15 +120,15 @@ namespace
 			return (true);
 		}
 
-		Database->DoNothing();
+		(*Database)->DoNothing();
 		return (false);
 	}
 
-	bool	initChannelDatabase(ChannelDB* Database)
+	bool	initChannelDatabase(ChannelDB** Database)
 	{
 		try
 		{
-			Database = new ChannelDB();
+			*Database = new ChannelDB();
 		}
 		catch (const std::exception& e)
 		{
@@ -137,7 +137,7 @@ namespace
 			return (true);
 		}
 
-		Database->DoNothing();
+		(*Database)->DoNothing();
 		return (false);
 	}
 
