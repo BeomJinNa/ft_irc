@@ -1,6 +1,5 @@
 #include <stdexcept>
 #include <cstddef>
-#include "Server.hpp"
 #include "ChannelDB.hpp"
 #include "Channel.hpp"
 #include "UserDB.hpp"
@@ -58,6 +57,17 @@ void	ChannelDB::DeleteChannel(int channelId)
 
 	mDataBase.erase(it);
 	UserDB::GetInstance().RemoveChannelInAllUsers(channelId);
+}
+
+bool	ChannelDB::IsChannelIdValid(int channelId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (false);
+	}
+	return (true);
 }
 
 bool	ChannelDB::AddUserIntoChannel(int channelId, int userId)

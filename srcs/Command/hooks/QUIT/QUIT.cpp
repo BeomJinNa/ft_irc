@@ -9,6 +9,11 @@ void	HookFunctionQuit(const Message& message)
 	int					userId = message.GetUserId();
 	const std::string&	trailing = message.GetTrailing();
 
+	if (userDB.IsUserIdValid(userId) == false)
+	{
+		return ;
+	}
+
 	std::string	quitMessage;
 	if (trailing.empty())
 	{

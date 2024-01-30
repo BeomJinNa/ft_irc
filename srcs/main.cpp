@@ -4,6 +4,7 @@
 #include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "Command.hpp"
+#include "HookFunctions.hpp"
 
 namespace
 {
@@ -142,9 +143,6 @@ namespace
 
 	void	addHooks(void)
 	{
-//		Command::RegisterCommand("KICK",	hookFunctionKick);
-//		Command::RegisterCommand("INVITE",	hookFunctionInvite);
-//		Command::RegisterCommand("TOPIC",	hookFunctionTopic);
-//		Command::RegisterCommand("MODE",	hookFunctionMode);
+		Command::RegisterCommand("QUIT", HookFunctionQuit);
 	}
 }

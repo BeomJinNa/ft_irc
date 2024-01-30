@@ -23,6 +23,8 @@ class UserDB
 		void				DoNothing(void) const;
 		void				DisconnectUser(int userId);
 
+		bool				IsUserIdValid(int userId) const;
+
 		bool				AddChannelInUserList(int userId, int channelId);
 		void				RemoveChannelInUserList(int userId, int channelId);
 

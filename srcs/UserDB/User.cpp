@@ -1,5 +1,4 @@
 #include <string>
-#include <algorithm>
 #include "User.hpp"
 
 User::User(void)

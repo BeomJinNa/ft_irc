@@ -22,6 +22,8 @@ class ChannelDB
 		int				CreateChannel(const std::string& name);
 		void			DeleteChannel(int channelId);
 
+		bool			IsChannelIdValid(int channelId) const;
+
 		bool			AddUserIntoChannel(int channelId, int userId);
 		void			RemoveUserIntoChannel(int channelId, int userId);
 

@@ -66,6 +66,17 @@ void	UserDB::DisconnectUser(int userId)
 	}
 }
 
+bool	UserDB::IsUserIdValid(int userId) const
+{
+	DB::const_iterator	it = mDataBase.find(userId);
+
+	if (it == mDataBase.end())
+	{
+		return (false);
+	}
+	return (true);
+}
+
 void	UserDB::WriteChannelInUserData(int userId, int channelId)
 {
 	DB::iterator	it = mDataBase.find(userId);
