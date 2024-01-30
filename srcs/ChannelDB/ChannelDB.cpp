@@ -220,6 +220,28 @@ void	ChannelDB::RemoveChannelFlag(int channelId, unsigned int flag)
 	SetChannelFlag(channelId, GetChannelFlag(channelId) & ~flag);
 }
 
+void	ChannelDB::SetChannelName(int channelId, const std::string& name)
+{
+	DB::iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+	it->second.SetChannelName(name);
+}
+
+std::string	ChannelDB::GetChannelName(int channelId)
+{
+	DB::iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ("");
+	}
+	return (it->second.GetChannelName());
+}
+
 void	ChannelDB::SetChannelTopic(int channelId, const std::string& topic)
 {
 	DB::iterator	it = mDataBase.find(channelId);

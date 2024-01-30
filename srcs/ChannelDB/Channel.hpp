@@ -38,6 +38,10 @@ class Channel
 		void				SetChannelId(int id);
 		unsigned int		GetChannelId(void) const;
 
+		void				SetChannelName(const std::string& name);
+		std::string&		GetChannelName(void);
+		const std::string&	GetChannelName(void) const;
+
 		void				SetChannelMode(unsigned int mode);
 		unsigned int		GetChannelMode(void) const;
 

@@ -155,6 +155,10 @@ void				Channel::SetChannelId(int channelId)
 						{ mChannelId = channelId; }
 unsigned int		Channel::GetChannelId(void) const
 						{ return (mChannelId); }
+void				Channel::SetChannelName(const std::string& name)
+						{ mName = name; }
+std::string&		Channel::GetChannelName(void){ return (mName); }
+const std::string&	Channel::GetChannelName(void) const { return (mName); }
 void				Channel::SetChannelMode(unsigned int mode)
 						{ mChannelMode = mode; }
 unsigned int		Channel::GetChannelMode(void) const

@@ -9,11 +9,6 @@ void	HookFunctionQuit(const Message& message)
 	int					userId = message.GetUserId();
 	const std::string&	trailing = message.GetTrailing();
 
-	if (userDB.IsUserIdValid(userId) == false)
-	{
-		return ;
-	}
-
 	std::string	quitMessage;
 	if (trailing.empty())
 	{
@@ -24,10 +19,14 @@ void	HookFunctionQuit(const Message& message)
 		quitMessage = userDB.GetNickName(userId) + " :" + trailing;
 	}
 
+	//TODO
+	//텍스트를 IRC 규격에 맞게 수정해야 함
 	UserDB::ChannelList	list = userDB.GetJoinnedChannelList(userId);
 	for (UserDB::ChannelList::iterator it = list.begin(); it != list.end(); ++it)
 	{
-		channelDB.SendMessageToChannel(quitMessage, *it);
+		std::string	sendMessage = "#" + channelDB.GetChannelName(*it)
+								+ " :" + quitMessage;
+		channelDB.SendMessageToChannel(sendMessage, *it);
 	}
 	userDB.DisconnectUser(userId);
 }
