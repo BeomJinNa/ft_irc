@@ -195,16 +195,19 @@ void Server::handleRead(int clientFd)
 	{
 		mReadSocketBuffers[clientFd].buffer[bytes_read] = '\0';
 		mReadBuffers[clientFd].append(mReadSocketBuffers[clientFd].buffer);
+
 		size_t	end_of_msg = mReadBuffers[clientFd].find("\r\n");
-		if (end_of_msg == std::string::npos
-			|| mReadBuffers[clientFd].size() > M_IRC_MAX_MESSAGE_LENGTH)
+		while (end_of_msg != std::string::npos)
 		{
-			CloseClientConnection(clientFd);
-			return ;
+			if (end_of_msg > M_IRC_MAX_MESSAGE_LENGTH)
+			{
+				CloseClientConnection(clientFd);
+				return ;
+			}
+			std::string message = mReadBuffers[clientFd].substr(0, end_of_msg);
+			mReadBuffers[clientFd].erase(0, end_of_msg + 2);
+			executeHooks(clientFd, message);
 		}
-		std::string message = mReadBuffers[clientFd].substr(0, end_of_msg);
-		mReadBuffers[clientFd].erase(0, end_of_msg + 2);
-		executeHooks(clientFd, message);
 	}
 	else if (bytes_read == 0 || (bytes_read == -1 && errno == ECONNRESET))
 	{
