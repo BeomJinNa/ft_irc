@@ -43,22 +43,23 @@ bool	Message::ParseMessage(int userId, std::string& message)
 
 	mRawMessage = message;
 	mUserId = userId;
+	//prefix가 존재할 경우 파싱
 	if (!message.empty() && message[0] == ':')
 	{
 		std::getline(iss, mPrefix, ' ');
 		mPrefix = mPrefix.substr(1);
 	}
 
-	if (!std::getline(iss, mCommand, ' '))
+	//Command 파싱, Command는 필수이므로 없는 경우 즉시 에러 반환
+	if (!std::getline(iss, mCommand, ' ')
+	 || mCommand.empty() || mCommand[0] == ':')
 	{
-		mPrefix.clear();
-		mCommand.clear();
-		mParameters.clear();
-		mTrailing.clear();
-		mRawMessage.clear();
+		ClearData();
 		return (false);
 	}
 
+	//parameters 파싱
+	//콜론`:`으로 시작하는 토큰 발견시 줄 끝까지 trailing으로 처리 후 종료
 	while (std::getline(iss, token, ' '))
 	{
 		if (!token.empty())
@@ -66,7 +67,7 @@ bool	Message::ParseMessage(int userId, std::string& message)
 			if (token[0] == ':')
 			{
 				std::getline(iss, mTrailing);
-				mTrailing = token.substr(1) + " " + mTrailing;
+				mTrailing = token.substr(1);
 				break;
 			}
 			else
@@ -77,4 +78,13 @@ bool	Message::ParseMessage(int userId, std::string& message)
 	}
 
 	return (true);
+}
+
+void	Message::ClearData(void)
+{
+	mPrefix.clear();
+	mCommand.clear();
+	mParameters.clear();
+	mTrailing.clear();
+	mRawMessage.clear();
 }

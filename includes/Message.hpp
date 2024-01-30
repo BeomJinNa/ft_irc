@@ -28,6 +28,8 @@ class Message
 		bool							ParseMessage(int clientFd, std::string& message);
 
 	private:
+		void	ClearData(void);
+
 		int							mUserId;
 		std::string					mPrefix;
 		std::string					mCommand;
