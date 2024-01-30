@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <cstddef>
+#include "Server.hpp"
 #include "ChannelDB.hpp"
 #include "Channel.hpp"
 #include "UserDB.hpp"
@@ -229,6 +230,56 @@ std::string	ChannelDB::GetChannelTopic(int channelId)
 		return ("");
 	}
 	return (it->second.GetTopic());
+}
+
+ChannelDB::UserList	ChannelDB::GetUserListInChannel(int channelId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (UserList());
+	}
+	return (it->second.GetActiveUserList());
+}
+
+ChannelDB::UserList	ChannelDB::GetOperatorListInChannel(int channelId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (UserList());
+	}
+	return (it->second.GetOperatorList());
+}
+
+ChannelDB::UserList	ChannelDB::GetBanListInChannel(int channelId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (UserList());
+	}
+	return (it->second.GetBanUserList());
+}
+
+void	ChannelDB::SendMessageToChannel(const std::string& message,
+										int channelId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+
+	UserList	list = it->second.GetActiveUserList();
+	for (UserList::const_iterator lit = list.cbegin(); lit != list.cend(); ++lit)
+	{
+		UserDB::GetInstance().SendMessageToUser(message, *lit);
+	}
 }
 
 bool	ChannelDB::SetMaxUsersInChannel(int channelId,

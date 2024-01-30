@@ -13,6 +13,7 @@ class ChannelDB
 	public:
 		typedef std::map<int, Channel>		DB;
 		typedef std::map<std::string, int>	RefDB;
+		typedef std::vector<int>			UserList;
 
 		ChannelDB(void);
 		~ChannelDB(void);
@@ -32,9 +33,6 @@ class ChannelDB
 		void			RemoveBanIntoChannel(int channelId, int userId);
 		bool			IsUserBanned(int channelId, int userId) const;
 
-						//UserDB에서 호출 전용
-		void			DeleteUserInAllChannels(int userId);
-
 		int				GetChannelIdByName(const std::string& name) const;
 
 		bool			SetMaxUsersInChannel(int channelId, unsigned int limit);
@@ -50,7 +48,17 @@ class ChannelDB
 										const std::string& topic);
 		std::string		GetChannelTopic(int channelId);
 
+		UserList		GetUserListInChannel(int channelId) const;
+		UserList		GetOperatorListInChannel(int channelId) const;
+		UserList		GetBanListInChannel(int channelId) const;
+
+		void			SendMessageToChannel(const std::string& message,
+											 int channelId) const;
+
 		static ChannelDB&	GetInstance(void);
+
+		//UserDB에서 호출 전용
+		void			DeleteUserInAllChannels(int userId);
 
 	private:
 		ChannelDB(const ChannelDB& source);

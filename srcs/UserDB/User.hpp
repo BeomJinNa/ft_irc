@@ -11,13 +11,13 @@ class User
 {
 	public:
 		User(void);
-		User(int clientFd, int socketFd);
+		User(int userId, int socketFd);
 		User(const User& source);
 		User&	operator=(const User& source);
 		~User(void);
 
-		void				SetClientFd(int value);
-		int					GetClientFd(void) const;
+		void				SetUserId(int value);
+		int					GetUserId(void) const;
 
 		void				SetSocketFd(int value);
 		int					GetSocketFd(void) const;
@@ -43,7 +43,7 @@ class User
 		void				RemoveChannelInJoinnedList(int channelId);
 
 	private:
-		int				mClientFd;
+		int				mUserId;
 		int				mSocketFd;
 		bool			mIsLoggedIn;
 		bool			mIsUserNameSet;

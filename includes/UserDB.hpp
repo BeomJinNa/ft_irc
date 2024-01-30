@@ -34,15 +34,19 @@ class UserDB
 		void				SetNickName(int userId, const std::string& name);
 		std::string			GetNickName(int userId) const;
 
+
 		int					GetUserIdByUserName(const std::string& userName) const;
 		int					GetUserIdByNickName(const std::string& nickName) const;
+		int					GetUserIdBySocketId(int socketId) const;
+		int					GetSocketIdByUserId(int userId) const;
+
+		void				SendMessageToUser(const std::string& message, int userId) const;
 
 		static UserDB&		GetInstance(void);
 
 							//Server에서 호출 전용
 		bool				ConnectUser(int userId);
 		int					RemoveUserData(int userId);
-		int					GetUserIdBySocketId(int socketId) const;
 
 							//ChannelDB에서 호출 전용
 		void				WriteChannelInUserData(int userId, int channelId);

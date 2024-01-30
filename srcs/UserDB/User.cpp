@@ -3,7 +3,7 @@
 #include "User.hpp"
 
 User::User(void)
-	: mClientFd(-1)
+	: mUserId(-1)
 	, mSocketFd(-1)
 	, mIsLoggedIn(false)
 	, mIsUserNameSet(false)
@@ -11,8 +11,8 @@ User::User(void)
 {
 }
 
-User::User(int clientFd, int socketFd)
-	: mClientFd(clientFd)
+User::User(int userId, int socketFd)
+	: mUserId(userId)
 	, mSocketFd(socketFd)
 	, mIsLoggedIn(false)
 	, mIsUserNameSet(false)
@@ -21,7 +21,7 @@ User::User(int clientFd, int socketFd)
 }
 
 User::User(const User& source)
-	: mClientFd(source.mClientFd)
+	: mUserId(source.mUserId)
 	, mSocketFd(source.mSocketFd)
 	, mIsLoggedIn(source.mIsLoggedIn)
 	, mIsUserNameSet(source.mIsUserNameSet)
@@ -36,7 +36,7 @@ User&	User::operator=(const User& source)
 {
 	if (this != &source)
 	{
-		mClientFd = source.mClientFd;
+		mUserId = source.mUserId;
 		mSocketFd = source.mSocketFd;
 		mIsLoggedIn = source.mIsLoggedIn;
 		mIsUserNameSet = source.mIsUserNameSet;
@@ -51,8 +51,8 @@ User&	User::operator=(const User& source)
 
 User::~User(void) {}
 
-void				User::SetClientFd(int value) { mClientFd = value; }
-int					User::GetClientFd(void) const { return (mClientFd); }
+void				User::SetUserId(int value) { mUserId = value; }
+int					User::GetUserId(void) const { return (mUserId); }
 
 void				User::SetSocketFd(int value) { mSocketFd = value; }
 int					User::GetSocketFd(void) const { return (mSocketFd); }

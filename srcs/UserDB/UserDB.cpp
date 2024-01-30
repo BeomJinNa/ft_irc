@@ -25,7 +25,7 @@ bool	UserDB::ConnectUser(int socketFd)
 		{
 			return (false);
 		}
-		mDataBase[userId].SetClientFd(userId);
+		mDataBase[userId].SetUserId(userId);
 		mDataBase[userId].SetSocketFd(socketFd);
 		mReferenceTableSocket[socketFd] = userId;
 		return (true);
@@ -142,6 +142,29 @@ int	UserDB::GetUserIdBySocketId(int socketId) const
 	}
 
 	return (-1);
+}
+
+int	UserDB::GetSocketIdByUserId(int userId) const
+{
+	const DB::const_iterator&	it = mDataBase.find(userId);
+
+	if (it == mDataBase.end())
+	{
+		return (-1);
+	}
+	return (it->second.GetSocketFd());
+}
+
+void	UserDB::SendMessageToUser(const std::string& message, int userId) const
+{
+	DB::const_iterator	it = mDataBase.find(userId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+	Server::GetInstance().SendMessageToClient(it->second.GetSocketFd(),
+											  message.c_str(), message.size());
 }
 
 void	UserDB::SetLoginStatus(int userId, bool value)
