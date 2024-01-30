@@ -83,24 +83,19 @@ bool				User::GetFlagUserNameSet(void) const { return (mIsUserNameSet); }
 void				User::SetFlagNickNameSet(bool value) { mIsNickNameSet = value; }
 bool				User::GetFlagNickNameSet(void) const { return (mIsNickNameSet); }
 
+std::vector<int>	User::GetChannelList(void) const
+{
+	return (std::vector<int>(mJoinedChannels.begin(), mJoinedChannels.end()));
+}
+
 void	User::AddChannelInJoinnedList(int channelId)
 {
-	std::set<int>::iterator	it = std::find(mJoinedChannels.begin(),
-										   mJoinedChannels.end(),
-									  	   channelId);
-
-	if (it == mJoinedChannels.end())
-	{
-		return ;
-	}
 	mJoinedChannels.insert(channelId);
 }
 
 void	User::RemoveChannelInJoinnedList(int channelId)
 {
-	std::set<int>::iterator	it = std::find(mJoinedChannels.begin(),
-										   mJoinedChannels.end(),
-										   channelId);
+	std::set<int>::iterator	it = mJoinedChannels.find(channelId);
 
 	if (it == mJoinedChannels.end())
 	{

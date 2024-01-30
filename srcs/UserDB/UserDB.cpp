@@ -77,6 +77,17 @@ void	UserDB::WriteChannelInUserData(int userId, int channelId)
 	it->second.AddChannelInJoinnedList(channelId);
 }
 
+UserDB::ChannelList	UserDB::GetJoinnedChannelList(int userId) const
+{
+	DB::const_iterator	it = mDataBase.find(userId);
+
+	if (it == mDataBase.end())
+	{
+		return (ChannelList());
+	}
+	return (it->second.GetChannelList());
+}
+
 bool	UserDB::AddChannelInUserList(int userId, int channelId)
 {
 	bool	IsUserInChannel
@@ -152,8 +163,7 @@ int	UserDB::GetSocketIdByUserId(int userId) const
 	{
 		return (-1);
 	}
-	return (it->second.GetSocketFd());
-}
+	return (it->second.GetSocketFd()); }
 
 void	UserDB::SendMessageToUser(const std::string& message, int userId) const
 {

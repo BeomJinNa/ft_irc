@@ -4,6 +4,7 @@
 
 # include <string>
 # include <set>
+# include <vector>
 
 class Channel;
 
@@ -39,6 +40,7 @@ class User
 		void				SetFlagNickNameSet(bool value);
 		bool				GetFlagNickNameSet(void) const;
 
+		std::vector<int>	GetChannelList(void) const;
 		void				AddChannelInJoinnedList(int channelId);
 		void				RemoveChannelInJoinnedList(int channelId);
 

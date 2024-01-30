@@ -15,6 +15,7 @@ class UserDB
 		typedef std::map<int, User>			DB;
 		typedef std::map<std::string, int>	RefDB;
 		typedef std::map<int, int>			SocketRefDB;
+		typedef std::vector<int>			ChannelList;
 
 		UserDB(void);
 		~UserDB(void);
@@ -34,6 +35,7 @@ class UserDB
 		void				SetNickName(int userId, const std::string& name);
 		std::string			GetNickName(int userId) const;
 
+		ChannelList			GetJoinnedChannelList(int userId) const;
 
 		int					GetUserIdByUserName(const std::string& userName) const;
 		int					GetUserIdByNickName(const std::string& nickName) const;
