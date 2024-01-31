@@ -12,6 +12,12 @@ void	HookFunctionQuit(const Message& message)
 	std::set<int>		sendingUserList;
 	std::string			trailing = message.GetTrailing();
 
+	if (userDB.IsUserAuthorized(userId) == false)
+	{
+		userDB.DisconnectUser(userId);
+		return ;
+	}
+
 	if (trailing.empty())
 	{
 		trailing = userDB.GetNickName(userId) + " has quit.";
