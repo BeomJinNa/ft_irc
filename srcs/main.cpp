@@ -4,7 +4,6 @@
 #include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "Command.hpp"
-#include "HookFunctions.hpp"
 
 namespace
 {
@@ -12,7 +11,6 @@ namespace
 	bool	initServer(Server** server, int port);
 	bool	initUserDatabase(UserDB** Database);
 	bool	initChannelDatabase(ChannelDB** Database);
-	void	addHooks(void);
 }
 
 int	main(int argc, char* argv[])
@@ -55,8 +53,6 @@ int	main(int argc, char* argv[])
 		delete ircServer;
 		return (1);
 	}
-
-	addHooks();
 
 	ircServer->SetServerPassword(password);
 	ircServer->RunServer();
@@ -139,10 +135,5 @@ namespace
 
 		(*Database)->DoNothing();
 		return (false);
-	}
-
-	void	addHooks(void)
-	{
-		Command::RegisterCommand("QUIT", HookFunctionQuit);
 	}
 }

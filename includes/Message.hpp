@@ -3,7 +3,6 @@
 # define MESSAGE_HPP
 
 # include <string>
-# include <vector>
 
 class Message
 {
@@ -13,28 +12,25 @@ class Message
 		Message&	operator=(const Message& source);
 		~Message(void);
 
-		int								GetUserId(void) const;
-		std::string&					GetPrefix(void);
-		const std::string&				GetPrefix(void) const;
-		std::string&					GetCommand(void);
-		const std::string&				GetCommand(void) const;
-		std::vector<std::string>&		GetParameters(void);
-		const std::vector<std::string>&	GetParameters(void) const;
-		std::string&					GetTrailing(void);
-		const std::string&				GetTrailing(void) const;
-		std::string&					GetRawMessageData(void);
-		const std::string&				GetRawMessageData(void) const;
+		int					GetUserId(void) const;
+		std::string&		GetPrefix(void);
+		const std::string&	GetPrefix(void) const;
+		std::string&		GetCommand(void);
+		const std::string&	GetCommand(void) const;
+		std::string&		GetMessage(void);
+		const std::string&	GetMessage(void) const;
+		std::string&		GetRawMessageData(void);
+		const std::string&	GetRawMessageData(void) const;
 
-		bool							ParseMessage(int clientFd, std::string& message);
+		bool				ParseMessage(int clientFd, std::string& message);
 
 	private:
 		void	ClearData(void);
 
-		int							mUserId;
-		std::string					mPrefix;
-		std::string					mCommand;
-		std::vector<std::string>	mParameters;
-		std::string					mTrailing;
-		std::string					mRawMessage;
+		int			mUserId;
+		std::string	mPrefix;
+		std::string	mCommand;
+		std::string	mMessage;
+		std::string	mRawMessage;
 };
 #endif
