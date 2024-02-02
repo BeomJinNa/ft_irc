@@ -1,0 +1,83 @@
+<ubuntu container id : 32926235a99d>
+
+6667 server
+43058 client
+
+:irc.local 001 nickname :Welcome to the Localnet IRC Network nickname!root@127.0.0.1
+:irc.local 002 nickname :Your host is irc.local, running version InspIRCd-3
+:irc.local 003 nickname :This server was created 05:31:06 Feb 02 2024
+:irc.local 004 nickname irc.local InspIRCd-3 iosw biklmnopstv :bklov
+:irc.local 005 nickname AWAYLEN=200 CASEMAPPING=rfc1459 CHANLIMIT=#:20 CHANMODES=b,k,l,imnpst CHANNELLEN=64 CHANTYPES=# ELIST=CMNTU HOSTLEN=64 KEYLEN=32 KICKLEN=255 LINELEN=512 MAXLIST=b:100 :are supported by this server
+:irc.local 005 nickname MAXTARGETS=20 MODES=20 NAMELEN=128 NETWORK=Localnet NICKLEN=30 PREFIX=(ov)@+ SAFELIST STATUSMSG=@+ TOPICLEN=307 USERLEN=10 USERMODES=,,s,iow WHOX :are supported by this server
+:irc.local 251 nickname :There are 0 users and 0 invisible on 1 servers
+:irc.local 253 nickname 1 :unknown connections
+:irc.local 254 nickname 0 :channels formed
+:irc.local 255 nickname :I have 0 clients and 0 servers
+:irc.local 265 nickname :Current local users: 0  Max: 1
+:irc.local 266 nickname :Current global users: 0  Max: 1
+:irc.local 375 nickname :irc.local message of the day
+:irc.local 372 nickname : **************************************************
+:irc.local 372 nickname : *             H    E    L    L    O              *
+:irc.local 372 nickname : *  This is a private irc server. Please contact  *
+:irc.local 372 nickname : *  the admin of the server for any questions or  *
+:irc.local 372 nickname : *  issues.                                       *
+:irc.local 372 nickname : **************************************************
+:irc.local 372 nickname : *  The software was provided as a package of     *
+:irc.local 372 nickname : *  Debian GNU/Linux <https://www.debian.org/>.   *
+:irc.local 372 nickname : *  However, Debian has no control over this      *
+:irc.local 372 nickname : *  server.                                       *
+:irc.local 372 nickname : **************************************************
+:irc.local 372 nickname : (The sysadmin possibly wants to edit </etc/inspircd/inspircd.motd>)
+:irc.local 376 nickname :End of message of the day.
+
+127.000.000.001.43058-127.000.000.001.06667: MODE nickname +i
+
+127.000.000.001.06667-127.000.000.001.43058: :nickname!root@127.0.0.1 MODE nickname :+i
+
+127.000.000.001.43058-127.000.000.001.06667: PING irc.local
+
+127.000.000.001.06667-127.000.000.001.43058: :irc.local PONG irc.local :irc.local
+
+127.000.000.001.43058-127.000.000.001.06667: PING irc.local
+
+127.000.000.001.06667-127.000.000.001.43058: :irc.local PONG irc.local :irc.local
+
+127.000.000.001.43058-127.000.000.001.06667: PING irc.local
+
+127.000.000.001.06667-127.000.000.001.43058: :irc.local PONG irc.local :irc.local
+
+127.000.000.001.43058-127.000.000.001.06667: PING irc.local
+
+127.000.000.001.43058-127.000.000.001.06667: NICK hcho2
+
+127.000.000.001.06667-127.000.000.001.43058: :nickname!root@127.0.0.1 NICK :hcho2
+
+127.000.000.001.43058-127.000.000.001.06667: JOIN #new_channel
+
+127.000.000.001.06667-127.000.000.001.43058: :john!root@127.0.0.1 JOIN :#new_channel
+:irc.local 353 john = #new_channel :@john
+:irc.local 366 john #new_channel :End of /NAMES list.
+
+127.000.000.001.43058-127.000.000.001.06667: MODE #new_channel
+
+127.000.000.001.06667-127.000.000.001.43058: :irc.local 324 john #new_channel :+nt
+:irc.local 329 john #new_channel :1706856455
+
+127.000.000.001.43058-127.000.000.001.06667: WHO #new_channel
+
+127.000.000.001.06667-127.000.000.001.43058: :irc.local 352 john #new_channel root 127.0.0.1 irc.local john H@ :0 root
+:irc.local 315 john #new_channel :End of /WHO list.
+
+127.000.000.001.43058-127.000.000.001.06667: MODE #new_channel b
+
+127.000.000.001.06667-127.000.000.001.43058: :irc.local 368 john #new_channel :End of channel ban list
+
+127.000.000.001.43058-127.000.000.001.06667: MODE #new_channel +i
+
+127.000.000.001.06667-127.000.000.001.43058: :john!root@127.0.0.1 MODE #new_channel :+i
+
+(/ping 1234)
+
+127.000.000.001.43058-127.000.000.001.06667: PRIVMSG string :.PING 1706856789 80645.
+
+127.000.000.001.06667-127.000.000.001.43058: :irc.local 401 john string :No such nick
