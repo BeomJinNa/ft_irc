@@ -47,6 +47,7 @@ class User
 	private:
 		int				mUserId;
 		int				mSocketFd;
+		// bool			mIsOper;
 		bool			mIsLoggedIn;
 		bool			mIsUserNameSet;
 		bool			mIsNickNameSet;
