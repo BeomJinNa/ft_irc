@@ -72,7 +72,7 @@ bool	Message::ParseMessage(int userId, std::string& message)
 			if (token[0] == ':')
 			{
 				std::getline(iss2, mTrailing);
-				mTrailing = token.substr(1);
+				mTrailing = token;
 				break;
 			}
 			else
