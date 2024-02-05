@@ -13,9 +13,6 @@ class Command
 	public:
 		typedef void	(*CommandFunction)(const Message& message);
 
-		Command(const std::string& command);
-		Command(const Command& source);
-		Command&	operator=(const Command& source);
 		~Command(void);
 
 		static void RegisterCommand(const std::string& commandName, CommandFunction function);
@@ -23,7 +20,9 @@ class Command
 
 	private:
 		Command(void);
-		std::string										mCommand;
+		Command(const Command& source);
+		Command&	operator=(const Command& source);
+
 		static std::map<std::string, CommandFunction>	mHookList;
 };
 #endif

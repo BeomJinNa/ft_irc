@@ -5,10 +5,9 @@
 std::map<std::string, Command::CommandFunction> Command::mHookList;
 
 Command::Command(void) {}
-Command::Command(const std::string& command) : mCommand(command) {}
-Command::Command(const Command& source) : mCommand(source.mCommand) {}
+Command::Command(const Command& source) { (void)source; }
 Command&	Command::operator=(const Command& source)
-{ if (this != &source) { mCommand = source.mCommand; } return (*this); }
+{ if (this != &source) { } return (*this); }
 Command::~Command(void) {}
 
 void	Command::RegisterCommand(const std::string& command,
