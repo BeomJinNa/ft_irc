@@ -11,7 +11,11 @@ Command&	Command::operator=(const Command& source)
 { if (this != &source) { mCommand = source.mCommand; } return (*this); }
 Command::~Command(void) {}
 
-std::string	Command::GetCommand(void) const { return (mCommand); }
+void	Command::RegisterCommand(const std::string& command,
+								 CommandFunction function)
+{
+	mHookList[command] = function;
+}
 
 bool	Command::ExecuteCommand(const Message& message)
 {

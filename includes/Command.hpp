@@ -18,7 +18,7 @@ class Command
 		Command&	operator=(const Command& source);
 		~Command(void);
 
-		std::string	GetCommand(void) const;
+		static void RegisterCommand(const std::string& commandName, CommandFunction function);
 		static bool	ExecuteCommand(const Message& message);
 
 	private:

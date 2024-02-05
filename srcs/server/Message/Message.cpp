@@ -24,15 +24,19 @@ Message&	Message::operator=(const Message& source)
 
 Message::~Message(void) {}
 
-int					Message::GetUserId(void) const			{ return (mUserId); }
-std::string&		Message::GetPrefix(void)				{ return (mPrefix); }
-const std::string&	Message::GetPrefix(void) const			{ return (mPrefix); }
-std::string&		Message::GetCommand(void)				{ return (mCommand); }
-const std::string&	Message::GetCommand(void) const			{ return (mCommand); }
-std::string&		Message::GetMessage(void)				{ return (mMessage); }
-const std::string&	Message::GetMessage(void) const			{ return (mMessage); }
-std::string&		Message::GetRawMessageData(void)		{ return (mRawMessage); }
-const std::string&	Message::GetRawMessageData(void) const	{ return (mRawMessage); }
+int								Message::GetUserId(void) const			{ return (mUserId); }
+std::string&					Message::GetPrefix(void)				{ return (mPrefix); }
+const std::string&				Message::GetPrefix(void) const			{ return (mPrefix); }
+std::string&					Message::GetCommand(void)				{ return (mCommand); }
+const std::string&				Message::GetCommand(void) const			{ return (mCommand); }
+std::vector<std::string>&		Message::GetParameters(void)			{ return (mParameters); }
+const std::vector<std::string>&	Message::GetParameters(void) const		{ return (mParameters); }
+std::string&					Message::GetTrailing(void)				{ return (mTrailing); }
+const std::string&				Message::GetTrailing(void) const		{ return (mTrailing); }
+std::string&					Message::GetMessage(void)				{ return (mMessage); }
+const std::string&				Message::GetMessage(void) const			{ return (mMessage); }
+std::string&					Message::GetRawMessageData(void)		{ return (mRawMessage); }
+const std::string&				Message::GetRawMessageData(void) const	{ return (mRawMessage); }
 
 bool	Message::ParseMessage(int userId, std::string& message)
 {
@@ -56,8 +60,28 @@ bool	Message::ParseMessage(int userId, std::string& message)
 		return (false);
 	}
 
-	//Command 뒷부분은 모두 mMessage에 저장
 	std::getline(iss, mMessage);
+	std::istringstream	iss2(mMessage);
+
+	//parameters 파싱
+	//콜론`:`으로 시작하는 토큰 발견시 줄 끝까지 trailing으로 처리 후 종료
+	while (std::getline(iss2, token, ' '))
+	{
+		if (!token.empty())
+		{
+			if (token[0] == ':')
+			{
+				std::getline(iss2, mTrailing);
+				mTrailing = token.substr(1);
+				break;
+			}
+			else
+			{
+				mParameters.push_back(token);
+			}
+		}
+	}
+
 	return (true);
 }
 
@@ -65,6 +89,8 @@ void	Message::ClearData(void)
 {
 	mPrefix.clear();
 	mCommand.clear();
+	mParameters.clear();
+	mTrailing.clear();
 	mMessage.clear();
 	mRawMessage.clear();
 }
