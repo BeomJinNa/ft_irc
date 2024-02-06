@@ -1,3 +1,4 @@
+CAP
 PASS
 NICK
 USER

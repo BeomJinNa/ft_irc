@@ -18,32 +18,32 @@ enum {
 void	HookFunctionPass(const Message& message)
 {
 	Server&			server = Server::GetInstance();
-	int				socketFd = message.GetUserId();
+	int				userId = message.GetUserId();
 
 	if (message.GetParameters().size() == 0) //TODO: Param 개수 0 가능?
 	{
 		std::string errCode = std::to_string(ERR_NEEDMOREPARAMS);
-    	server.SendMessageToClient(socketFd, errCode.c_str(), errCode.length());
+    	server.SendMessageToClient(userId, errCode.c_str(), errCode.length());
 		return;
 	}
 
 	std::string		inputPassword = message.GetParameters().at(0);
 	UserDB&			userDB = UserDB::GetInstance();
 
-	if (userDB.GetUserIdBySocketId(socketFd) != -1)
+	if (userDB.GetUserIdBySocketId(userId) != -1)
 	{
 		std::string errCode = std::to_string(ERR_ALREADYREGISTERED);
-    	server.SendMessageToClient(socketFd, errCode.c_str(), errCode.length());
+    	server.SendMessageToClient(userId, errCode.c_str(), errCode.length());
 		return;
 	}
 	if (server.GetServerPassword() != inputPassword)
 	{
 		std::string errCode = std::to_string(ERR_PASSWDMISMATCH);
-    	server.SendMessageToClient(socketFd, errCode.c_str(), errCode.length());
+    	server.SendMessageToClient(userId, errCode.c_str(), errCode.length());
 		return;
 	}
 
-	userDB.ConnectUser(socketFd);
+	userDB.ConnectUser(userId);
 }
 
 //TODO: test!

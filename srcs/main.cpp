@@ -144,5 +144,6 @@ namespace
 	void	addHooks(void)
 	{
 		Command::RegisterCommand("QUIT", HookFunctionQuit);
+		Command::RegisterCommand("PASS", HookFunctionPass);
 	}
 }

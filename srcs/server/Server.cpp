@@ -14,6 +14,7 @@
 #include "Command.hpp"
 #include "FixedBufferArray.hpp"
 #include "Constant.hpp"
+#include <iostream>
 
 namespace
 {
@@ -175,6 +176,7 @@ void Server::acceptConnection(void)
 		EV_SET(&ev, clientFd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
 		xKevent(mKq, &ev, 1, NULL, 0, NULL);
 		mClientFds.insert(clientFd);
+		std::cout << clientFd << " has been connected!" << std::endl;
 
 		bool isConnectionAvailable = UserDB::GetInstance().ConnectUser(clientFd);
 		if (isConnectionAvailable == false)
@@ -196,6 +198,7 @@ void Server::handleRead(int clientFd)
 		mReadSocketBuffers[clientFd].buffer[bytes_read] = '\0';
 		mReadBuffers[clientFd].append(mReadSocketBuffers[clientFd].buffer);
 
+		std::cout << mReadBuffers[clientFd] << std::endl;
 		size_t	end_of_msg = mReadBuffers[clientFd].find("\r\n");
 		while (end_of_msg != std::string::npos)
 		{
@@ -205,6 +208,7 @@ void Server::handleRead(int clientFd)
 				return ;
 			}
 			std::string message = mReadBuffers[clientFd].substr(0, end_of_msg);
+			std::cout << "message: " << message << std::endl;
 			mReadBuffers[clientFd].erase(0, end_of_msg + 2);
 			executeHooks(UserDB::GetInstance().GetUserIdBySocketId(clientFd), message);
 		}
