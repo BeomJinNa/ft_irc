@@ -30,6 +30,9 @@ class Server
 		void				SetServerPassword(const std::string& password);
 		std::string&		GetServerPassword(void);
 		const std::string&	GetServerPassword(void) const;
+		std::string			GetHostAddress(void) const;
+		uint16_t			GetHostPortNumber(void) const;
+		std::string			GetHostPort(void) const;
 
 		static Server&		GetInstance(void);
 
@@ -53,5 +56,7 @@ class Server
 		std::vector<struct kevent>		mWriteEvents;
 
 		std::string						mPassword;
+		std::string						mHostAddress;
+		uint16_t						mHostPort;
 };
 #endif

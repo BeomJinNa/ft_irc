@@ -2,12 +2,15 @@
 #include <sys/event.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <ctime>
 #include <cerrno>
 #include <stdexcept>
 #include <string>
+#include <netdb.h>
+#include <sstream>
 #include "Server.hpp"
 #include "UserDB.hpp"
 #include "Message.hpp"
@@ -64,6 +67,19 @@ Server::Server(int port)
 		close(mKq);
 		throw std::runtime_error("Failed to add server socket event to mKqueue");
 	}
+
+	struct sockaddr_in	address_input;
+	socklen_t			address_input_len = sizeof(address_input);
+
+	if (getsockname(mServerFd, (struct sockaddr *)&address_input,
+					&address_input_len) == -1)
+	{
+		close(mServerFd);
+		close(mKq);
+		throw std::runtime_error("getsockname failed");
+	}
+	mHostAddress = inet_ntoa(address_input.sin_addr);
+	mHostPort = ntohs(address_input.sin_port);
 	TouchInstanceData(this);
 }
 
@@ -122,6 +138,16 @@ void				Server::SetServerPassword(const std::string& password)
 						{ mPassword = password; }
 std::string&		Server::GetServerPassword(void) { return (mPassword); }
 const std::string&	Server::GetServerPassword(void) const { return (mPassword); }
+std::string			Server::GetHostAddress(void) const { return (mHostAddress); }
+uint16_t			Server::GetHostPortNumber(void) const { return (mHostPort); }
+
+std::string			Server::GetHostPort(void) const
+{
+	std::ostringstream	oss;
+
+	oss << mHostPort;
+	return (oss.str());
+}
 
 Server& Server::GetInstance(void)
 {
