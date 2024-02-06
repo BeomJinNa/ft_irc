@@ -21,20 +21,19 @@ class Server
 		Server(int port);
 		~Server(void);
 
-		void				DoNothing(void) const;
-		void				RunServer(void);
-		void				SendMessageToClient(int clientFd, const char* data,
-												size_t dataLength);
-		void				CloseClientConnection(int clientFd);
-		void				CloseAllClientConnection(void);
-		void				SetServerPassword(const std::string& password);
-		std::string&		GetServerPassword(void);
-		const std::string&	GetServerPassword(void) const;
-		std::string			GetHostAddress(void) const;
-		uint16_t			GetHostPortNumber(void) const;
-		std::string			GetHostPort(void) const;
+		void			DoNothing(void) const;
+		void			RunServer(void);
+		void			SendMessageToClient(int clientFd, const char* data,
+											size_t dataLength);
+		void			CloseClientConnection(int clientFd);
+		void			CloseAllClientConnection(void);
+		void			SetServerPassword(const std::string& password);
+		std::string		GetServerPassword(void);
+		std::string		GetHostAddress(void) const;
+		uint16_t		GetHostPortNumber(void) const;
+		std::string		GetHostPort(void) const;
 
-		static Server&		GetInstance(void);
+		static Server&	GetInstance(void);
 
 	private:
 		Server(void);
@@ -58,5 +57,6 @@ class Server
 		std::string						mPassword;
 		std::string						mHostAddress;
 		uint16_t						mHostPort;
+		std::string						mHostPortString;
 };
 #endif
