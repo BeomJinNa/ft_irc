@@ -7,19 +7,19 @@
 
 enum {
 
+	RPL_WELCOME = 1,
     ERR_NEEDMOREPARAMS = 461,
-    ERR_ALREADYREGISTERED = 462,
-    ERR_PASSWDMISMATCH = 464
+    ERR_ALREADYREGISTERED = 462
 
 };
 
-void	HookFunctionPass(const Message& message)
+void	HookFunctionUser(const Message& message)
 {
 	Server&			server = Server::GetInstance();
 	UserDB&			userDB = UserDB::GetInstance();
 	int				userId = message.GetUserId();
 
-	if (message.GetParameters().size() == 0)
+	if (message.GetParameters().size() < 3 || message.GetParameters().at(0).length() == 0)
 	{
 		std::string errMsg = std::to_string(ERR_NEEDMOREPARAMS);
 		userDB.SendMessageToUser(errMsg, userId);
@@ -32,14 +32,7 @@ void	HookFunctionPass(const Message& message)
 		return ;
 	}
 
-	const std::string&	inputPassword = message.GetParameters().at(0);
-
-	if (server.GetServerPassword() != inputPassword)
-	{
-		std::string errMsg = std::to_string(ERR_PASSWDMISMATCH);
-		userDB.SendMessageToUser(errMsg, userId);
-		return ;
-	}
-
-	userDB.SetLoginStatus(userId, true);
+	std::string userName = message.GetParameters().at(0);
+	userDB.SetUserName(userId, userName);
+	userDB.SendMessageToUser(userId);
 }
