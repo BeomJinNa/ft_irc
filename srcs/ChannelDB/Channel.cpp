@@ -92,6 +92,7 @@ void	Channel::RemoveUserData(int userId)
 {
 	RemoveActiveUser(userId);
 	RemoveOperator(userId);
+	RemoveInvitedUser(userId);
 	RemoveBanUser(userId);
 }
 
@@ -131,10 +132,34 @@ bool	Channel::IsUserOperator(int userID) const
 	return (true);
 }
 
+void	Channel::AddInvitedUser(int userId)
+{
+	if (IsUserBanned(userId))
+	{
+		RemoveBanUser(userId);
+	}
+	mInvitedUserList.insert(userId);
+}
+
+void	Channel::RemoveInvitedUser(int userId)
+			{ mInvitedUserList.erase(userId); }
+
+bool	Channel::IsUserInvited(int userID) const
+{
+	DB::iterator	it = mInvitedUserList.find(userID);
+
+	if (it == mInvitedUserList.end())
+	{
+		return (false);
+	}
+	return (true);
+}
+
 void	Channel::AddBanUser(int userId)
 {
 	mBanUserList.insert(userId);
 	RemoveActiveUser(userId);
+	RemoveInvitedUser(userId);
 }
 
 void	Channel::RemoveBanUser(int userId)
@@ -179,6 +204,11 @@ std::vector<int>	Channel::GetActiveUserList(void) const
 std::vector<int>	Channel::GetOperatorList(void) const
 {
     return (std::vector<int>(mOperatorList.begin(), mOperatorList.end()));
+}
+
+std::vector<int>	Channel::GetInvitedUserList(void) const
+{
+    return (std::vector<int>(mInvitedUserList.begin(), mInvitedUserList.end()));
 }
 
 std::vector<int>	Channel::GetBanUserList(void) const
