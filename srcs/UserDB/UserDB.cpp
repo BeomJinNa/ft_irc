@@ -1,3 +1,5 @@
+#include <sstream>
+#include <iomanip>
 #include "UserDB.hpp"
 #include "User.hpp"
 #include "Server.hpp"
@@ -186,6 +188,32 @@ void	UserDB::SendMessageToUser(const std::string& message, int userId) const
 	}
 	Server::GetInstance().SendMessageToClient(it->second.GetSocketFd(),
 											  message.c_str(), message.size());
+}
+
+void	UserDB::SendErrorMessageToUser(const std::string& message, int userId, int code) const
+{
+	Server&	serv = Server::GetInstance();
+	UserDB&	uDB = UserDB::GetInstance();
+
+	std::ostringstream	oss;
+	oss << ":" << serv.GetHostAddress()
+		<< " " << std::setw(3) << code
+		<< " " << uDB.GetNickName(userId)
+		<< " " << message;
+	uDB.SendMessageToUser(oss.str(), userId);
+}
+
+void	UserDB::SendFormattedMessageToUser(const std::string& message, int userId) const
+{
+	Server&	serv = Server::GetInstance();
+	UserDB&	uDB = UserDB::GetInstance();
+
+	std::string	sendingMessage
+		= ":" + uDB.GetNickName(userId)
+		+ "!" + uDB.GetUserName(userId)
+		+ "@" + serv.GetHostAddress();
+		+ " " + message;
+	uDB.SendMessageToUser(sendingMessage, userId);
 }
 
 void	UserDB::SetLoginStatus(int userId, bool value)
