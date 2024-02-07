@@ -31,6 +31,11 @@ class Channel
 		void				RemoveOperator(int userId);
 		bool				IsUserOperator(int userId) const;
 
+							//성공 여부 반환
+		void				AddInvitedUser(int userId);
+		void				RemoveInvitedUser(int userId);
+		bool				IsUserInvited(int userId) const;
+
 		void				AddBanUser(int userId);
 		void				RemoveBanUser(int userId);
 		bool				IsUserBanned(int userId) const;
@@ -55,6 +60,7 @@ class Channel
 
 		std::vector<int>	GetActiveUserList(void) const;
 		std::vector<int>	GetOperatorList(void) const;
+		std::vector<int>	GetInvitedUserList(void) const;
 		std::vector<int>	GetBanUserList(void) const;
 
 	private:
@@ -68,6 +74,7 @@ class Channel
 
 		DB				mActiveUserList;
 		DB				mOperatorList;
+		DB				mInvitedUserList;
 		DB				mBanUserList;
 };
 #endif

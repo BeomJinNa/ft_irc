@@ -136,6 +136,40 @@ bool	ChannelDB::IsUserOperator(int channelId, int userId) const
 	return (it->second.IsUserOperator(userId));
 }
 
+void	ChannelDB::AddInvitedUserIntoChannel(int channelId, int userId)
+{
+	DB::iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+
+	it->second.AddInvitedUser(userId);
+}
+
+void	ChannelDB::RemoveInvitedUserIntoChannel(int channelId, int userId)
+{
+	DB::iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+	it->second.RemoveInvitedUser(userId);
+}
+
+bool	ChannelDB::IsUserInvited(int channelId, int userId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (false);
+	}
+	return (it->second.IsUserInvited(userId));
+}
+
 void	ChannelDB::AddBanIntoChannel(int channelId, int userId)
 {
 	DB::iterator	it = mDataBase.find(channelId);
@@ -242,6 +276,28 @@ std::string	ChannelDB::GetChannelName(int channelId)
 	return (it->second.GetChannelName());
 }
 
+void	ChannelDB::SetChannelPassword(int channelId, const std::string& password)
+{
+	DB::iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+	it->second.SetPassword(password);
+}
+
+std::string	ChannelDB::GetChannelPassword(int channelId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ("");
+	}
+	return (it->second.GetPassword());
+}
+
 void	ChannelDB::SetChannelTopic(int channelId, const std::string& topic)
 {
 	DB::iterator	it = mDataBase.find(channelId);
@@ -253,9 +309,9 @@ void	ChannelDB::SetChannelTopic(int channelId, const std::string& topic)
 	it->second.SetTopic(topic);
 }
 
-std::string	ChannelDB::GetChannelTopic(int channelId)
+std::string	ChannelDB::GetChannelTopic(int channelId) const
 {
-	DB::iterator	it = mDataBase.find(channelId);
+	DB::const_iterator	it = mDataBase.find(channelId);
 
 	if (it == mDataBase.end())
 	{

@@ -24,16 +24,16 @@ enum {
 
 namespace
 {
-	bool isForbiddenName(std::string nickname)
+	bool isValidName(std::string nickname)
 	{
 		char firstChar = nickname.at(0);
 
 		if (firstChar == '#' || firstChar == '&' || firstChar == ':')
 		{
-			return true;
+			return false;
 		}
 
-		return false;
+		return true;
 	}
 
 }
@@ -42,28 +42,30 @@ void	HookFunctionNick(const Message& message)
 {
 	Server&		server = Server::GetInstance();
 	UserDB&		userDB = UserDB::GetInstance();
-	int			socketFd = message.GetUserId();
+	int			userId = message.GetUserId();
+	std::string	response;
 
-	if (message.GetParameters().size() == 0)
+	if (message.GetParameters().empty())
 	{
-		//server.SendErrCodeToClient(socketFd, ERR_NONICKNAMEGIVEN);
+		response = std::to_string(ERR_NONICKNAMEGIVEN) + " PASS :Not enough parameters";
+		userDB.SendMessageToUser(response, userId);
+		//server.SendErrCodeToClient(userId, ERR_NONICKNAMEGIVEN);
 		return;
 	}
 
-	std::string nickname = message.GetParameters().at(0);
+	std::string nickname = message.GetParameters().front();
 
-	if (isForbiddenName(nickname))
+	if (!isValidName(nickname))
 	{
-		//server.SendErrCodeToClient(socketFd, ERR_ERRONEUSNICKNAME);
+		//server.SendErrCodeToClient(userId, ERR_ERRONEUSNICKNAME);
 		return;
 	}
 	/*
 	if (userDB.hasNickname(nickname))
 	{
-		server.SendErrCodeToClient(socketFd, ERR_NICKNAMEINUSE);
+		server.SendErrCodeToClient(userId, ERR_NICKNAMEINUSE);
 		return;
 	}
-	*/
-	int userId = userDB.GetUserIdBySocketId(socketFd);
+	*/	
 	userDB.SetNickName(userId, nickname);
 }
