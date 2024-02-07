@@ -34,5 +34,5 @@ void	HookFunctionUser(const Message& message)
 
 	std::string userName = message.GetParameters().at(0);
 	userDB.SetUserName(userId, userName);
-	userDB.SendMessageToUser(userId);
+	userDB.SendMessageToUser("", userId);
 }

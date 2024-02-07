@@ -22,6 +22,8 @@ class Message
 		const std::vector<std::string>&	GetParameters(void) const;
 		std::string&					GetTrailing(void);
 		const std::string&				GetTrailing(void) const;
+		std::string&					GetMessage(void);
+		const std::string&				GetMessage(void) const;
 		std::string&					GetRawMessageData(void);
 		const std::string&				GetRawMessageData(void) const;
 
@@ -35,6 +37,7 @@ class Message
 		std::string					mCommand;
 		std::vector<std::string>	mParameters;
 		std::string					mTrailing;
+		std::string					mMessage;
 		std::string					mRawMessage;
 };
 #endif

@@ -6,8 +6,8 @@ Message::Message(void) {}
 Message::Message(const Message& source)
 	: mPrefix(source.mPrefix)
 	, mCommand(source.mPrefix)
-	, mParameters(source.mParameters)
-	, mTrailing(source.mTrailing) {}
+	, mMessage(source.mMessage)
+	, mRawMessage(source.mRawMessage) {}
 
 Message&	Message::operator=(const Message& source)
 {
@@ -15,8 +15,8 @@ Message&	Message::operator=(const Message& source)
 	{
 		mPrefix = source.mPrefix;
 		mCommand = source.mCommand;
-		mParameters = source.mParameters;
-		mTrailing = source.mTrailing;
+		mMessage = source.mMessage;
+		mRawMessage = source.mRawMessage;
 	}
 
 	return (*this);
@@ -33,6 +33,8 @@ std::vector<std::string>&		Message::GetParameters(void)			{ return (mParameters)
 const std::vector<std::string>&	Message::GetParameters(void) const		{ return (mParameters); }
 std::string&					Message::GetTrailing(void)				{ return (mTrailing); }
 const std::string&				Message::GetTrailing(void) const		{ return (mTrailing); }
+std::string&					Message::GetMessage(void)				{ return (mMessage); }
+const std::string&				Message::GetMessage(void) const			{ return (mMessage); }
 std::string&					Message::GetRawMessageData(void)		{ return (mRawMessage); }
 const std::string&				Message::GetRawMessageData(void) const	{ return (mRawMessage); }
 
@@ -58,16 +60,19 @@ bool	Message::ParseMessage(int userId, std::string& message)
 		return (false);
 	}
 
+	std::getline(iss, mMessage);
+	std::istringstream	iss2(mMessage);
+
 	//parameters 파싱
 	//콜론`:`으로 시작하는 토큰 발견시 줄 끝까지 trailing으로 처리 후 종료
-	while (std::getline(iss, token, ' '))
+	while (std::getline(iss2, token, ' '))
 	{
 		if (!token.empty())
 		{
 			if (token[0] == ':')
 			{
-				std::getline(iss, mTrailing);
-				mTrailing = token.substr(1);
+				std::getline(iss2, mTrailing);
+				mTrailing = token;
 				break;
 			}
 			else
@@ -86,5 +91,6 @@ void	Message::ClearData(void)
 	mCommand.clear();
 	mParameters.clear();
 	mTrailing.clear();
+	mMessage.clear();
 	mRawMessage.clear();
 }
