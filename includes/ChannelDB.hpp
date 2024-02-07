@@ -50,9 +50,13 @@ class ChannelDB
 		void			AddChannelFlag(int channelId, unsigned int flag);
 		void			RemoveChannelFlag(int channelId, unsigned int flag);
 
+		void			SetChannelPassword(int channelId,
+										const std::string& password);
+		std::string		GetChannelPassword(int channelId) const;
+
 		void			SetChannelTopic(int channelId,
 										const std::string& topic);
-		std::string		GetChannelTopic(int channelId);
+		std::string		GetChannelTopic(int channelId) const;
 
 		UserList		GetUserListInChannel(int channelId) const;
 		UserList		GetOperatorListInChannel(int channelId) const;
