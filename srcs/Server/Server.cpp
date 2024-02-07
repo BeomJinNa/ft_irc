@@ -80,6 +80,11 @@ Server::Server(int port)
 	}
 	mHostAddress = inet_ntoa(address_input.sin_addr);
 	mHostPort = ntohs(address_input.sin_port);
+
+	std::ostringstream	oss;
+	oss << mHostPort;
+	mHostPortString = oss.str();
+
 	TouchInstanceData(this);
 }
 
@@ -134,20 +139,11 @@ void	Server::CloseAllClientConnection(void)
 	}
 }
 
-void				Server::SetServerPassword(const std::string& password)
-						{ mPassword = password; }
-std::string&		Server::GetServerPassword(void) { return (mPassword); }
-const std::string&	Server::GetServerPassword(void) const { return (mPassword); }
-std::string			Server::GetHostAddress(void) const { return (mHostAddress); }
-uint16_t			Server::GetHostPortNumber(void) const { return (mHostPort); }
-
-std::string			Server::GetHostPort(void) const
-{
-	std::ostringstream	oss;
-
-	oss << mHostPort;
-	return (oss.str());
-}
+void		Server::SetServerPassword(const std::string& password) { mPassword = password; }
+std::string	Server::GetServerPassword(void) { return (mPassword); }
+std::string	Server::GetHostAddress(void) const { return (mHostAddress); }
+uint16_t	Server::GetHostPortNumber(void) const { return (mHostPort); }
+std::string	Server::GetHostPort(void) const { return (mHostPortString); }
 
 Server& Server::GetInstance(void)
 {

@@ -15,7 +15,10 @@ SRCS	= srcs/main.cpp \
 		  srcs/ChannelDB/Channel.cpp \
 		  srcs/ChannelDB/ChannelDB.cpp \
 		  srcs/Command/Command.cpp \
-		  srcs/Command/hooks/QUIT/QUIT.cpp \
+		  srcs/Command/NICK/NICK.cpp \
+		  srcs/Command/PASS/PASS.cpp \
+		  srcs/Command/QUIT/QUIT.cpp \
+		  srcs/Command/USER/USER.cpp \
 		  srcs/ConstString.cpp \
 		  srcs/IndexManager/IndexManager.cpp \
 		  srcs/Server/FixedBufferArray.cpp \
