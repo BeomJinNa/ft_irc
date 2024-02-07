@@ -20,41 +20,45 @@ class UserDB
 		UserDB(void);
 		~UserDB(void);
 
-		void				DoNothing(void) const;
-		void				DisconnectUser(int userId);
+		void			DoNothing(void) const;
+		void			DisconnectUser(int userId);
 
-		bool				IsUserIdValid(int userId) const;
+		bool			IsUserIdValid(int userId) const;
 
-		bool				AddChannelInUserList(int userId, int channelId);
-		void				RemoveChannelInUserList(int userId, int channelId);
+		bool			AddChannelInUserList(int userId, int channelId);
+		void			RemoveChannelInUserList(int userId, int channelId);
 
-		void				SetLoginStatus(int userId, bool value);
-		bool				GetLoginStatus(int userId) const;
-		bool				IsUserAuthorized(int userId) const;
+		void			SetLoginStatus(int userId, bool value);
+		bool			GetLoginStatus(int userId) const;
+		bool			IsUserAuthorized(int userId) const;
 
-		void				SetUserName(int userId, const std::string& name);
-		std::string			GetUserName(int userId) const;
-		void				SetNickName(int userId, const std::string& name);
-		std::string			GetNickName(int userId) const;
+		void			SetUserName(int userId, const std::string& name);
+		std::string		GetUserName(int userId) const;
+		void			SetNickName(int userId, const std::string& name);
+		std::string		GetNickName(int userId) const;
 
-		ChannelList			GetJoinnedChannelList(int userId) const;
+		ChannelList		GetJoinnedChannelList(int userId) const;
 
-		int					GetUserIdByUserName(const std::string& userName) const;
-		int					GetUserIdByNickName(const std::string& nickName) const;
-		int					GetUserIdBySocketId(int socketId) const;
-		int					GetSocketIdByUserId(int userId) const;
+		int				GetUserIdByUserName(const std::string& userName) const;
+		int				GetUserIdByNickName(const std::string& nickName) const;
+		int				GetUserIdBySocketId(int socketId) const;
+		int				GetSocketIdByUserId(int userId) const;
 
-		void				SendMessageToUser(const std::string& message, int userId) const;
+		void			SendMessageToUser(const std::string& message, int userId) const;
+		void			SendFormattedMessageToUser(const std::string& message,
+												   int userId) const;
+		void			SendErrorMessageToUser(const std::string& message,
+											   int userId, int code) const;
 
-		static UserDB&		GetInstance(void);
+		static UserDB&	GetInstance(void);
 
-							//Server에서 호출 전용
-		bool				ConnectUser(int userId);
-		int					RemoveUserData(int userId);
+						//Server에서 호출 전용
+		bool			ConnectUser(int userId);
+		int				RemoveUserData(int userId);
 
-							//ChannelDB에서 호출 전용
-		void				WriteChannelInUserData(int userId, int channelId);
-		void				RemoveChannelInAllUsers(int channelId);
+						//ChannelDB에서 호출 전용
+		void			WriteChannelInUserData(int userId, int channelId);
+		void			RemoveChannelInAllUsers(int channelId);
 
 
 	private:
