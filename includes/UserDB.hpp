@@ -46,7 +46,7 @@ class UserDB
 
 		void			SendMessageToUser(const std::string& message, int userId) const;
 		void			SendFormattedMessageToUser(const std::string& message,
-												   int userId) const;
+												   int userId, int targetUserId) const;
 		void			SendErrorMessageToUser(const std::string& message,
 											   int userId, int code) const;
 
