@@ -203,7 +203,8 @@ void	UserDB::SendErrorMessageToUser(const std::string& message, int userId, int 
 	uDB.SendMessageToUser(oss.str(), userId);
 }
 
-void	UserDB::SendFormattedMessageToUser(const std::string& message, int userId) const
+void	UserDB::SendFormattedMessageToUser(const std::string& message,
+										   int userId, int targetUserID) const
 {
 	Server&	serv = Server::GetInstance();
 	UserDB&	uDB = UserDB::GetInstance();
@@ -213,7 +214,7 @@ void	UserDB::SendFormattedMessageToUser(const std::string& message, int userId) 
 		+ "!" + uDB.GetUserName(userId)
 		+ "@" + serv.GetHostAddress();
 		+ " " + message;
-	uDB.SendMessageToUser(sendingMessage, userId);
+	uDB.SendMessageToUser(sendingMessage, targetUserID);
 }
 
 void	UserDB::SetLoginStatus(int userId, bool value)
