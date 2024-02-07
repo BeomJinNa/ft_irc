@@ -136,6 +136,40 @@ bool	ChannelDB::IsUserOperator(int channelId, int userId) const
 	return (it->second.IsUserOperator(userId));
 }
 
+void	ChannelDB::AddInvitedUserIntoChannel(int channelId, int userId)
+{
+	DB::iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+
+	it->second.AddInvitedUser(userId);
+}
+
+void	ChannelDB::RemoveInvitedUserIntoChannel(int channelId, int userId)
+{
+	DB::iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+	it->second.RemoveInvitedUser(userId);
+}
+
+bool	ChannelDB::IsUserInvited(int channelId, int userId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (false);
+	}
+	return (it->second.IsUserInvited(userId));
+}
+
 void	ChannelDB::AddBanIntoChannel(int channelId, int userId)
 {
 	DB::iterator	it = mDataBase.find(channelId);

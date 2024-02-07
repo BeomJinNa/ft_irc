@@ -31,6 +31,10 @@ class ChannelDB
 		void			RemoveOperatorIntoChannel(int channelId, int userId);
 		bool			IsUserOperator(int channelId, int userId) const;
 
+		void			AddInvitedUserIntoChannel(int channelId, int userId);
+		void			RemoveInvitedUserIntoChannel(int channelId, int userId);
+		bool			IsUserInvited(int channelId, int userId) const;
+
 		void			AddBanIntoChannel(int channelId, int userId);
 		void			RemoveBanIntoChannel(int channelId, int userId);
 		bool			IsUserBanned(int channelId, int userId) const;
@@ -97,6 +101,15 @@ class ChannelDB
  *                            유저가 운영자 목록에 없거나 채널이 없으면 아무 작업도 않음.
  *
  * IsUserOperator: 특정 채널에서 유저가 운영자인지 확인합니다.
+ *                 유저가 운영자 목록에 있으면 true, 아니면 false 반환.
+ *                 채널이 없는 경우도 false 반환.
+ *
+ * AddInvitedUserIntoChannel: 특정 채널에 유저를 초대 리스트에 올립니다.
+ *
+ * RemoveInvitedUserIntoChannel: 채널에서 유저를 초대 목록에서 제거합니다.
+ *								 유저가 초대 목록에 없거나 채널이 없으면 아무 작업도 않음.
+ *
+ * IsUserInvited: 특정 채널에서 유저가 운영자인지 확인합니다.
  *                 유저가 운영자 목록에 있으면 true, 아니면 false 반환.
  *                 채널이 없는 경우도 false 반환.
  *
