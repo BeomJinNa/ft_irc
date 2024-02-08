@@ -8,12 +8,11 @@
 enum {
 
     ERR_NEEDMOREPARAMS = 461,
-    ERR_ALREADYREGISTERED = 462,
-    ERR_PASSWDMISMATCH = 464
+    ERR_NOORIGIN = 409
 
 };
 
-void	HookFunctionPass(const Message& message)
+void	HookFunctionPing(const Message& message)
 {
 	Server&			server = Server::GetInstance();
 	UserDB&			userDB = UserDB::GetInstance();

@@ -21,18 +21,16 @@ void	HookFunctionUser(const Message& message)
 
 	if (message.GetParameters().size() < 3 || message.GetParameters().at(0).length() == 0)
 	{
-		std::string errMsg = std::to_string(ERR_NEEDMOREPARAMS);
-		userDB.SendMessageToUser(errMsg, userId);
+		userDB.SendErrorMessageToUser("", userId, ERR_NEEDMOREPARAMS);
 		return ;
 	}
 	if (userDB.GetLoginStatus(userId))
 	{
-		std::string errMsg = std::to_string(ERR_ALREADYREGISTERED);
-		userDB.SendMessageToUser(errMsg, userId);
+		userDB.SendErrorMessageToUser("", userId, ERR_ALREADYREGISTERED);
 		return ;
 	}
 
 	std::string userName = message.GetParameters().at(0);
 	userDB.SetUserName(userId, userName);
-	userDB.SendMessageToUser("", userId);
+	userDB.SendErrorMessageToUser(":welcome!", userId, RPL_WELCOME);
 }
