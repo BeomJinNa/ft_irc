@@ -20,7 +20,7 @@ void	HookFunctionPass(const Message& message)
 	}
 	if (userDB.GetLoginStatus(userId))
 	{
-		userDB.SendErrorMessageToUser(":Already registered", userId, M_ERR_ALREADYREGISTERED);
+		// userDB.SendErrorMessageToUser(":Already registered", userId, M_ERR_ALREADYREGISTERED);
 		return ;
 	}
 
