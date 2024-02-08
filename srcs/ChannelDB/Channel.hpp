@@ -56,9 +56,10 @@ class Channel
 		std::string&		GetPassword(void);
 		const std::string&	GetPassword(void) const;
 
-		void				SetTopic(const std::string& topic);
+		void				SetTopic(const std::string& topic, int userId);
 		std::string&		GetTopic(void);
 		const std::string&	GetTopic(void) const;
+		int					GetTopicSetUserId(void) const;
 
 		std::vector<int>	GetActiveUserList(void) const;
 		std::vector<int>	GetOperatorList(void) const;
@@ -73,6 +74,7 @@ class Channel
 		unsigned int	mCurrentActiveUsers;
 		std::string		mPassword;
 		std::string		mTopic;
+		int				mTopicSetUser;
 
 		DB				mActiveUserList;
 		DB				mOperatorList;

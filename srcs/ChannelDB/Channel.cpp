@@ -6,6 +6,7 @@ Channel::Channel(void)
 	, mChannelMode(0)
 	, mMaxActiveUsers(0)
 	, mCurrentActiveUsers(0)
+	, mTopicSetUser(-1)
 {
 }
 
@@ -15,6 +16,7 @@ Channel::Channel(int channelId, const std::string& channelName)
 	, mChannelMode(0)
 	, mMaxActiveUsers(0)
 	, mCurrentActiveUsers(0)
+	, mTopicSetUser(-1)
 {
 }
 
@@ -26,6 +28,7 @@ Channel::Channel(const Channel& source)
 	, mCurrentActiveUsers(source.mCurrentActiveUsers)
 	, mPassword(source.mPassword)
 	, mTopic(source.mTopic)
+	, mTopicSetUser(source.mTopicSetUser)
 	, mActiveUserList(source.mActiveUserList)
 	, mOperatorList(source.mOperatorList)
 	, mBanUserList(source.mBanUserList)
@@ -43,6 +46,7 @@ Channel&	Channel::operator=(const Channel& source)
 		mCurrentActiveUsers	= source.mCurrentActiveUsers;
 		mPassword			= source.mPassword;
 		mTopic				= source.mTopic;
+		mTopicSetUser		= source.mTopicSetUser;
 		mActiveUserList		= source.mActiveUserList;
 		mOperatorList		= source.mOperatorList;
 		mBanUserList		= source.mBanUserList;
@@ -203,9 +207,15 @@ void				Channel::SetPassword(const std::string& password)
 						{ mPassword = password; }
 std::string&		Channel::GetPassword(void){ return (mPassword); }
 const std::string&	Channel::GetPassword(void) const { return (mPassword); }
-void				Channel::SetTopic(const std::string& topic) { mTopic = topic; }
+void				Channel::SetTopic(const std::string& topic, int userId)
+{
+	mTopic = topic;
+	mTopicSetUser = userId;
+}
+
 std::string&		Channel::GetTopic(void) { return (mTopic); }
 const std::string&	Channel::GetTopic(void) const { return (mTopic); }
+int					Channel::GetTopicSetUserId(void) const { return (mTopicSetUser); }
 
 std::vector<int>	Channel::GetActiveUserList(void) const
 {

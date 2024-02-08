@@ -312,7 +312,7 @@ std::string	ChannelDB::GetChannelPassword(int channelId) const
 	return (it->second.GetPassword());
 }
 
-void	ChannelDB::SetChannelTopic(int channelId, const std::string& topic)
+void	ChannelDB::SetChannelTopic(int channelId, const std::string& topic, int setUserId)
 {
 	DB::iterator	it = mDataBase.find(channelId);
 
@@ -320,7 +320,7 @@ void	ChannelDB::SetChannelTopic(int channelId, const std::string& topic)
 	{
 		return ;
 	}
-	it->second.SetTopic(topic);
+	it->second.SetTopic(topic, setUserId);
 }
 
 std::string	ChannelDB::GetChannelTopic(int channelId) const
@@ -332,6 +332,17 @@ std::string	ChannelDB::GetChannelTopic(int channelId) const
 		return ("");
 	}
 	return (it->second.GetTopic());
+}
+
+int	ChannelDB::GetChannelTopicSetUser(int channelId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (-1);
+	}
+	return (it->second.GetTopicSetUserId());
 }
 
 ChannelDB::UserList	ChannelDB::GetUserListInChannel(int channelId) const
