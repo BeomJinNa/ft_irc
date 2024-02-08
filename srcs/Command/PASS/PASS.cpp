@@ -1,17 +1,11 @@
 #include <set>
+#include <string>
 #include "Server.hpp"
 #include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "Message.hpp"
-#include <string>
-
-enum {
-
-    ERR_NEEDMOREPARAMS = 461,
-    ERR_ALREADYREGISTERED = 462,
-    ERR_PASSWDMISMATCH = 464
-
-};
+#include "ErrorCodes.hpp"
+#include "ReplyCodes.hpp"
 
 void	HookFunctionPass(const Message& message)
 {
@@ -21,12 +15,12 @@ void	HookFunctionPass(const Message& message)
 
 	if (message.GetParameters().size() == 0)
 	{
-		userDB.SendErrorMessageToUser(":Not enough parameters", userId, ERR_NEEDMOREPARAMS);
+		userDB.SendErrorMessageToUser(":Not enough parameters", userId, M_ERR_NEEDMOREPARAMS);
 		return ;
 	}
 	if (userDB.GetLoginStatus(userId))
 	{
-		userDB.SendErrorMessageToUser(":Already registered", userId, ERR_ALREADYREGISTERED);
+		userDB.SendErrorMessageToUser(":Already registered", userId, M_ERR_ALREADYREGISTERED);
 		return ;
 	}
 
@@ -34,7 +28,7 @@ void	HookFunctionPass(const Message& message)
 
 	if (server.GetServerPassword() != inputPassword)
 	{
-		userDB.SendErrorMessageToUser(":Wrong password", userId, ERR_PASSWDMISMATCH);
+		userDB.SendErrorMessageToUser(":Wrong password", userId, M_ERR_PASSWDMISMATCH);
 		return ;
 	}
 

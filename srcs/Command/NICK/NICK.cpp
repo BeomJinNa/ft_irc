@@ -1,18 +1,11 @@
+#include <string>
 #include <set>
 #include "Server.hpp"
 #include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "Message.hpp"
-#include <string>
-
-enum {
-
-    ERR_NONICKNAMEGIVEN = 431,
-    ERR_ERRONEUSNICKNAME = 432,
-    ERR_NICKNAMEINUSE = 433,
-    ERR_NICKCOLLISION = 436
-
-};
+#include "ErrorCodes.hpp"
+#include "ReplyCodes.hpp"
 
 namespace
 {
@@ -38,7 +31,7 @@ void	HookFunctionNick(const Message& message)
 
 	if (message.GetParameters().empty())
 	{
-		userDB.SendErrorMessageToUser(":Not enough parameters", userId, ERR_NONICKNAMEGIVEN);
+		userDB.SendErrorMessageToUser(":Not enough parameters", userId, M_ERR_NONICKNAMEGIVEN);
 		return ;
 	}
 
@@ -46,12 +39,12 @@ void	HookFunctionNick(const Message& message)
 
 	if (!isValidName(nickname))
 	{
-		userDB.SendErrorMessageToUser(":Invalid nickname", userId, ERR_ERRONEUSNICKNAME);
+		userDB.SendErrorMessageToUser(":Invalid nickname", userId, M_ERR_ERRONEUSNICKNAME);
 		return ;
 	}
 	if (userDB.GetUserIdByNickName(nickname) != -1)
 	{
-		userDB.SendErrorMessageToUser(":Nickname already in use", userId, ERR_NICKNAMEINUSE);
+		userDB.SendErrorMessageToUser(":Nickname already in use", userId, M_ERR_NICKNAMEINUSE);
 		return ;
 	}
 
