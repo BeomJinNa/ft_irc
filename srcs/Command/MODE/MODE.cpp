@@ -1,10 +1,13 @@
+#include <climits>
 #include <sstream>
 #include <string>
 #include <vector>
 #include "Server.hpp"
+#include "Message.hpp"
 #include "UserDB.hpp"
 #include "ChannelDB.hpp"
-#include "Message.hpp"
+#include "ChannelMode.hpp"
+
 typedef std::vector<std::string>	Tokens;
 
 namespace
@@ -13,7 +16,10 @@ namespace
 	void	applyUserMode(const Message& message);
 	void	applyChannelMode(const Message& message);
 	bool	divideCommands(Tokens* vec, const std::string& commands);
-	bool	checkParameters(Tokens command, Tokens parameter);
+	bool	checkParameters(const Tokens& command, const Tokens& parameter,
+							int userId, int channelId);
+	void	executeChannelMode(const Tokens& command, const Tokens& parameter,
+							int userId, int channelId);
 }
 
 void	HookFunctionMode(const Message& message)
@@ -91,14 +97,12 @@ namespace
 		Tokens	parametersVec = Tokens(message.GetParameters().begin() + 2,
 									message.GetParameters().end());
 
-		if (checkParameters(commandVec, parametersVec) == false)
+		if (checkParameters(commandVec, parametersVec, userId, channelId) == false)
 		{
 			return ;
 		}
-		while (itCommand != commandVec.end())
-		{
-			//코드 실행
-		}
+
+		executeChannelMode(commandVec, parametersVec, userId, channelId);//코드 실행
 	}
 
 	bool	divideCommands(Tokens* vec, const std::string& commands)
@@ -131,8 +135,12 @@ namespace
 		return (true);
 	}
 
-	bool	checkParameters(const Tokens& command, const Tokens& parameter)
+	bool	checkParameters(const Tokens& command, const Tokens& parameter,
+							int userId, int channelId)
 	{
+		UserDB&		userDB = UserDB::GetInstance();
+		ChannelDB&	channelDB = ChannelDB::GetInstance();
+
 		Tokens::const_iterator	pit = parameter.begin();
 
 		for (Tokens::const_iterator it = command.begin(); it != command.end(); ++it)
@@ -147,12 +155,75 @@ namespace
 				++pit;
 				continue;
 			}
+			else if (*it == "-k")
+			{
+				if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_PASSWORD_CHECK_ON) == 0)
+				{
+					//비밀번호 설정되지 않음
+					return (false);
+				}
+				continue;
+			}
 			else if (*it == "+o")
 			{
+				if (pit == parameter.end() || (*pit).empty())
+				{
+					//M_ERR_NEEDMOREPARAMS
+					return (false);
+				}
+				if (channelDB.IsUserOperator(channelId, userId) == false)
+				{
+					//ERR_CHANOPRIVSNEEDED
+					return (false);
+				}
+				if (channelDB.IsUserInChannel(channelId, userDB.GetUserIdByNickName(*pit)) == false)
+				{
+					//M_ERR_USERNOTINCHANNEL
+					return (false);
+				}
+				++pit;
+				continue;
 			}
 			else if (*it == "-o")
 			{
+				if (pit == parameter.end() || (*pit).empty())
+				{
+					//M_ERR_NEEDMOREPARAMS
+					return (false);
+				}
+				if (channelDB.IsUserOperator(channelId, userId) == false)
+				{
+					//ERR_CHANOPRIVSNEEDED
+					return (false);
+				}
+				++pit;
+				continue;
+			}
+			else if (*it == "+l")
+			{
+				if (pit == parameter.end() || (*pit).empty())
+				{
+					//M_ERR_NEEDMOREPARAMS
+					return (false);
+				}
+
+				std::istringstream	iss(*pit);
+				long long	buffer;
+				iss >> buffer;
+				if (buffer <= 0 || buffer > std::numeric_limits<unsigned int>::max())
+				{
+					//값 범위를 벗어남
+					return (false);
+				}
+				++pit;
+				continue;
 			}
 		}
+		return (true);
+	}
+
+	void	executeChannelMode(const Tokens& command, const Tokens& parameter,
+							int userId, int channelId)
+	{
 	}
 }
