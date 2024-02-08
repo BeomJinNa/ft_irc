@@ -23,6 +23,7 @@ class ChannelDB
 		void			DeleteChannel(int channelId);
 
 		bool			IsChannelIdValid(int channelId) const;
+		bool			IsUserInChannel(int channelId, int userId) const;
 
 		bool			AddUserIntoChannel(int channelId, int userId);
 		void			RemoveUserIntoChannel(int channelId, int userId);
@@ -67,6 +68,10 @@ class ChannelDB
 		UserList		GetBanListInChannel(int channelId) const;
 
 		void			SendMessageToChannel(const std::string& message,
+											 int channelId) const;
+		void			SendErrorMessageToChannel(const std::string& message,
+											 int channelId, int code) const;
+		void			SendFormattedMessageToChannel(const std::string& message,
 											 int channelId) const;
 
 		static ChannelDB&	GetInstance(void);

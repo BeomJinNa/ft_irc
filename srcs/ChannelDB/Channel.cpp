@@ -108,6 +108,17 @@ void	Channel::RemoveActiveUser(int userId)
 	--mCurrentActiveUsers;
 }
 
+bool	Channel::IsUserActive(int userID) const
+{
+	DB::iterator	it = mActiveUserList.find(userID);
+
+	if (it == mActiveUserList.end())
+	{
+		return (false);
+	}
+	return (true);
+}
+
 bool	Channel::AddOperator(int userId)
 {
 	if (IsUserBanned(userId))
