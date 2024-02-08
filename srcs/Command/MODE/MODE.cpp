@@ -225,12 +225,98 @@ namespace
 					return (false);
 				}
 			}
+			else if (*it == "-i")
+			{
+				if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_INVITE_ONLY) == 0)
+				{
+					userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+												+ " :Invite only mode is not set",
+												  userId, M_ERR_CHANOPRIVSNEEDED, userId);
+					return (false);
+				}
+			}
+			else if (*it == "+t")
+			{
+				if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY) != 0)
+				{
+					userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+												+ " :Topic operator only mode is already set",
+												  userId, M_ERR_CHANOPRIVSNEEDED, userId);
+					return (false);
+				}
+			}
+			else if (*it == "-t")
+			{
+				if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY) == 0)
+				{
+					userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+												+ " :Topic operator only mode is not set",
+												  userId, M_ERR_CHANOPRIVSNEEDED, userId);
+					return (false);
+				}
+			}
 		}
 		return (true);
 	}
 
 	void	executeChannelMode(const Tokens& command, const Tokens& parameter,
-			int userId, int channelId)
+							   int userId, int channelId)
 	{
+		UserDB&		userDB = UserDB::GetInstance();
+		ChannelDB&	channelDB = ChannelDB::GetInstance();
+
+		Tokens::const_iterator	pit = parameter.begin();
+
+		for (Tokens::const_iterator it = command.begin(); it != command.end(); ++it)
+		{
+			if (*it == "+i")
+			{
+				channelDB.AddChannelFlag(channelId, M_FLAG_CHANNEL_INVITE_ONLY);
+			}
+			else if (*it == "-i")
+			{
+				channelDB.RemoveChannelFlag(channelId, M_FLAG_CHANNEL_INVITE_ONLY);
+			}
+			else if (*it == "+t")
+			{
+				channelDB.AddChannelFlag(channelId, M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY);
+			}
+			else if (*it == "-t")
+			{
+				channelDB.RemoveChannelFlag(channelId, M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY);
+			}
+			else if (*it == "+k")
+			{
+				channelDB.AddChannelFlag(channelId, M_FLAG_CHANNEL_PASSWORD_CHECK_ON);
+				channelDB.SetChannelPassword(channelId, *pit++);
+			}
+			else if (*it == "-k")
+			{
+				channelDB.RemoveChannelFlag(channelId, M_FLAG_CHANNEL_PASSWORD_CHECK_ON);
+				channelDB.SetChannelPassword(channelId, "");
+			}
+			else if (*it == "+o")
+			{
+				channelDB.AddOperatorIntoChannel(channelId, userDB.GetUserIdByNickName(*pit++));
+			}
+			else if (*it == "-o")
+			{
+				channelDB.RemoveOperatorIntoChannel(channelId, userDB.GetUserIdByNickName(*pit++));
+			}
+			else if (*it == "+l")
+			{
+				std::istringstream	iss(*pit++);
+				unsigned int		limit;
+
+				iss >> limit;
+				channelDB.AddChannelFlag(channelId, M_FLAG_CHANNEL_MAX_USER_LIMIT_ON);
+				channelDB.SetMaxUsersInChannel(channelId, limit);
+			}
+			else if (*it == "-l")
+			{
+				channelDB.RemoveChannelFlag(channelId, M_FLAG_CHANNEL_MAX_USER_LIMIT_ON);
+				channelDB.SetMaxUsersInChannel(channelId, std::numeric_limits<unsigned int>::max());
+			}
+		}
 	}
 }
