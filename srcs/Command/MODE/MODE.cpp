@@ -5,7 +5,6 @@
 #include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "Message.hpp"
-
 typedef std::vector<std::string>	Tokens;
 
 namespace
@@ -21,7 +20,7 @@ void	HookFunctionMode(const Message& message)
 {
 	if (message.GetParameters().size() < 1)
 	{
-		//잘못된 파라미터
+		//M_ERR_NEEDMOREPARAMS
 		return ;
 	}
 
@@ -63,7 +62,7 @@ namespace
 
 		if (message.GetParameters().size() < 2)
 		{
-			//잘못된 파라미터
+			//M_ERR_NEEDMOREPARAMS
 			return ;
 		}
 		std::string	channelName = message.GetParameters()[0].substr(1);
@@ -71,14 +70,14 @@ namespace
 		int	channelId = channelDB.GetChannelIdByName(channelName);
 		if (channelId == -1)
 		{
-			//채널존재 X
+			//M_ERR_NOSUCHCHANNEL
 			return ;
 		}
 
 		std::string command = message.GetParameters()[1];
 		if (command[0] != '+' && command[0] != '-')
 		{
-			//잘못된 파라미터
+			//별도의 메시지 코드 없음
 			return ;
 		}
 
@@ -94,7 +93,6 @@ namespace
 
 		if (checkParameters(commandVec, parametersVec) == false)
 		{
-			//잘못된 파라미터
 			return ;
 		}
 		while (itCommand != commandVec.end())
@@ -135,5 +133,26 @@ namespace
 
 	bool	checkParameters(const Tokens& command, const Tokens& parameter)
 	{
+		Tokens::const_iterator	pit = parameter.begin();
+
+		for (Tokens::const_iterator it = command.begin(); it != command.end(); ++it)
+		{
+			if (*it == "+k")
+			{
+				if (pit == parameter.end() || (*pit).empty())
+				{
+					//M_ERR_NEEDMOREPARAMS
+					return (false);
+				}
+				++pit;
+				continue;
+			}
+			else if (*it == "+o")
+			{
+			}
+			else if (*it == "-o")
+			{
+			}
+		}
 	}
 }
