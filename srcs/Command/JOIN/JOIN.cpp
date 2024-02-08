@@ -81,6 +81,15 @@ namespace{
 		result.push_back(parameters.substr(prev));
 		return result;
 	}
+	// int errorcheck(const Message& message)
+	// {
+	// 	if(message.GetParameters().size() < 1)
+	// 	{
+	// 		userDB.SendErrorMessageToUser("#1.2 :Invalid channel name", userId, M_ERR_BADCHANMASK,userId);
+	// 		return 1;
+	// 	}
+	// 	return 0;
+	// }
 }
 
 void	HookFunctionJoin(const Message& message)
@@ -92,6 +101,13 @@ void	HookFunctionJoin(const Message& message)
 		std::vector<std::string>	parseChannel;
 		std::vector<std::string>	parseKey;
 
+		// errorcheck(message);
+
+		if (message.GetParameters().size() < 1)
+		{
+			userDB.SendErrorMessageToUser("#1.2 :Invalid channel name", userId, M_ERR_NEEDMOREPARAMS, userId);
+			return;
+		}
 		//파씽 채널명이랑 키파씽하기.
 		parseChannel = parseParameters(message.GetParameters().at(0));
 		parseKey = parseParameters(message.GetParameters().at(1));
@@ -101,7 +117,8 @@ void	HookFunctionJoin(const Message& message)
 			int channelId = channelDB.GetChannelIdByName(parseChannel[i]);
 			if(!Checkparse(message.GetParameters().at(i)))
 			{//TODO: 채널명/메세지/유저이름/에러코드를 보내야한다.
-				userDB.SendErrorMessageToUser("#1.2 :Invalid channel name", userId, M_ERR_BADCHANMASK);
+			//127.000.000.001.06667-127.000.000.001.35066: :irc.local 476 itsmemario #. :Invalid channel name
+				userDB.SendErrorMessageToUser("#1.2 :Invalid channel name", userId, M_ERR_BADCHANMASK,userId);
 				continue;
 			}
 			if (channelId == -1) //채널이 존재하지 않을때 (-1) 생성하고 클라이언트를 입장시킨다.
@@ -116,7 +133,7 @@ void	HookFunctionJoin(const Message& message)
 					if (channelDB.IsUserInvited(channelId, userId) == false)
 					{
 						//127.000.000.001.06667-127.000.000.001.58710: :irc.local 473 mikim3 #1 :Cannot join channel (invite only)
-						userDB.SendErrorMessageToUser("#1 :Cannot join channel (invite only)", userId, ERR_INVITEONLYCHAN);
+						userDB.SendErrorMessageToUser("#1 :Cannot join channel (invite only)", userId, ERR_INVITEONLYCHAN,userId);
 						continue;
 					}
 				//key가 있는 채널인지 확인후, 키가 맞는지 확인하고 아니면 에러메세지를 보내고 continue
@@ -124,7 +141,7 @@ void	HookFunctionJoin(const Message& message)
 					if(compareChannelKey(channelId, parseKey[i]) == false) //i
 					{
 						//127.000.000.001.06667-127.000.000.001.54044: :irc.local 475 user1 #1 :Cannot join channel (incorrect channel key)
-						userDB.SendErrorMessageToUser("#1.2 :Invalid channel name", userId, ERR_BADCHANNELKEY);
+						userDB.SendErrorMessageToUser("#1.2 :Invalid channel name", userId, ERR_BADCHANNELKEY, userId);
 						continue;
 					}
 			}
@@ -137,4 +154,8 @@ void	HookFunctionJoin(const Message& message)
 	}
 
 }
-/*알게된점 : 서버채널 접속할때 서버*/
+/*알게된점 : 서버채널 접속할때 서버*
+ERR_TOOMANYCHANNELS (405) 합의결과 채널에 접속할수있는 최대수를 넘었을때의 에러처리는 지금 필요없는것같아서 하지 않았음.
+ERR_BADCHANMASK (476) 채널명을 올바르게 표시하진 않았으나 비슷한 채널명이 있을경우 뱉는 에러 ex) #Hello가 올바른 채널이름인데 #hello라는 유사한 채널명을 입력했을시 뱉는 에러
+ERR_BANNEDFROMCHAN (474) 채널에 차단당한 클라이언트가 채널에 접속하려고 할때 뱉는 에러 할필요없음 
+/
