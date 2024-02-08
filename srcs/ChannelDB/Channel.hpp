@@ -20,6 +20,7 @@ class Channel
 							//성공 여부 반환
 		bool				SetMaxActiveUsers(unsigned int maxUsers);
 		unsigned int		GetMaxActiveUsers(void) const;
+		unsigned int		GetCurrentActiveUsers(void) const;
 
 		void				RemoveUserData(int userId);
 							//성공 여부 반환

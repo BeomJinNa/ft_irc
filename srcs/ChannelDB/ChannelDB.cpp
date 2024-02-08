@@ -442,6 +442,17 @@ unsigned int	ChannelDB::GetMaxUsersInChannel(int channelId) const
 	return (it->second.GetMaxActiveUsers());
 }
 
+unsigned int	ChannelDB::GetCurrentUsersInChannel(int channelId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (-1);
+	}
+	return (it->second.GetCurrentActiveUsers());
+}
+
 ChannelDB& ChannelDB::GetInstance(void)
 {
 	ChannelDB*	output = TouchInstanceData(NULL);
