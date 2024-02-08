@@ -44,6 +44,7 @@ class ChannelDB
 
 		bool			SetMaxUsersInChannel(int channelId, unsigned int limit);
 		unsigned int	GetMaxUsersInChannel(int channelId) const;
+		unsigned int	GetCurrentUsersInChannel(int channelId) const;
 
 		void			SetChannelName(int channelId,
 										const std::string& name);
