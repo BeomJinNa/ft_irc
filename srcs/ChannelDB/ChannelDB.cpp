@@ -345,6 +345,31 @@ int	ChannelDB::GetChannelTopicSetUser(int channelId) const
 	return (it->second.GetTopicSetUserId());
 }
 
+std::time_t	ChannelDB::GetCreatedTimeOfChannel(int channelId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (static_cast<std::time_t>(-1));
+	}
+	return (it->second.GetCreatedTime());
+}
+
+std::string	ChannelDB::GetCreatedTimeStampOfChannel(int channelId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ("");
+	}
+
+	std::ostringstream	oss;
+	oss << it->second.GetCreatedTime();
+	return (oss.str());
+}
+
 ChannelDB::UserList	ChannelDB::GetUserListInChannel(int channelId) const
 {
 	DB::const_iterator	it = mDataBase.find(channelId);
