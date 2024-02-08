@@ -2,20 +2,19 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include "Server.hpp"
 #include "Message.hpp"
 #include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "ChannelMode.hpp"
+#include "ErrorCodes.hpp"
 
 typedef std::vector<std::string>	Tokens;
 
 namespace
 {
-	void	sendMessage(int userId, int code, const std::string& message);
 	void	applyUserMode(const Message& message);
 	void	applyChannelMode(const Message& message);
-	bool	divideCommands(Tokens* vec, const std::string& commands);
+	bool	divideCommands(Tokens* vec, const std::string& commands, int userId);
 	bool	checkParameters(const Tokens& command, const Tokens& parameter,
 							int userId, int channelId);
 	void	executeChannelMode(const Tokens& command, const Tokens& parameter,
@@ -24,9 +23,12 @@ namespace
 
 void	HookFunctionMode(const Message& message)
 {
+
 	if (message.GetParameters().size() < 1)
 	{
-		//M_ERR_NEEDMOREPARAMS
+		UserDB::GetInstance().SendErrorMessageToUser("Not enough parameters for MODE command",
+													 message.GetUserId(), M_ERR_NEEDMOREPARAMS,
+													 message.GetUserId());
 		return ;
 	}
 
@@ -43,32 +45,20 @@ void	HookFunctionMode(const Message& message)
 
 namespace
 {
-	void	sendMessage(int userId, int code, const std::string& message)
-	{
-		Server&	serv = Server::GetInstance();
-		UserDB&	uDB = UserDB::GetInstance();
-
-		std::ostringstream	oss;
-		oss << ":" << serv.GetHostAddress()
-			<< " " << code << " " << uDB.GetUserName(userId)
-			<< " " << message;
-		uDB.SendMessageToUser(oss.str(), userId);
-	}
-
 	void	applyUserMode(const Message& message)
 	{
 	}
 
 	void	applyChannelMode(const Message& message)
 	{
-		Server&		server = Server::GetInstance();
 		UserDB&		userDB = UserDB::GetInstance();
 		ChannelDB&	channelDB = ChannelDB::GetInstance();
 		int			userId = message.GetUserId();
 
 		if (message.GetParameters().size() < 2)
 		{
-			//M_ERR_NEEDMOREPARAMS
+			userDB.SendErrorMessageToUser("Not enough parameters for MODE command",
+										  userId, M_ERR_NEEDMOREPARAMS, userId);
 			return ;
 		}
 		std::string	channelName = message.GetParameters()[0].substr(1);
@@ -76,27 +66,35 @@ namespace
 		int	channelId = channelDB.GetChannelIdByName(channelName);
 		if (channelId == -1)
 		{
-			//M_ERR_NOSUCHCHANNEL
+			userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+										+ " :No such channel",
+										  userId, M_ERR_NOSUCHCHANNEL, userId);
 			return ;
 		}
 
 		std::string command = message.GetParameters()[1];
 		if (command[0] != '+' && command[0] != '-')
 		{
-			//별도의 메시지 코드 없음
+			userDB.SendErrorMessageToUser(":Invalid command value", userId,
+										  M_ERR_NEEDMOREPARAMS, userId);
 			return ;
 		}
 
 		Tokens	commandVec;
-		if (divideCommands(&commandVec, command) == false)
+		if (divideCommands(&commandVec, command, userId) == false)
 		{
-			//UNKNOWNMODE 에러
 			return ;
 		}
 
+		if (channelDB.IsUserOperator(channelId, userId) == false)
+		{
+			userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+										+ " :You're not channel operator",
+										  userId, M_ERR_CHANOPRIVSNEEDED, userId);
+			return ;
+		}
 		Tokens	parametersVec = Tokens(message.GetParameters().begin() + 2,
-									message.GetParameters().end());
-
+				message.GetParameters().end());
 		if (checkParameters(commandVec, parametersVec, userId, channelId) == false)
 		{
 			return ;
@@ -105,22 +103,22 @@ namespace
 		executeChannelMode(commandVec, parametersVec, userId, channelId);//코드 실행
 	}
 
-	bool	divideCommands(Tokens* vec, const std::string& commands)
+	bool	divideCommands(Tokens* vec, const std::string& commands, int userId)
 	{
 		static const std::string	commandLUT = "itkol";
 		char						sign = commands[0];
 		std::string					buffer;
+		std::string					commandsNoSign = commands.substr(1);
 
-		commands.substr(1);
 		(*vec).clear();
-		for (std::size_t i = 0; i < commands.size(); ++i)
+		for (std::size_t i = 0; i < commandsNoSign.size(); ++i)
 		{
 			bool	exist = false;
 			for (std::size_t j = 0; j < commandLUT.size(); ++j)
 			{
-				if (commands[i] == commandLUT[j])
+				if (commandsNoSign[i] == commandLUT[j])
 				{
-					buffer = sign + commands[i];
+					buffer = sign + commandsNoSign[i];
 					(*vec).push_back(buffer);
 					exist = true;
 					break;
@@ -129,6 +127,9 @@ namespace
 			if (exist == false)
 			{
 				(*vec).clear();
+				UserDB::GetInstance().SendErrorMessageToUser(std::string(1, commandsNoSign[i])
+														   + " :is unknown mode char to me",
+															 userId, M_ERR_UNKNOWNMODE, userId);
 				return (false);
 			}
 		}
@@ -136,7 +137,7 @@ namespace
 	}
 
 	bool	checkParameters(const Tokens& command, const Tokens& parameter,
-							int userId, int channelId)
+			int userId, int channelId)
 	{
 		UserDB&		userDB = UserDB::GetInstance();
 		ChannelDB&	channelDB = ChannelDB::GetInstance();
@@ -149,81 +150,87 @@ namespace
 			{
 				if (pit == parameter.end() || (*pit).empty())
 				{
-					//M_ERR_NEEDMOREPARAMS
+					userDB.SendErrorMessageToUser("Not enough parameters for MODE command",
+												  userId, M_ERR_NEEDMOREPARAMS, userId);
 					return (false);
 				}
 				++pit;
-				continue;
 			}
 			else if (*it == "-k")
 			{
 				if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_PASSWORD_CHECK_ON) == 0)
 				{
-					//비밀번호 설정되지 않음
+					userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+												+ " :No password is set",
+												  userId, M_ERR_CHANOPRIVSNEEDED, userId);
 					return (false);
 				}
-				continue;
 			}
 			else if (*it == "+o")
 			{
 				if (pit == parameter.end() || (*pit).empty())
 				{
-					//M_ERR_NEEDMOREPARAMS
-					return (false);
-				}
-				if (channelDB.IsUserOperator(channelId, userId) == false)
-				{
-					//ERR_CHANOPRIVSNEEDED
+					userDB.SendErrorMessageToUser("Not enough parameters for MODE command",
+												  userId, M_ERR_NEEDMOREPARAMS, userId);
 					return (false);
 				}
 				if (channelDB.IsUserInChannel(channelId, userDB.GetUserIdByNickName(*pit)) == false)
 				{
-					//M_ERR_USERNOTINCHANNEL
+					userDB.SendErrorMessageToUser(*pit + " " + channelDB.GetChannelName(channelId)
+												+ " :They aren't on that channel",
+												  userId, M_ERR_USERNOTINCHANNEL, userId);
 					return (false);
 				}
 				++pit;
-				continue;
 			}
 			else if (*it == "-o")
 			{
 				if (pit == parameter.end() || (*pit).empty())
 				{
-					//M_ERR_NEEDMOREPARAMS
-					return (false);
-				}
-				if (channelDB.IsUserOperator(channelId, userId) == false)
-				{
-					//ERR_CHANOPRIVSNEEDED
+					userDB.SendErrorMessageToUser("Not enough parameters for MODE command",
+												  userId, M_ERR_NEEDMOREPARAMS, userId);
 					return (false);
 				}
 				++pit;
-				continue;
 			}
 			else if (*it == "+l")
 			{
 				if (pit == parameter.end() || (*pit).empty())
 				{
-					//M_ERR_NEEDMOREPARAMS
+					userDB.SendErrorMessageToUser("Not enough parameters for MODE command",
+												  userId, M_ERR_NEEDMOREPARAMS, userId);
 					return (false);
 				}
 
 				std::istringstream	iss(*pit);
 				long long	buffer;
 				iss >> buffer;
-				if (buffer <= 0 || buffer > std::numeric_limits<unsigned int>::max())
+				if (buffer <= 0 || buffer > std::numeric_limits<unsigned int>::max()
+						|| buffer < channelDB.GetCurrentUsersInChannel(channelId))
 				{
-					//값 범위를 벗어남
+					userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+												+ " :Invalid parameter value for +l",
+												  userId, M_ERR_NEEDMOREPARAMS, userId);
 					return (false);
 				}
 				++pit;
-				continue;
+			}
+			else if (*it == "-l")
+			{
+				if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_MAX_USER_LIMIT_ON) == 0)
+				{
+					userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+												+ " :User limit is net set",
+												  userId, M_ERR_CHANOPRIVSNEEDED, userId);
+					return (false);
+				}
 			}
 		}
 		return (true);
 	}
 
 	void	executeChannelMode(const Tokens& command, const Tokens& parameter,
-							int userId, int channelId)
+			int userId, int channelId)
 	{
 	}
 }
