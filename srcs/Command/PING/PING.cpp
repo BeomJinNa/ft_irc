@@ -18,19 +18,18 @@ void	HookFunctionPing(const Message& message)
 		userDB.SendErrorMessageToUser(":Not enough parameters", userId, M_ERR_NEEDMOREPARAMS);
 		return ;
 	}
-	if (userDB.GetLoginStatus(userId))
-	{
-		userDB.SendErrorMessageToUser(":Already registered", userId, M_ERR_ALREADYREGISTERED);
-		return ;
-	}
 
-	const std::string&	inputPassword = message.GetParameters().at(0);
+	const std::string&	token = message.GetParameters().at(0);
+	std::string	hostname
+		= userDB.GetNickName(userId)
+		+ "!" + userDB.GetUserName(userId)
+		+ "@" + server.GetHostAddress();
 
-	if (server.GetServerPassword() != inputPassword)
-	{
-		userDB.SendErrorMessageToUser(":Wrong password", userId, M_ERR_PASSWDMISMATCH);
-		return ;
-	}
-
-	userDB.SetLoginStatus(userId, true);
+	std::string	sendingMessage
+		= ":" + hostname
+		+ " PONG " + hostname
+		+ " " + token;
+	userDB.SendMessageToUser(sendingMessage, userId);
 }
+
+// TODO: check message format again. hostname?

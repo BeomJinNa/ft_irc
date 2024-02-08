@@ -79,7 +79,7 @@ void	HookFunctionKick(const Message& message)
 	const std::string& 		user = message.GetParameters().at(1);
 	std::string 			comment = message.GetTrailing();
 	if (comment == "") // if trailing is not presented, send default message
-		comment = ":Default message";
+		comment = ":";
 
 	getUserList(user, kickUsers);
 
