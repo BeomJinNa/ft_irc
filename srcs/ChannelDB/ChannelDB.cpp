@@ -1,5 +1,8 @@
 #include <stdexcept>
 #include <cstddef>
+#include <sstream>
+#include <iomanip>
+#include "Server.hpp"
 #include "ChannelDB.hpp"
 #include "Channel.hpp"
 #include "UserDB.hpp"
@@ -68,6 +71,17 @@ bool	ChannelDB::IsChannelIdValid(int channelId) const
 		return (false);
 	}
 	return (true);
+}
+
+bool	ChannelDB::IsUserInChannel(int channelId, int userId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (false);
+	}
+	return (it->second.IsUserActive(userId));
 }
 
 bool	ChannelDB::AddUserIntoChannel(int channelId, int userId)
@@ -370,6 +384,40 @@ void	ChannelDB::SendMessageToChannel(const std::string& message,
 	}
 }
 
+void	ChannelDB::SendErrorMessageToChannel(const std::string& message,
+											 int channelId, int code) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+
+	UserList	list = it->second.GetActiveUserList();
+	for (UserList::const_iterator lit = list.cbegin(); lit != list.cend(); ++lit)
+	{
+		UserDB::GetInstance().SendErrorMessageToUser(message, *lit, code, *lit);
+	}
+}
+
+void	ChannelDB::SendFormattedMessageToChannel(const std::string& message,
+												 int channelId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+
+	UserList	list = it->second.GetActiveUserList();
+	for (UserList::const_iterator lit = list.cbegin(); lit != list.cend(); ++lit)
+	{
+		UserDB::GetInstance().SendFormattedMessageToUser(message, *lit, *lit);
+	}
+}
+
 bool	ChannelDB::SetMaxUsersInChannel(int channelId,
 										unsigned int limit)
 {
@@ -392,6 +440,17 @@ unsigned int	ChannelDB::GetMaxUsersInChannel(int channelId) const
 		return (-1);
 	}
 	return (it->second.GetMaxActiveUsers());
+}
+
+unsigned int	ChannelDB::GetCurrentUsersInChannel(int channelId) const
+{
+	DB::const_iterator	it = mDataBase.find(channelId);
+
+	if (it == mDataBase.end())
+	{
+		return (-1);
+	}
+	return (it->second.GetCurrentActiveUsers());
 }
 
 ChannelDB& ChannelDB::GetInstance(void)

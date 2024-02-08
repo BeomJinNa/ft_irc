@@ -65,8 +65,8 @@ bool	Channel::SetMaxActiveUsers(unsigned int maxUsers)
 	return (true);
 }
 
-unsigned int	Channel::GetMaxActiveUsers(void) const
-						{ return (mMaxActiveUsers); }
+unsigned int	Channel::GetMaxActiveUsers(void) const { return (mMaxActiveUsers); }
+unsigned int	Channel::GetCurrentActiveUsers(void) const { return (mCurrentActiveUsers); }
 
 bool	Channel::AddActiveUser(int userId)
 {
@@ -106,6 +106,17 @@ void	Channel::RemoveActiveUser(int userId)
 	}
 	mActiveUserList.erase(userId);
 	--mCurrentActiveUsers;
+}
+
+bool	Channel::IsUserActive(int userID) const
+{
+	DB::iterator	it = mActiveUserList.find(userID);
+
+	if (it == mActiveUserList.end())
+	{
+		return (false);
+	}
+	return (true);
 }
 
 bool	Channel::AddOperator(int userId)
