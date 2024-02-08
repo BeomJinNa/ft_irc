@@ -25,6 +25,7 @@ class Channel
 							//성공 여부 반환
 		bool				AddActiveUser(int userId);
 		void				RemoveActiveUser(int userId);
+		bool				IsUserActive(int userId) const;
 
 							//성공 여부 반환
 		bool				AddOperator(int userId);
