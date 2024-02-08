@@ -190,7 +190,8 @@ void	UserDB::SendMessageToUser(const std::string& message, int userId) const
 											  message.c_str(), message.size());
 }
 
-void	UserDB::SendErrorMessageToUser(const std::string& message, int userId, int code) const
+void	UserDB::SendErrorMessageToUser(const std::string& message, int userId,
+									   int code, int targetUserID) const
 {
 	Server&	serv = Server::GetInstance();
 	UserDB&	uDB = UserDB::GetInstance();
@@ -200,11 +201,11 @@ void	UserDB::SendErrorMessageToUser(const std::string& message, int userId, int 
 		<< " " << std::setw(3) << code
 		<< " " << uDB.GetNickName(userId)
 		<< " " << message;
-	uDB.SendMessageToUser(oss.str(), userId);
+	uDB.SendMessageToUser(oss.str(), targetUserID);
 }
 
-void	UserDB::SendFormattedMessageToUser(const std::string& message,
-										   int userId, int targetUserID) const
+void	UserDB::SendFormattedMessageToUser(const std::string& message, int userId,
+										   int targetUserID) const
 {
 	Server&	serv = Server::GetInstance();
 	UserDB&	uDB = UserDB::GetInstance();
@@ -212,9 +213,35 @@ void	UserDB::SendFormattedMessageToUser(const std::string& message,
 	std::string	sendingMessage
 		= ":" + uDB.GetNickName(userId)
 		+ "!" + uDB.GetUserName(userId)
-		+ "@" + serv.GetHostAddress();
+		+ "@" + serv.GetHostAddress()
 		+ " " + message;
 	uDB.SendMessageToUser(sendingMessage, targetUserID);
+}
+
+std::string	UserDB::GetErrorMessage(const std::string& message, int userId, int code) const
+{
+	Server&	serv = Server::GetInstance();
+	UserDB&	uDB = UserDB::GetInstance();
+
+	std::ostringstream	oss;
+	oss << ":" << serv.GetHostAddress()
+		<< " " << std::setw(3) << code
+		<< " " << uDB.GetNickName(userId)
+		<< " " << message;
+	return (oss.str());
+}
+
+std::string	UserDB::GetFormattedMessage(const std::string& message, int userId) const
+{
+	Server&	serv = Server::GetInstance();
+	UserDB&	uDB = UserDB::GetInstance();
+
+	std::string	sendingMessage
+		= ":" + uDB.GetNickName(userId)
+		+ "!" + uDB.GetUserName(userId)
+		+ "@" + serv.GetHostAddress()
+		+ " " + message;
+	return (sendingMessage);
 }
 
 void	UserDB::SetLoginStatus(int userId, bool value)
