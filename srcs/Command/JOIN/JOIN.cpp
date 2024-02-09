@@ -18,6 +18,7 @@
 #include "ErrorCodes.hpp"
 #include "Enum.hpp"
 #include "ChannelMode.hpp"
+#include "ReplyCodes.hpp"
 namespace{
 	// std::string addAllMessage(std::string command, std::string channelName, int GetUserId)
 	// {
@@ -172,7 +173,9 @@ void	HookFunctionJoin(const Message& message)
 			userNames += userDB.GetUserName(*it) + " ";
 		}
 		//  "<client> = <channel> :[prefix]<nick>{ [prefix]<nick>}"
-		//topic을 여기다가 놓으면 될것같은데..?
+		std::string topic = channelDB.GetChannelTopic(channelId);
+		if (topic != "")
+			userDB.SendErrorMessageToUser(channelName + " :" + topic, userId, M_RPL_TOPIC, userId);
 		channelDB.SendFormattedMessageToChannel("= " + channelName + " :" + userNames, channelId); //TODO: RPL_NAMREPLY (353) 보내기? 366해야함.
 		channelDB.SendFormattedMessageToChannel("366 " + channelName + " :End of /NAMES list", channelId);
 	}
