@@ -18,6 +18,7 @@
 #include "ErrorCodes.hpp"
 #include "Enum.hpp"
 #include "ChannelMode.hpp"
+#include "ReplyCodes.hpp"
 namespace{
 	// std::string addAllMessage(std::string command, std::string channelName, int GetUserId)
 	// {
@@ -112,7 +113,7 @@ void	HookFunctionJoin(const Message& message)
 
 	if (message.GetParameters().size() < 1)
 	{
-		userDB.SendErrorMessageToUser("#1.2 :Invalid channel name", userId, M_ERR_NEEDMOREPARAMS, userId);
+		userDB.SendErrorMessageToUser(":Invalid channel name", userId, M_ERR_NEEDMOREPARAMS, userId);
 		return;
 	}
 	//파씽 채널명이랑 키파씽하기.
@@ -127,14 +128,14 @@ void	HookFunctionJoin(const Message& message)
 		{
 			if(channelDB.GetCurrentUsersInChannel(channelId) >= channelDB.GetMaxUsersInChannel(channelId))
 			{
-				userDB.SendErrorMessageToUser("#1.2 :Invalid channel name", userId, ERR_CHANNELISFULL, userId);
+				userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+l)", userId, ERR_CHANNELISFULL, userId);
 				continue;
 			}
 		}
 		if(!CheckParse(channelName))
 		{//TODO: 채널명/메세지/유저이름/에러코드를 보내야한다.
 		//127.000.000.001.06667-127.000.000.001.35066: :irc.local 476 itsmemario #. :Invalid channel name
-			userDB.SendErrorMessageToUser("#1.2 :Invalid channel name", userId, M_ERR_BADCHANMASK,userId);
+			userDB.SendErrorMessageToUser(channelName + " :Bad Channel Mask", userId, M_ERR_BADCHANMASK,userId);
 			continue;
 		}
 		if (channelId == -1) //채널이 존재하지 않을때 (-1) 생성하고 클라이언트를 입장시킨다.
@@ -149,7 +150,7 @@ void	HookFunctionJoin(const Message& message)
 				if (channelDB.IsUserInvited(channelId, userId) == false)
 				{
 					//127.000.000.001.06667-127.000.000.001.58710: :irc.local 473 mikim3 #1 :Cannot join channel (invite only)
-					userDB.SendErrorMessageToUser("#1 :Cannot join channel (invite only)", userId, ERR_INVITEONLYCHAN,userId);
+					userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+i)", userId, ERR_INVITEONLYCHAN,userId);
 					continue;
 				}
 			//key가 있는 채널인지 확인후, 키가 맞는지 확인하고 아니면 에러메세지를 보내고 continue
@@ -157,7 +158,7 @@ void	HookFunctionJoin(const Message& message)
 				if(compareChannelKey(channelId, parsedKeys[i]) == false) //i
 				{
 					//127.000.000.001.06667-127.000.000.001.54044: :irc.local 475 user1 #1 :Cannot join channel (incorrect channel key)
-					userDB.SendErrorMessageToUser("#1.2 :Invalid channel name", userId, ERR_BADCHANNELKEY, userId);
+					userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+k)", userId, ERR_BADCHANNELKEY, userId);
 					continue;
 				}
 		}
@@ -172,7 +173,11 @@ void	HookFunctionJoin(const Message& message)
 			userNames += userDB.GetUserName(*it) + " ";
 		}
 		//  "<client> = <channel> :[prefix]<nick>{ [prefix]<nick>}"
+		std::string topic = channelDB.GetChannelTopic(channelId);
+		if (topic != "")
+			userDB.SendErrorMessageToUser(channelName + " :" + topic, userId, M_RPL_TOPIC, userId);
 		channelDB.SendFormattedMessageToChannel("= " + channelName + " :" + userNames, channelId); //TODO: RPL_NAMREPLY (353) 보내기? 366해야함.
+		channelDB.SendFormattedMessageToChannel("366 " + channelName + " :End of /NAMES list", channelId);
 	}
 }
 
@@ -184,6 +189,6 @@ void	HookFunctionJoin(const Message& message)
 	ERR_BANNEDFROMCHAN (474) 채널에 차단당한 클라이언트가 채널에 접속하려고 할때 뱉는 에러 할필요없음
 	TODO: topic해야하는데 아직 안만들어져서 못했음. (RPL_TOPICWHOTIME (333)와 RPL_TOPIC (332)는 만들면 하기로함.)
 
-
+	TODO: 파씽자잘한것만 고치면 끝?
 
 */
