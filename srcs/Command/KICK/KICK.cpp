@@ -22,7 +22,7 @@
 
 namespace
 {
-	typedef std::vector<std::pair<int, std::string>> UserList;
+	typedef std::vector<std::pair<int, std::string> > UserList;
 
 	size_t getUserList(std::string param, UserList& userList)
 	{
@@ -92,7 +92,7 @@ void	HookFunctionKick(const Message& message)
 
 		if (kickUsedId == -1 || !channelDB.IsUserInChannel(channelId, kickUsedId)) //No such user in channel
 		{
-			userDB.SendErrorMessageToUser(kickUserName + " " + channelName + " :They aren't on that channel", userId);
+			userDB.SendErrorMessageToUser(kickUserName + " " + channelName + " :They aren't on that channel", userId, M_ERR_NOTONCHANNEL, userId);
 			continue ;
 		}
 		std::string sendMessage = "KICK " + kickUserName + " " + comment;

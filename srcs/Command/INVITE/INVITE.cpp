@@ -64,7 +64,7 @@ void	HookFunctionInvite(const Message& message)
 		return ;
 	}
 	//check if channel is invite-only & sender is the operator of the channel
-	if ((channelDB.GetChannelFlag(channelId) && M_FLAG_CHANNEL_INVITE_ONLY) && channelDB.IsUserOperator(channelId, userId))
+	if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_INVITE_ONLY) && channelDB.IsUserOperator(channelId, userId))
 	{
 		userDB.SendErrorMessageToUser(channelName + ":You're not channel operator", userId, M_ERR_CHANOPRIVSNEEDED, userId);
 		return ;

@@ -221,7 +221,8 @@ void Server::handleRead(int clientFd)
 		mReadBuffers[clientFd].append(mReadSocketBuffers[clientFd].buffer);
 
 		std::cout << mReadBuffers[clientFd] << std::endl;
-		size_t	end_of_msg = mReadBuffers[clientFd].find("\r\n");
+		// size_t	end_of_msg = mReadBuffers[clientFd].find("\r\n");
+		size_t	end_of_msg = mReadBuffers[clientFd].find("\n"); // TODO: edit
 		while (end_of_msg != std::string::npos)
 		{
 			if (end_of_msg > M_IRC_MAX_MESSAGE_LENGTH)
@@ -232,6 +233,7 @@ void Server::handleRead(int clientFd)
 			std::string message = mReadBuffers[clientFd].substr(0, end_of_msg);
 			std::cout << "message: " << message << std::endl;
 			mReadBuffers[clientFd].erase(0, end_of_msg + 2);
+			end_of_msg = mReadBuffers[clientFd].find("\n");// TODO: added
 			executeHooks(UserDB::GetInstance().GetUserIdBySocketId(clientFd), message);
 		}
 	}

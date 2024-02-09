@@ -21,7 +21,7 @@ void	HookFunctionPass(const Message& message)
 	//
 	if (userDB.GetLoginStatus(userId))
 	{
-		// userDB.SendErrorMessageToUser(":You may not reregister", userId, M_ERR_ALREADYREGISTERED);
+		userDB.SendErrorMessageToUser(":You may not reregister", userId, M_ERR_ALREADYREGISTRED, userId);
 		return ;
 	}
 

@@ -3,7 +3,7 @@
 CXX			= c++
 
 COMMONFLAGS	=
-CXXFLAGS	= $(COMMONFLAGS) -Wall -Wextra -Werror -std=c++98
+CXXFLAGS	= $(COMMONFLAGS) -Wall -Wextra -Werror -std=c++98 -g
 LDFLAGS		= $(COMMONFLAGS)
 
 NAME	= ircserv
@@ -20,7 +20,6 @@ SRCS	= srcs/main.cpp \
 		  srcs/Command/NICK/NICK.cpp \
 		  srcs/Command/JOIN/JOIN.cpp \
 		  srcs/Command/TOPIC/TOPIC.cpp \
-		  srcs/Command/MODE/MODE.cpp \
 		  srcs/Command/PING/PING.cpp \
 		  srcs/Command/KICK/KICK.cpp \
 		  srcs/Command/INVITE/INVITE.cpp \

@@ -78,7 +78,7 @@ namespace{
 	// parameters: #1,#2,#3 or key1,key2,key3
 	// ,를 기준으로 파씽한 이후 vector에 담아서 반환한다.
 	//동적할당은 하지 않는다.
-	void parseParameters(const std::string& parameters, std::vector<std::string> list)
+	size_t parseParameters(const std::string& parameters, std::vector<std::string>& list)
 	{
 		std::string::size_type pos = 0, prev = 0;
 		while((pos = parameters.find(',', prev)) != std::string::npos)
@@ -87,6 +87,7 @@ namespace{
 		    prev = pos + 1;
 		}
 		list.push_back(parameters.substr(prev));
+		return list.size();
 	}
 	// int errorcheck(const Message& message)
 	// {
@@ -116,12 +117,14 @@ void	HookFunctionJoin(const Message& message)
 	}
 	//파씽 채널명이랑 키파씽하기.
 	parseParameters(message.GetParameters().at(0), parsedChannelNames);
-	parseParameters(message.GetParameters().at(1), parsedKeys);
+	// parseParameters(message.GetParameters().at(1), parsedKeys); //TODO: 살리기
+	std::cout << parsedChannelNames.size() << "\n";
 	for(size_t i = 0; i < parsedChannelNames.size(); i++)
 	{
 		const std::string&	channelName = parsedChannelNames[i];
 		int					channelId = channelDB.GetChannelIdByName(channelName);
 
+		std::cout << "channel name: " + channelName << "\n";
 		if (isMaxUserLimitOn(channelId))
 		{
 			if(channelDB.GetCurrentUsersInChannel(channelId) >= channelDB.GetMaxUsersInChannel(channelId))
@@ -160,7 +163,8 @@ void	HookFunctionJoin(const Message& message)
 					continue;
 				}
 		}
-		channelDB.AddUserIntoChannel(message.GetUserId(), channelId);
+		// channelDB.AddUserIntoChannel(message.GetUserId(), channelId);
+		channelDB.AddUserIntoChannel(channelId, userId);
 		channelDB.SendMessageToChannel(userDB.GetUserName(userId) + " has joined", channelId);
 
 		const ChannelDB::UserList& userList = channelDB.GetUserListInChannel(channelId);

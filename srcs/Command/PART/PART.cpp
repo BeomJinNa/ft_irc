@@ -20,7 +20,7 @@
 
 namespace
 {
-	typedef std::vector<std::pair<int, std::string>> ChannelList;
+	typedef std::vector<std::pair<int, std::string> > ChannelList;
 
 	size_t getChannelList(std::string param, ChannelList& channelList)
 	{

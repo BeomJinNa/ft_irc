@@ -150,7 +150,7 @@ namespace
 		Command::RegisterCommand("NICK", HookFunctionNick);
 		Command::RegisterCommand("JOIN", HookFunctionJoin);
 		Command::RegisterCommand("KICK", HookFunctionKick);
-		Command::RegisterCommand("MODE", HookFunctionMode);
+		// Command::RegisterCommand("MODE", HookFunctionMode);
 		Command::RegisterCommand("TOPIC", HookFunctionTopic);
 		Command::RegisterCommand("PING", HookFunctionPing);
 		Command::RegisterCommand("INVITE", HookFunctionInvite);
