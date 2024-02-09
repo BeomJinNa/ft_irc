@@ -15,7 +15,7 @@ void	HookFunctionPing(const Message& message)
 
 	if (message.GetParameters().size() == 0)
 	{
-		userDB.SendErrorMessageToUser(":Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
+		userDB.SendErrorMessageToUser("PING :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
 		return ;
 	}
 

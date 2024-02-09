@@ -15,16 +15,16 @@ void	HookFunctionUser(const Message& message)
 
 	if (message.GetParameters().size() < 3 || message.GetParameters().at(0).length() == 0)
 	{
-		userDB.SendErrorMessageToUser("", userId, M_ERR_NEEDMOREPARAMS, userId);
+		userDB.SendErrorMessageToUser("USER :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
 		return ;
 	}
 	if (userDB.GetLoginStatus(userId))
 	{
-		// userDB.SendErrorMessageToUser("", userId, M_ERR_ALREADYREGISTERED, userId);
+		// userDB.SendErrorMessageToUser(":You may not reregister", userId, M_ERR_ALREADYREGISTERED, userId);
 		return ;
 	}
 
 	std::string userName = message.GetParameters().at(0);
-	userDB.SetUserName(userId, userName);
-	userDB.SendErrorMessageToUser(":welcome!", userId, M_RPL_WELCOME, userId);
+	userDB.SetUserName(userId, userName); // TODO: add other attributes in User class
+	userDB.SendErrorMessageToUser(":Welcome to the " + server.GetHostAddress() + " Network, " + userDB.GetNickName(userId), userId, M_RPL_WELCOME, userId);
 }

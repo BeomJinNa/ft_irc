@@ -77,6 +77,21 @@ void	HookFunctionInvite(const Message& message)
 	}
 
 	channelDB.AddInvitedUserIntoChannel(channelId, inviteeId);
-	userDB.SendErrorMessageToUser(inviteeNickname + " " + channelName, userId, M_RPL_INVITING, userId);//TODO
+
+	// 127.000.000.001.53540-127.000.000.001.06667: INVITE yujin #new2
+	// 127.000.000.001.06667-127.000.000.001.53540: :irc.local 341 hcho2_ yujin :#new2
+	// 127.000.000.001.06667-127.000.000.001.40210: :hcho2_!codespace@127.0.0.1 INVITE yujin :#new2
+
+	userDB.SendErrorMessageToUser(inviteeNickname + " " + channelName, userId, M_RPL_INVITING, userId);
+	userDB.SendFormattedMessageToUser("INVITE " + inviteeNickname + " :" + channelName, userId, inviteeId);
 
 }
+
+
+/*
+
+inspircd --runasroot --nofork
+irssi -c 127.0.0.1 -p 6667 -n nickname
+tcpflow -i lo port 6667 -c
+
+*/

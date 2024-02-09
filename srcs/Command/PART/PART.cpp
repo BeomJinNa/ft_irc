@@ -50,7 +50,7 @@ void	HookFunctionPart(const Message& message)
 	// check if parameters are enough
 	if (message.GetParameters().size() == 0)
 	{
-		userDB.SendErrorMessageToUser("KICK :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
+		userDB.SendErrorMessageToUser("PART :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
 		return ;
 	}
 

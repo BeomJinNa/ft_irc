@@ -15,12 +15,13 @@ void	HookFunctionPass(const Message& message)
 
 	if (message.GetParameters().size() == 0)
 	{
-		userDB.SendErrorMessageToUser(":Not enough parameters", userId, M_ERR_NEEDMOREPARAMS);
+		userDB.SendErrorMessageToUser("PASS :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
 		return ;
 	}
+	//
 	if (userDB.GetLoginStatus(userId))
 	{
-		// userDB.SendErrorMessageToUser(":Already registered", userId, M_ERR_ALREADYREGISTERED);
+		// userDB.SendErrorMessageToUser(":You may not reregister", userId, M_ERR_ALREADYREGISTERED);
 		return ;
 	}
 
@@ -28,7 +29,7 @@ void	HookFunctionPass(const Message& message)
 
 	if (server.GetServerPassword() != inputPassword)
 	{
-		userDB.SendErrorMessageToUser(":Wrong password", userId, M_ERR_PASSWDMISMATCH);
+		userDB.SendErrorMessageToUser(":Password incorrect", userId, M_ERR_PASSWDMISMATCH, userId);
 		return ;
 	}
 

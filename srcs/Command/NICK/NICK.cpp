@@ -31,7 +31,7 @@ void	HookFunctionNick(const Message& message)
 
 	if (message.GetParameters().empty())
 	{
-		userDB.SendErrorMessageToUser(":Not enough parameters", userId, M_ERR_NONICKNAMEGIVEN);
+		userDB.SendErrorMessageToUser(":No nickname given", userId, M_ERR_NONICKNAMEGIVEN, userId);
 		return ;
 	}
 
@@ -39,12 +39,12 @@ void	HookFunctionNick(const Message& message)
 
 	if (!isValidName(nickname))
 	{
-		userDB.SendErrorMessageToUser(":Invalid nickname", userId, M_ERR_ERRONEUSNICKNAME);
+		userDB.SendErrorMessageToUser(nickname + " :Erroneus nickname", userId, M_ERR_ERRONEUSNICKNAME, userId);
 		return ;
 	}
 	if (userDB.GetUserIdByNickName(nickname) != -1)
 	{
-		userDB.SendErrorMessageToUser(":Nickname already in use", userId, M_ERR_NICKNAMEINUSE);
+		userDB.SendErrorMessageToUser(nickname + " :Nickname is already in use", userId, M_ERR_NICKNAMEINUSE, userId);
 		return ;
 	}
 
