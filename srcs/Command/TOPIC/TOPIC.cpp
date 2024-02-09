@@ -55,7 +55,7 @@ void	HookFunctionTopic(const Message& message)
 		return ;
 	}
 
-	if (message.GetParameters().size() == 1)
+	if (message.GetTrailing() == "")
 	{
 		std::string topic = channelDB.GetChannelTopic(channelId);
 
