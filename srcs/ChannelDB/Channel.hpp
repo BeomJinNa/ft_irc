@@ -2,6 +2,7 @@
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 
+# include <ctime>
 # include <string>
 # include <set>
 # include <vector>
@@ -20,6 +21,7 @@ class Channel
 							//성공 여부 반환
 		bool				SetMaxActiveUsers(unsigned int maxUsers);
 		unsigned int		GetMaxActiveUsers(void) const;
+		unsigned int		GetCurrentActiveUsers(void) const;
 
 		void				RemoveUserData(int userId);
 							//성공 여부 반환
@@ -55,9 +57,11 @@ class Channel
 		std::string&		GetPassword(void);
 		const std::string&	GetPassword(void) const;
 
-		void				SetTopic(const std::string& topic);
+		void				SetTopic(const std::string& topic, int userId);
 		std::string&		GetTopic(void);
 		const std::string&	GetTopic(void) const;
+		int					GetTopicSetUserId(void) const;
+		std::time_t			GetCreatedTime(void) const;
 
 		std::vector<int>	GetActiveUserList(void) const;
 		std::vector<int>	GetOperatorList(void) const;
@@ -72,6 +76,8 @@ class Channel
 		unsigned int	mCurrentActiveUsers;
 		std::string		mPassword;
 		std::string		mTopic;
+		int				mTopicSetUser;
+		std::time_t		mCreatedTime;
 
 		DB				mActiveUserList;
 		DB				mOperatorList;

@@ -4,6 +4,7 @@
 
 # include <string>
 # include <map>
+# include <ctime>
 # include "IndexManager.hpp"
 
 class Channel;
@@ -44,6 +45,7 @@ class ChannelDB
 
 		bool			SetMaxUsersInChannel(int channelId, unsigned int limit);
 		unsigned int	GetMaxUsersInChannel(int channelId) const;
+		unsigned int	GetCurrentUsersInChannel(int channelId) const;
 
 		void			SetChannelName(int channelId,
 										const std::string& name);
@@ -60,8 +62,13 @@ class ChannelDB
 		std::string		GetChannelPassword(int channelId) const;
 
 		void			SetChannelTopic(int channelId,
-										const std::string& topic);
+										const std::string& topic,
+										int setUserId);
 		std::string		GetChannelTopic(int channelId) const;
+		int				GetChannelTopicSetUser(int channelId) const;
+
+		std::time_t		GetCreatedTimeOfChannel(int channelId) const;
+		std::string		GetCreatedTimeStampOfChannel(int channelId) const;
 
 		UserList		GetUserListInChannel(int channelId) const;
 		UserList		GetOperatorListInChannel(int channelId) const;
