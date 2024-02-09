@@ -25,7 +25,6 @@ namespace
 
 void	HookFunctionNick(const Message& message)
 {
-	Server&		server = Server::GetInstance();
 	UserDB&		userDB = UserDB::GetInstance();
 	int			userId = message.GetUserId();
 
