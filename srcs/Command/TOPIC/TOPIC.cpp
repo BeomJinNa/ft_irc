@@ -65,12 +65,12 @@ void	HookFunctionTopic(const Message& message)
 			return ;
 		}
 
-		userDB.SendErrorMessageToUser(channelName + " :" + topic, userId, M_RPL_TOPIC, userId);
+		userDB.SendErrorMessageToUser(channelName + " " + topic, userId, M_RPL_TOPIC, userId);
 
 		std::string reply = channelName + " " + userDB.GetNickName(channelDB.GetChannelTopicSetUser(channelId)) + " :" + std::to_string(std::time(0));
 		userDB.SendErrorMessageToUser(reply, userId, M_RPL_TOPICWHOTIME, userId);
 		return;
 	}
 
-	channelDB.SetChannelTopic(channelId, message.GetParameters().at(1), userId);
+	channelDB.SetChannelTopic(channelId, message.GetTrailing(), userId);
 }
