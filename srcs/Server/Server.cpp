@@ -232,7 +232,7 @@ void Server::handleRead(int clientFd)
 			}
 			std::string message = mReadBuffers[clientFd].substr(0, end_of_msg);
 			std::cout << "message: " << message << std::endl;
-			mReadBuffers[clientFd].erase(0, end_of_msg + 2);
+			mReadBuffers[clientFd].erase(0, end_of_msg + 1); //TODO: 2
 			end_of_msg = mReadBuffers[clientFd].find("\n");// TODO: added
 			executeHooks(UserDB::GetInstance().GetUserIdBySocketId(clientFd), message);
 		}
