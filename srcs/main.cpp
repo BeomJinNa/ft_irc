@@ -143,13 +143,16 @@ namespace
 
 	void	addHooks(void)
 	{
-		Command::RegisterCommand("PASS", HookFunctionPass);
 		Command::RegisterCommand("QUIT", HookFunctionQuit);
-<<<<<<< HEAD
+		Command::RegisterCommand("PART", HookFunctionPart);
 		Command::RegisterCommand("PASS", HookFunctionPass);
-=======
 		Command::RegisterCommand("USER", HookFunctionUser);
 		Command::RegisterCommand("NICK", HookFunctionNick);
->>>>>>> main
+		Command::RegisterCommand("JOIN", HookFunctionJoin);
+		Command::RegisterCommand("KICK", HookFunctionKick);
+		Command::RegisterCommand("MODE", HookFunctionMode);
+		Command::RegisterCommand("TOPIC", HookFunctionTopic);
+		Command::RegisterCommand("PING", HookFunctionPing);
+		Command::RegisterCommand("INVITE", HookFunctionInvite);
 	}
 }
