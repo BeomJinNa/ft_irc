@@ -4,6 +4,7 @@
 
 # include <string>
 # include <map>
+# include <ctime>
 # include "IndexManager.hpp"
 
 class Channel;
@@ -65,6 +66,9 @@ class ChannelDB
 										int setUserId);
 		std::string		GetChannelTopic(int channelId) const;
 		int				GetChannelTopicSetUser(int channelId) const;
+
+		std::time_t		GetCreatedTimeOfChannel(int channelId) const;
+		std::string		GetCreatedTimeStampOfChannel(int channelId) const;
 
 		UserList		GetUserListInChannel(int channelId) const;
 		UserList		GetOperatorListInChannel(int channelId) const;
