@@ -88,15 +88,15 @@ void	HookFunctionKick(const Message& message)
 	for (it = kickUsers.begin(); it != kickUsers.end(); it++)
 	{
 		std::string&	kickUserName = it->second;
-		int				kickUsedId = it->first;
+		int				kickUserId = it->first;
 
-		if (kickUsedId == -1 || !channelDB.IsUserInChannel(channelId, kickUsedId)) //No such user in channel
+		if (kickUserId == -1 || !channelDB.IsUserInChannel(channelId, kickUserId)) //No such user in channel
 		{
 			userDB.SendErrorMessageToUser(kickUserName + " " + channelName + " :They aren't on that channel", userId, M_ERR_NOTONCHANNEL, userId);
 			continue ;
 		}
 		std::string sendMessage = "KICK " + kickUserName + " " + comment;
 		channelDB.SendFormattedMessageToChannel(sendMessage, channelId);
-		channelDB.RemoveUserIntoChannel(channelId, it->first);
+		channelDB.RemoveUserIntoChannel(channelId, kickUserId);
 	}
 }
