@@ -24,7 +24,6 @@ namespace
 
 void	HookFunctionTopic(const Message& message)
 {
-	Server&			server = Server::GetInstance();
     ChannelDB&      channelDB = ChannelDB::GetInstance();
 	UserDB&			userDB = UserDB::GetInstance();
 	int				userId = message.GetUserId();
