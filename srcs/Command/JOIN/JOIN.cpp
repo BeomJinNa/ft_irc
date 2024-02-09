@@ -172,6 +172,7 @@ void	HookFunctionJoin(const Message& message)
 			userNames += userDB.GetUserName(*it) + " ";
 		}
 		//  "<client> = <channel> :[prefix]<nick>{ [prefix]<nick>}"
+		//topic을 여기다가 놓으면 될것같은데..?
 		channelDB.SendFormattedMessageToChannel("= " + channelName + " :" + userNames, channelId); //TODO: RPL_NAMREPLY (353) 보내기? 366해야함.
 		channelDB.SendFormattedMessageToChannel("366 " + channelName + " :End of /NAMES list", channelId);
 	}
