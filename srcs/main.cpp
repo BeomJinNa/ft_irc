@@ -154,5 +154,6 @@ namespace
 		Command::RegisterCommand("TOPIC", HookFunctionTopic);
 		Command::RegisterCommand("PING", HookFunctionPing);
 		Command::RegisterCommand("INVITE", HookFunctionInvite);
+		// Command::RegisterCommand("CONNECT", HookFunctionConnect);
 	}
 }

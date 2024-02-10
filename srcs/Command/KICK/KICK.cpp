@@ -71,7 +71,7 @@ void	HookFunctionKick(const Message& message)
 	//check if sender is the operator of the channel
 	if (!channelDB.IsUserOperator(channelId, userId))
 	{
-		userDB.SendErrorMessageToUser(channelName + ":You're not channel operator", userId, M_ERR_CHANOPRIVSNEEDED, userId);
+		userDB.SendErrorMessageToUser(channelName + " :You're not channel operator", userId, M_ERR_CHANOPRIVSNEEDED, userId);
 		return ;
 	}
 
