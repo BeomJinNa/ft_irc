@@ -26,5 +26,8 @@ void	HookFunctionUser(const Message& message)
 
 	std::string userName = message.GetParameters().at(0);
 	userDB.SetUserName(userId, userName); // TODO: add other attributes in User class
-	userDB.SendErrorMessageToUser(":Welcome to the " + server.GetHostAddress() + " Network, " + userDB.GetNickName(userId), userId, M_RPL_WELCOME, userId);
+
+	const std::string&	nickname = UserDB::GetInstance().GetNickName(userId);
+
+	userDB.SendErrorMessageToUser(nickname + " :Welcome to the " + server.GetHostAddress() + " Network, " + nickname, userId, M_RPL_WELCOME, userId);
 }
