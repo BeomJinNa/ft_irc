@@ -30,6 +30,7 @@ void	HookFunctionPass(const Message& message)
 	if (server.GetServerPassword() != inputPassword)
 	{
 		userDB.SendErrorMessageToUser(":Password incorrect", userId, M_ERR_PASSWDMISMATCH, userId);
+		userDB.DisconnectUser(userId);
 		return ;
 	}
 

@@ -199,7 +199,8 @@ void	UserDB::SendErrorMessageToUser(const std::string& message, int userId,
 
 	std::ostringstream	oss;
 	oss << ":" << serv.GetHostAddress()
-		<< " " << std::setw(3) << code
+		<< " " << std::setfill('0')
+		<< std::setw(3) << code
 		<< " " << uDB.GetNickName(userId)
 		<< " " << message << std::endl;
 	uDB.SendMessageToUser(oss.str(), targetUserID);
