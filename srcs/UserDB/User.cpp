@@ -92,13 +92,14 @@ void	User::AddChannelInJoinnedList(int channelId)
 	mJoinedChannels.insert(channelId);
 }
 
-void	User::RemoveChannelInJoinnedList(int channelId)
+bool	User::RemoveChannelInJoinnedList(int channelId)
 {
 	std::set<int>::iterator	it = mJoinedChannels.find(channelId);
 
 	if (it == mJoinedChannels.end())
 	{
-		return ;
+		return false;
 	}
 	mJoinedChannels.erase(it);
+	return true;
 }

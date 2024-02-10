@@ -42,7 +42,7 @@ class User
 
 		std::vector<int>	GetChannelList(void) const;
 		void				AddChannelInJoinnedList(int channelId);
-		void				RemoveChannelInJoinnedList(int channelId);
+		bool				RemoveChannelInJoinnedList(int channelId);
 
 	private:
 		int				mUserId;
