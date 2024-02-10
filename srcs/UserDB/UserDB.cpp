@@ -117,7 +117,8 @@ void	UserDB::RemoveChannelInUserList(int userId, int channelId)
 	{
 		return ;
 	}
-	it->second.RemoveChannelInJoinnedList(channelId);
+	if (it->second.RemoveChannelInJoinnedList(channelId))
+		return ;
 	ChannelDB::GetInstance().RemoveUserIntoChannel(channelId, userId);
 }
 
@@ -200,7 +201,7 @@ void	UserDB::SendErrorMessageToUser(const std::string& message, int userId,
 	oss << ":" << serv.GetHostAddress()
 		<< " " << std::setw(3) << code
 		<< " " << uDB.GetNickName(userId)
-		<< " " << message;
+		<< " " << message << std::endl;
 	uDB.SendMessageToUser(oss.str(), targetUserID);
 }
 
@@ -214,7 +215,7 @@ void	UserDB::SendFormattedMessageToUser(const std::string& message, int userId,
 		= ":" + uDB.GetNickName(userId)
 		+ "!" + uDB.GetUserName(userId)
 		+ "@" + serv.GetHostAddress()
-		+ " " + message;
+		+ " " + message + "\n";
 	uDB.SendMessageToUser(sendingMessage, targetUserID);
 }
 
