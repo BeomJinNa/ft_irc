@@ -189,8 +189,10 @@ void	UserDB::SendMessageToUser(const std::string& message, int userId) const
 	{
 		return ;
 	}
+	std::string	sendingMessage = message + "\r\n";
 	Server::GetInstance().SendMessageToClient(it->second.GetSocketFd(),
-											  message.c_str(), message.size());
+											  sendingMessage.c_str(),
+											  sendingMessage.size());
 }
 
 void	UserDB::SendErrorMessageToUser(const std::string& message, int userId,
@@ -218,7 +220,7 @@ void	UserDB::SendFormattedMessageToUser(const std::string& message, int userId,
 		= ":" + uDB.GetNickName(userId)
 		+ "!" + uDB.GetUserName(userId)
 		+ "@" + serv.GetHostAddress()
-		+ " " + message + "\n";
+		+ " " + message;
 	uDB.SendMessageToUser(sendingMessage, targetUserID);
 }
 
