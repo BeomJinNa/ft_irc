@@ -145,11 +145,7 @@ namespace
 	{
 		Command::RegisterCommand("PASS", HookFunctionPass);
 		Command::RegisterCommand("QUIT", HookFunctionQuit);
-<<<<<<< HEAD
-		Command::RegisterCommand("PASS", HookFunctionPass);
-=======
 		Command::RegisterCommand("USER", HookFunctionUser);
 		Command::RegisterCommand("NICK", HookFunctionNick);
->>>>>>> main
 	}
 }
