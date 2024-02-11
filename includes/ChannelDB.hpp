@@ -58,7 +58,7 @@ class ChannelDB
 		void			RemoveChannelFlag(int channelId, unsigned int flag);
 
 		void			SetChannelPassword(int channelId,
-										const std::string& password);
+										   const std::string& password);
 		std::string		GetChannelPassword(int channelId) const;
 
 		void			SetChannelTopic(int channelId,
@@ -77,9 +77,15 @@ class ChannelDB
 		void			SendMessageToChannel(const std::string& message,
 											 int channelId) const;
 		void			SendErrorMessageToChannel(const std::string& message,
-											 int channelId, int code) const;
+												  int channelId, int code) const;
 		void			SendFormattedMessageToChannel(const std::string& message,
-											 int channelId) const;
+													  int channelId) const;
+		void			SendErrorMessageToChannel(const std::string& message,
+												  int channelId, int code,
+												  int userId) const;
+		void			SendFormattedMessageToChannel(const std::string& message,
+													  int channelId,
+													  int userId) const;
 
 		static ChannelDB&	GetInstance(void);
 

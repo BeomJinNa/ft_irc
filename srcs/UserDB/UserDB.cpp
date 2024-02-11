@@ -195,7 +195,7 @@ void	UserDB::SendMessageToUser(const std::string& message, int userId) const
 											  sendingMessage.size());
 }
 
-void	UserDB::SendErrorMessageToUser(const std::string& message, int userId,
+void	UserDB::SendCodeMessageToUser(const std::string& message, int userId,
 									   int code, int targetUserID) const
 {
 	Server&	serv = Server::GetInstance();
@@ -208,6 +208,12 @@ void	UserDB::SendErrorMessageToUser(const std::string& message, int userId,
 		<< " " << uDB.GetNickName(userId)
 		<< " " << message << std::endl;
 	uDB.SendMessageToUser(oss.str(), targetUserID);
+}
+
+void	UserDB::SendErrorMessageToUser(const std::string& message, int userId,
+									   int code, int targetUserID) const
+{
+	SendCodeMessageToUser(message, userId, code, targetUserID);
 }
 
 void	UserDB::SendFormattedMessageToUser(const std::string& message, int userId,
