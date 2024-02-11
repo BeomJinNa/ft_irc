@@ -147,5 +147,6 @@ namespace
 		Command::RegisterCommand("QUIT", HookFunctionQuit);
 		Command::RegisterCommand("USER", HookFunctionUser);
 		Command::RegisterCommand("NICK", HookFunctionNick);
+		Command::RegisterCommand("PRIVMSG", HookFunctionPrivmsg);
 	}
 }

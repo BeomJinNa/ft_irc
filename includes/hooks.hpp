@@ -8,4 +8,5 @@ void	HookFunctionPass(const Message& message);
 void	HookFunctionQuit(const Message& message);
 void	HookFunctionUser(const Message& message);
 void	HookFunctionNick(const Message& message);
+void	HookFunctionPrivmsg(const Message& message);
 #endif
