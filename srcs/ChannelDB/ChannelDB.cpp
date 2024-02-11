@@ -111,8 +111,12 @@ void	ChannelDB::RemoveUserIntoChannel(int channelId, int userId)
 	{
 		return ;
 	}
-	it->second.RemoveUserData(userId);
-	UserDB::GetInstance().RemoveChannelInUserList(userId, channelId);
+
+	if (it->second.RemoveUserData(userId))
+	{
+		//만약 Ban 구현시 유저가 서버 종료할 경우와 채널에서 나갈 경우 구분 필요
+		UserDB::GetInstance().RemoveChannelInUserList(userId, channelId);
+	}
 }
 
 bool	ChannelDB::AddOperatorIntoChannel(int channelId, int userId)

@@ -96,12 +96,18 @@ bool	Channel::AddActiveUser(int userId)
 	return (false);
 }
 
-void	Channel::RemoveUserData(int userId)
+bool	Channel::RemoveUserData(int userId)
 {
-	RemoveActiveUser(userId);
+	DB::iterator	it = mActiveUserList.find(userId);
+
+	if (it == mActiveUserList.end())
+	{
+		return (false);
+	}
 	RemoveOperator(userId);
 	RemoveInvitedUser(userId);
 	RemoveBanUser(userId);
+	return (true);
 }
 
 void	Channel::RemoveActiveUser(int userId)
