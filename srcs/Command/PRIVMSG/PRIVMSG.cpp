@@ -21,7 +21,6 @@ void split(const std::string& str, char delimiter, std::vector<std::string>& res
 
 // prefix : sender
 // <receiver>{,<receiver>} <text to be sent>
-#include <iostream>
 void	HookFunctionPrivmsg(const Message& message)
 {
 	UserDB&				userDB = UserDB::GetInstance();
@@ -74,7 +73,6 @@ void	HookFunctionPrivmsg(const Message& message)
 		}
 		else
 		{
-			std::cout << "receiver: " << receiver << std::endl;
 			// send to user
 			int receiverId = userDB.GetUserIdByNickName(receiver);
 			if (receiverId == -1)
