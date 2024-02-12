@@ -117,9 +117,11 @@ void	UserDB::RemoveChannelInUserList(int userId, int channelId)
 	{
 		return ;
 	}
+
 	if (it->second.RemoveChannelInJoinnedList(channelId))
-		return ;
-	ChannelDB::GetInstance().RemoveUserIntoChannel(channelId, userId);
+	{
+		ChannelDB::GetInstance().RemoveUserIntoChannel(channelId, userId);
+	}
 }
 
 void	UserDB::RemoveChannelInAllUsers(int channelId)
@@ -187,11 +189,13 @@ void	UserDB::SendMessageToUser(const std::string& message, int userId) const
 	{
 		return ;
 	}
+	std::string	sendingMessage = message + "\r\n";
 	Server::GetInstance().SendMessageToClient(it->second.GetSocketFd(),
-											  message.c_str(), message.size());
+											  sendingMessage.c_str(),
+											  sendingMessage.size());
 }
 
-void	UserDB::SendErrorMessageToUser(const std::string& message, int userId,
+void	UserDB::SendCodeMessageToUser(const std::string& message, int userId,
 									   int code, int targetUserID) const
 {
 	Server&	serv = Server::GetInstance();
@@ -206,6 +210,12 @@ void	UserDB::SendErrorMessageToUser(const std::string& message, int userId,
 	uDB.SendMessageToUser(oss.str(), targetUserID);
 }
 
+void	UserDB::SendErrorMessageToUser(const std::string& message, int userId,
+									   int code, int targetUserID) const
+{
+	SendCodeMessageToUser(message, userId, code, targetUserID);
+}
+
 void	UserDB::SendFormattedMessageToUser(const std::string& message, int userId,
 										   int targetUserID) const
 {
@@ -216,7 +226,7 @@ void	UserDB::SendFormattedMessageToUser(const std::string& message, int userId,
 		= ":" + uDB.GetNickName(userId)
 		+ "!" + uDB.GetUserName(userId)
 		+ "@" + serv.GetHostAddress()
-		+ " " + message + "\n";
+		+ " " + message;
 	uDB.SendMessageToUser(sendingMessage, targetUserID);
 }
 

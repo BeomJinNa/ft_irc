@@ -78,11 +78,12 @@ void	HookFunctionPart(const Message& message)
 		}
 		// :dan-!d@localhost PART #test
 		std::string sendMessage = "PART :" + channelName;
-		if (message.GetTrailing() != " ")
-			sendMessage += " " + message.GetTrailing();
+		// if (message.GetTrailing() != " ")
+		// 	sendMessage += " " + message.GetTrailing();
 
-		channelDB.RemoveUserIntoChannel(channelId, userId);
 		channelDB.SendFormattedMessageToChannel(sendMessage, channelId);
+		channelDB.RemoveUserIntoChannel(channelId, userId);
+		// userDB.SendFormattedMessageToUser(sendMessage, userId, userId);
 		// remove user from the channel
 	}
 }

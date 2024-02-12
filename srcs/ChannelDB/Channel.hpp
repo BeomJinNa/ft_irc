@@ -23,7 +23,7 @@ class Channel
 		unsigned int		GetMaxActiveUsers(void) const;
 		unsigned int		GetCurrentActiveUsers(void) const;
 
-		void				RemoveUserData(int userId);
+		bool				RemoveUserData(int userId);
 							//성공 여부 반환
 		bool				AddActiveUser(int userId);
 		void				RemoveActiveUser(int userId);
