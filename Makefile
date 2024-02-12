@@ -20,6 +20,13 @@ SRCS	= srcs/main.cpp \
 		  srcs/Command/NICK/NICK.cpp \
 		  srcs/Command/PASS/PASS.cpp \
 		  srcs/Command/USER/USER.cpp \
+		  srcs/Command/PRIVMSG/PRIVMSG.cpp \
+		  srcs/Command/INVITE/INVITE.cpp \
+		  srcs/Command/KICK/KICK.cpp \
+		  srcs/Command/PART/PART.cpp \
+		  srcs/Command/PING/PING.cpp \
+		  srcs/Command/TOPIC/TOPIC.cpp \
+		  srcs/Command/QUIT/QUIT.cpp \
 		  srcs/ConstString.cpp \
 		  srcs/IndexManager/IndexManager.cpp \
 		  srcs/Server/FixedBufferArray.cpp \
