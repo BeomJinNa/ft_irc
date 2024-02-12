@@ -16,7 +16,6 @@ SRCS	= srcs/main.cpp \
 		  srcs/ChannelDB/ChannelDB.cpp \
 		  srcs/Command/Command.cpp \
 		  srcs/Command/JOIN/JOIN.cpp \
-		  srcs/Command/MODE/MODE.cpp \
 		  srcs/Command/NICK/NICK.cpp \
 		  srcs/Command/PASS/PASS.cpp \
 		  srcs/Command/USER/USER.cpp \
