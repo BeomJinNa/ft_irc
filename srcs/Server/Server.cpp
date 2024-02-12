@@ -307,3 +307,8 @@ Server::Server(void) {}
 Server::Server(const Server& source) { (void)source; }
 Server&	Server::operator=(const Server& source)
 { if (this != &source) {} return (*this); }
+
+void Server::SetHostAddress(std::string& hostAddress)
+{
+	mHostAddress = hostAddress;
+}

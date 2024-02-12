@@ -216,6 +216,7 @@ void	UserDB::SendErrorMessageToUser(const std::string& message, int userId,
 	SendCodeMessageToUser(message, userId, code, targetUserID);
 }
 
+#include <iostream>//TODO: delete
 void	UserDB::SendFormattedMessageToUser(const std::string& message, int userId,
 										   int targetUserID) const
 {
@@ -227,6 +228,7 @@ void	UserDB::SendFormattedMessageToUser(const std::string& message, int userId,
 		+ "!" + uDB.GetUserName(userId)
 		+ "@" + serv.GetHostAddress()
 		+ " " + message;
+	std::cout << sendingMessage << "\n";
 	uDB.SendMessageToUser(sendingMessage, targetUserID);
 }
 

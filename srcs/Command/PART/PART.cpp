@@ -81,7 +81,7 @@ void	HookFunctionPart(const Message& message)
 		// if (message.GetTrailing() != " ")
 		// 	sendMessage += " " + message.GetTrailing();
 
-		channelDB.SendFormattedMessageToChannel(sendMessage, channelId);
+		channelDB.SendFormattedMessageToChannel(sendMessage, channelId, userId);
 		channelDB.RemoveUserIntoChannel(channelId, userId);
 		// userDB.SendFormattedMessageToUser(sendMessage, userId, userId);
 		// remove user from the channel

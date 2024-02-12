@@ -147,5 +147,12 @@ namespace
 		Command::RegisterCommand("USER", HookFunctionUser);
 		Command::RegisterCommand("NICK", HookFunctionNick);
 		Command::RegisterCommand("PRIVMSG", HookFunctionPrivmsg);
+		Command::RegisterCommand("PASS", HookFunctionPass);
+		Command::RegisterCommand("PING", HookFunctionPing);
+		Command::RegisterCommand("PART", HookFunctionPart);
+		Command::RegisterCommand("JOIN", HookFunctionJoin);
+		Command::RegisterCommand("TOPIC", HookFunctionTopic);
+		Command::RegisterCommand("KICK", HookFunctionKick);
+		Command::RegisterCommand("INVITE", HookFunctionInvite);
 	}
 }
