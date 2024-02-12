@@ -18,19 +18,11 @@
 #include "ErrorCodes.hpp"
 #include "ChannelMode.hpp"
 #include "ReplyCodes.hpp"
-namespace{
-	// std::string addAllMessage(std::string command, std::string channelName, int GetUserId)
-	// {
-	// 	UserDB userDB;
-	// 	std::string username = userDB.GetUserName(GetUserId);
+#include <sstream>
 
-	// 	if(command == "MEJOIN")
-	// 		return "JOIN " + username;
-	// 	else if(command == "SOMEONEJOIN")
-	// 		return username + " has joined";
-	// 	else
-	// 		return "";
-	// }
+namespace
+{
+
 	bool CheckParse(std::string channelName)
 	{
 		if(channelName[0] == '#' && channelName.length() > 1 && channelName.length() <= 200)
@@ -38,6 +30,7 @@ namespace{
 		else
 			return false;
 	}
+
 	bool CheckInviteOnly(int channelid)
 	{
 		ChannelDB&	channelDB = ChannelDB::GetInstance();
@@ -46,6 +39,7 @@ namespace{
 		else
 			return false;
 	}
+
 	bool doesChannelRequirePassword(int channelId)
 	{
 		ChannelDB&	channelDB = ChannelDB::GetInstance();
@@ -89,15 +83,7 @@ namespace{
 		list.push_back(parameters.substr(prev));
 		return list.size();
 	}
-	// int errorcheck(const Message& message)
-	// {
-	// 	if(message.GetParameters().size() < 1)
-	// 	{
-	// 		userDB.SendErrorMessageToUser("#1.2 :Invalid channel name", userId, M_ERR_BADCHANMASK,userId);
-	// 		return 1;
-	// 	}
-	// 	return 0;
-	// }
+
 }
 
 void	HookFunctionJoin(const Message& message)
@@ -105,44 +91,35 @@ void	HookFunctionJoin(const Message& message)
 	ChannelDB&					channelDB = ChannelDB::GetInstance();
 	UserDB&						userDB = UserDB::GetInstance();
 	int							userId = message.GetUserId();
+	const std::string&			nickname = userDB.GetNickName(userId);
 	std::vector<std::string>	parsedChannelNames;
 	std::vector<std::string>	parsedKeys;
 
-	// errorcheck(message);
-
 	if (message.GetParameters().size() < 1)
 	{
-		userDB.SendErrorMessageToUser(":Invalid channel name", userId, M_ERR_NEEDMOREPARAMS, userId);
+		userDB.SendErrorMessageToUser(nickname + " :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
 		return;
 	}
 	//파씽 채널명이랑 키파씽하기.
 	parseParameters(message.GetParameters().at(0), parsedChannelNames);
 	// parseParameters(message.GetParameters().at(1), parsedKeys); //TODO: 살리기
-	std::cout << parsedChannelNames.size() << "\n";
 	for(size_t i = 0; i < parsedChannelNames.size(); i++)
 	{
 		const std::string&	channelName = parsedChannelNames[i];
-		int					channelId = channelDB.GetChannelIdByName(channelName);
 
-		std::cout << "channel name: " + channelName << "\n";
-		if (isMaxUserLimitOn(channelId))
-		{
-			if(channelDB.GetCurrentUsersInChannel(channelId) >= channelDB.GetMaxUsersInChannel(channelId))
-			{
-				userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+l)", userId, M_ERR_CHANNELISFULL, userId);
-				continue;
-			}
-		}
 		if(!CheckParse(channelName))
 		{//TODO: 채널명/메세지/유저이름/에러코드를 보내야한다.
 		//127.000.000.001.06667-127.000.000.001.35066: :irc.local 476 itsmemario #. :Invalid channel name
 			userDB.SendErrorMessageToUser(channelName + " :Bad Channel Mask", userId, M_ERR_BADCHANMASK,userId);
 			continue;
 		}
+
+		int	channelId = channelDB.GetChannelIdByName(channelName);
+
 		if (channelId == -1) //채널이 존재하지 않을때 (-1) 생성하고 클라이언트를 입장시킨다.
 		{
 			channelId = channelDB.CreateChannel(channelName);
-			channelDB.AddOperatorIntoChannel(channelId, message.GetUserId());
+			channelDB.AddOperatorIntoChannel(channelId, userId);
 		}
 		else
 		{
@@ -162,24 +139,58 @@ void	HookFunctionJoin(const Message& message)
 					userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+k)", userId, M_ERR_BADCHANNELKEY, userId);
 					continue;
 				}
+			if (isMaxUserLimitOn(channelId))
+			{
+				if(channelDB.GetCurrentUsersInChannel(channelId) >= channelDB.GetMaxUsersInChannel(channelId))
+				{
+					userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+l)", userId, M_ERR_CHANNELISFULL, userId);
+					continue;
+				}
+			}
 		}
 		// channelDB.AddUserIntoChannel(message.GetUserId(), channelId);
-		channelDB.AddUserIntoChannel(channelId, userId);
+
+
+/*
+
+		 "<client> = <channel> :[prefix]<nick>{ [prefix]<nick>}"
+		 "<client> <symbol> <channel> :[prefix]<nick>{ [prefix]<nick>}"
+
 		channelDB.SendMessageToChannel(userDB.GetUserName(userId) + " has joined", channelId);
+		:hcho2!codespace@127.0.0.1 JOIN :#new2
 
-		const ChannelDB::UserList& userList = channelDB.GetUserListInChannel(channelId);
+		:irc.local 353 yujin = #new :@yujin
 
-		std::string userNames = "";
-		for (ChannelDB::UserList::const_iterator it = userList.begin(); it != userList.end(); ++it)
-		{
-			userNames += userDB.GetUserName(*it) + " ";
-		}
-		//  "<client> = <channel> :[prefix]<nick>{ [prefix]<nick>}"
+*/
+
+		//add new user to a channel
+		channelDB.AddUserIntoChannel(channelId, userId);
+		channelDB.SendFormattedMessageToChannel("JOIN :" + channelName, channelId, userId);
+
+		//check topic
 		std::string topic = channelDB.GetChannelTopic(channelId);
 		if (topic != "")
 			userDB.SendErrorMessageToUser(channelName + " :" + topic, userId, M_RPL_TOPIC, userId);
-		channelDB.SendFormattedMessageToChannel("= " + channelName + " :" + userNames, channelId); //TODO: RPL_NAMREPLY (353) 보내기? 366해야함.
-		channelDB.SendFormattedMessageToChannel("366 " + channelName + " :End of /NAMES list", channelId);
+
+		//send name reply
+		const ChannelDB::UserList& userList = channelDB.GetUserListInChannel(channelId);
+		std::string userNames = "";
+		// for (ChannelDB::UserList::const_iterator it = userList.begin(); it != userList.end(); ++it)
+		// {
+		// 	userNames += userDB.GetUserName(*it) + " ";
+		// }
+		std::ostringstream oss;
+		ChannelDB::UserList::const_iterator it = userList.begin();
+		oss << userDB.GetUserName(*it);
+
+		for (++it; it != userList.end(); ++it) {
+			oss << " " << userDB.GetNickName(*it);
+		}
+		userNames = oss.str();
+		// channelDB.SendErrorMessageToChannel(nickname + " = " + channelName + " :" + userNames, channelId, M_RPL_NAMREPLY, userId);
+		// channelDB.SendErrorMessageToChannel(channelName + " :End of /NAMES list", channelId, M_RPL_ENDOFNAMES, userId);
+		userDB.SendErrorMessageToUser("= " + channelName + " :" + userNames, userId, M_RPL_NAMREPLY, userId);
+		userDB.SendErrorMessageToUser(channelName + " :End of /NAMES list", userId, M_RPL_ENDOFNAMES, userId);
 	}
 }
 

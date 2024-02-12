@@ -104,6 +104,7 @@ bool	Channel::RemoveUserData(int userId)
 	{
 		return (false);
 	}
+	RemoveActiveUser(userId);
 	RemoveOperator(userId);
 	RemoveInvitedUser(userId);
 	RemoveBanUser(userId);

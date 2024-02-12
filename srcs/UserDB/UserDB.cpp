@@ -194,7 +194,7 @@ void	UserDB::SendMessageToUser(const std::string& message, int userId) const
 											  sendingMessage.c_str(),
 											  sendingMessage.size());
 }
-
+#include <iostream> // TODO: delete
 void	UserDB::SendCodeMessageToUser(const std::string& message, int userId,
 									   int code, int targetUserID) const
 {
@@ -207,6 +207,7 @@ void	UserDB::SendCodeMessageToUser(const std::string& message, int userId,
 		<< std::setw(3) << code
 		<< " " << uDB.GetNickName(userId)
 		<< " " << message << std::endl;
+	std::cout << oss.str() << "\n"; //TODO: delete
 	uDB.SendMessageToUser(oss.str(), targetUserID);
 }
 

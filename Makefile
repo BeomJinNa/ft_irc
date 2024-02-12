@@ -3,7 +3,7 @@
 CXX			= c++
 
 COMMONFLAGS	=
-CXXFLAGS	= $(COMMONFLAGS) -Wall -Wextra -Werror -std=c++98 -g
+CXXFLAGS	= $(COMMONFLAGS) -Wall -Wextra -Werror -std=c++98 -g -o2
 LDFLAGS		= $(COMMONFLAGS)
 
 NAME	= ircserv
