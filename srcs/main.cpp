@@ -143,7 +143,6 @@ namespace
 
 	void	addHooks(void)
 	{
-		Command::RegisterCommand("PASS", HookFunctionPass);
 		Command::RegisterCommand("QUIT", HookFunctionQuit);
 		Command::RegisterCommand("USER", HookFunctionUser);
 		Command::RegisterCommand("NICK", HookFunctionNick);

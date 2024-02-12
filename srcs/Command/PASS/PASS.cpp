@@ -1,17 +1,11 @@
 #include <set>
+#include <string>
 #include "Server.hpp"
 #include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "Message.hpp"
-#include <string>
-
-enum {
-
-    ERR_NEEDMOREPARAMS = 461,
-    ERR_ALREADYREGISTERED = 462,
-    ERR_PASSWDMISMATCH = 464
-
-};
+#include "ErrorCodes.hpp"
+#include "ReplyCodes.hpp"
 
 void	HookFunctionPass(const Message& message)
 {
@@ -21,14 +15,13 @@ void	HookFunctionPass(const Message& message)
 
 	if (message.GetParameters().size() == 0)
 	{
-		std::string errMsg = std::to_string(ERR_NEEDMOREPARAMS);
-		userDB.SendMessageToUser(errMsg, userId);
+		userDB.SendErrorMessageToUser("PASS :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
 		return ;
 	}
+	//
 	if (userDB.GetLoginStatus(userId))
 	{
-		std::string errMsg = std::to_string(ERR_ALREADYREGISTERED);
-		userDB.SendMessageToUser(errMsg, userId);
+		userDB.SendErrorMessageToUser(":You may not reregister", userId, M_ERR_ALREADYREGISTRED, userId);
 		return ;
 	}
 
@@ -36,8 +29,8 @@ void	HookFunctionPass(const Message& message)
 
 	if (server.GetServerPassword() != inputPassword)
 	{
-		std::string errMsg = std::to_string(ERR_PASSWDMISMATCH);
-		userDB.SendMessageToUser(errMsg, userId);
+		userDB.SendErrorMessageToUser(":Password incorrect", userId, M_ERR_PASSWDMISMATCH, userId);
+		userDB.DisconnectUser(userId);
 		return ;
 	}
 

@@ -16,7 +16,6 @@
 #include "UserDB.hpp"
 #include <iostream>
 #include "ErrorCodes.hpp"
-#include "Enum.hpp"
 #include "ChannelMode.hpp"
 #include "ReplyCodes.hpp"
 namespace{
@@ -39,7 +38,7 @@ namespace{
 		else
 			return false;
 	}
-	bool CheckInviteOnly(int channelid, int userId)
+	bool CheckInviteOnly(int channelid)
 	{
 		ChannelDB&	channelDB = ChannelDB::GetInstance();
 		if(channelDB.GetChannelFlag(channelid) & M_FLAG_CHANNEL_INVITE_ONLY)
@@ -65,6 +64,7 @@ namespace{
 		else
 			return false;
 	}
+
 	bool compareChannelKey(int channelid, std::string& parsedKeys)
 	{
 		ChannelDB&	channelDB = ChannelDB::GetInstance();
@@ -78,17 +78,16 @@ namespace{
 	// parameters: #1,#2,#3 or key1,key2,key3
 	// ,를 기준으로 파씽한 이후 vector에 담아서 반환한다.
 	//동적할당은 하지 않는다.
-	std::vector<std::string> &parseParameters(const std::string& parameters)
+	size_t parseParameters(const std::string& parameters, std::vector<std::string>& list)
 	{
-		std::vector<std::string> result;
 		std::string::size_type pos = 0, prev = 0;
 		while((pos = parameters.find(',', prev)) != std::string::npos)
 		{
-		    result.push_back(parameters.substr(prev, pos - prev));
+		    list.push_back(parameters.substr(prev, pos - prev));
 		    prev = pos + 1;
 		}
-		result.push_back(parameters.substr(prev));
-		return result;
+		list.push_back(parameters.substr(prev));
+		return list.size();
 	}
 	// int errorcheck(const Message& message)
 	// {
@@ -117,18 +116,20 @@ void	HookFunctionJoin(const Message& message)
 		return;
 	}
 	//파씽 채널명이랑 키파씽하기.
-	parsedChannelNames = parseParameters(message.GetParameters().at(0));
-	parsedKeys = parseParameters(message.GetParameters().at(1));
-	for(int i = 0; i < parsedChannelNames.size(); i++)
+	parseParameters(message.GetParameters().at(0), parsedChannelNames);
+	// parseParameters(message.GetParameters().at(1), parsedKeys); //TODO: 살리기
+	std::cout << parsedChannelNames.size() << "\n";
+	for(size_t i = 0; i < parsedChannelNames.size(); i++)
 	{
 		const std::string&	channelName = parsedChannelNames[i];
 		int					channelId = channelDB.GetChannelIdByName(channelName);
 
+		std::cout << "channel name: " + channelName << "\n";
 		if (isMaxUserLimitOn(channelId))
 		{
 			if(channelDB.GetCurrentUsersInChannel(channelId) >= channelDB.GetMaxUsersInChannel(channelId))
 			{
-				userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+l)", userId, ERR_CHANNELISFULL, userId);
+				userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+l)", userId, M_ERR_CHANNELISFULL, userId);
 				continue;
 			}
 		}
@@ -146,11 +147,11 @@ void	HookFunctionJoin(const Message& message)
 		else
 		{
 			//invite-only 모드인지 확인후 인바이트 된 클라이언트인지 확인하고 아니면 에러메세지를 보내고 continue
-			if(CheckInviteOnly(channelId, userId))
+			if(CheckInviteOnly(channelId))
 				if (channelDB.IsUserInvited(channelId, userId) == false)
 				{
 					//127.000.000.001.06667-127.000.000.001.58710: :irc.local 473 mikim3 #1 :Cannot join channel (invite only)
-					userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+i)", userId, ERR_INVITEONLYCHAN,userId);
+					userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+i)", userId, M_ERR_INVITEONLYCHAN,userId);
 					continue;
 				}
 			//key가 있는 채널인지 확인후, 키가 맞는지 확인하고 아니면 에러메세지를 보내고 continue
@@ -158,11 +159,12 @@ void	HookFunctionJoin(const Message& message)
 				if(compareChannelKey(channelId, parsedKeys[i]) == false) //i
 				{
 					//127.000.000.001.06667-127.000.000.001.54044: :irc.local 475 user1 #1 :Cannot join channel (incorrect channel key)
-					userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+k)", userId, ERR_BADCHANNELKEY, userId);
+					userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+k)", userId, M_ERR_BADCHANNELKEY, userId);
 					continue;
 				}
 		}
-		channelDB.AddUserIntoChannel(message.GetUserId(), channelId);
+		// channelDB.AddUserIntoChannel(message.GetUserId(), channelId);
+		channelDB.AddUserIntoChannel(channelId, userId);
 		channelDB.SendMessageToChannel(userDB.GetUserName(userId) + " has joined", channelId);
 
 		const ChannelDB::UserList& userList = channelDB.GetUserListInChannel(channelId);

@@ -1,17 +1,11 @@
 #include <set>
+#include <string>
 #include "Server.hpp"
 #include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "Message.hpp"
-#include <string>
-
-enum {
-
-	RPL_WELCOME = 1,
-    ERR_NEEDMOREPARAMS = 461,
-    ERR_ALREADYREGISTERED = 462
-
-};
+#include "ErrorCodes.hpp"
+#include "ReplyCodes.hpp"
 
 void	HookFunctionUser(const Message& message)
 {
@@ -21,18 +15,19 @@ void	HookFunctionUser(const Message& message)
 
 	if (message.GetParameters().size() < 3 || message.GetParameters().at(0).length() == 0)
 	{
-		std::string errMsg = std::to_string(ERR_NEEDMOREPARAMS);
-		userDB.SendMessageToUser(errMsg, userId);
+		userDB.SendErrorMessageToUser("USER :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
 		return ;
 	}
-	if (userDB.GetLoginStatus(userId))
+	if (userDB.IsUserAuthorized(userId))
 	{
-		std::string errMsg = std::to_string(ERR_ALREADYREGISTERED);
-		userDB.SendMessageToUser(errMsg, userId);
+		userDB.SendErrorMessageToUser(":You may not reregister", userId, M_ERR_ALREADYREGISTRED, userId);
 		return ;
 	}
 
 	std::string userName = message.GetParameters().at(0);
-	userDB.SetUserName(userId, userName);
-	userDB.SendMessageToUser("", userId);
+	userDB.SetUserName(userId, userName); // TODO: add other attributes in User class
+
+	const std::string&	nickname = UserDB::GetInstance().GetNickName(userId);
+
+	userDB.SendErrorMessageToUser(nickname + " :Welcome to the " + server.GetHostAddress() + " Network, " + nickname, userId, M_RPL_WELCOME, userId);
 }
