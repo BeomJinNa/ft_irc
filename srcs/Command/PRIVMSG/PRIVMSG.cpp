@@ -30,7 +30,7 @@ void	HookFunctionPrivmsg(const Message& message)
 	if (message.GetParameters().size() == 0)
 	{
 		// no receiver
-		userDB.SendErrorMessageToUser("Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
+		userDB.SendErrorMessageToUser(":Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
 		return;
 	}
 	std::vector<std::string> receivers;
@@ -38,7 +38,7 @@ void	HookFunctionPrivmsg(const Message& message)
 	if (receivers.size() == 0)
 	{
 		// no receiver
-		userDB.SendErrorMessageToUser("Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
+		userDB.SendErrorMessageToUser(":Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
 		return;
 	}
 	for (std::vector<std::string>::const_iterator it = receivers.begin(); it != receivers.end(); ++it)
@@ -53,11 +53,11 @@ void	HookFunctionPrivmsg(const Message& message)
 		if (receiver[0] == '#')
 		{
 			// send to channel
-			int channelId = channelDB.GetChannelIdByName(receiver.substr(1));
+			int channelId = channelDB.GetChannelIdByName(receiver);
 			if (channelId == -1)
 			{
 				// no such channel
-				userDB.SendMessageToUser("No such channel", userId);
+				userDB.SendErrorMessageToUser(receiver + " :No such channel", userId, M_ERR_NOSUCHCHANNEL, userId);
 				continue;
 			}
 
@@ -66,9 +66,10 @@ void	HookFunctionPrivmsg(const Message& message)
 			ChannelDB::UserList	list = channelDB.GetUserListInChannel(channelId);
 			for (ChannelDB::UserList::const_iterator user_iter = list.cbegin(); user_iter != list.cend(); ++user_iter)
 			{
+				// :hcho2__!codespace@127.0.0.1 PRIVMSG #new :fassdf
 				if (*user_iter == userId)
 					continue;
-				userDB.SendMessageToUser(msg, *user_iter);
+				userDB.SendFormattedMessageToUser("PRIVMSG " + receiver + " " + msg, userId, *user_iter);
 			}
 		}
 		else
@@ -78,10 +79,10 @@ void	HookFunctionPrivmsg(const Message& message)
 			if (receiverId == -1)
 			{
 				// no such nick
-				userDB.SendMessageToUser("No such nick", userId);
+				userDB.SendErrorMessageToUser(receiver + " :No such nick/channel", userId, M_ERR_NOSUCHNICK, userId);
 				continue;
 			}
-			userDB.SendMessageToUser(msg, receiverId);
+			userDB.SendFormattedMessageToUser("PRIVMSG " + receiver + " " + msg, userId, receiverId);
 		}
 	}
 }
