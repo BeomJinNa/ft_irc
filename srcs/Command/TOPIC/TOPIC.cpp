@@ -73,4 +73,6 @@ void	HookFunctionTopic(const Message& message)
 	}
 
 	channelDB.SetChannelTopic(channelId, message.GetTrailing(), userId);
+	//27.000.000.001.06667-127.000.000.001.53206: :hcho2!codespace@127.0.0.1 TOPIC #tt :nano users are psychopaths!
+	channelDB.SendFormattedMessageToChannel("TOPIC " + channelName + " " + channelDB.GetChannelTopic(channelId), channelId);
 }
