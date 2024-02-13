@@ -89,12 +89,12 @@ namespace
 
 		if (channelDB.IsUserOperator(channelId, userId) == false)
 		{
-			userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+			userDB.SendErrorMessageToUser(channelDB.GetChannelName(channelId)
 										+ " :You're not channel operator",
 										  userId, M_ERR_CHANOPRIVSNEEDED, userId);
 			return ;
 		}
-		Tokens	parametersVec = Tokens(message.GetParameters().begin() + 1,
+		Tokens	parametersVec = Tokens(message.GetParameters().begin() + 2,
 				message.GetParameters().end());
 		if (checkParameters(commandVec, parametersVec, userId, channelId) == false)
 		{
@@ -161,7 +161,7 @@ namespace
 			{
 				if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_PASSWORD_CHECK_ON) == 0)
 				{
-					userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+					userDB.SendErrorMessageToUser(channelDB.GetChannelName(channelId)
 												+ " :No password is set",
 												  userId, M_ERR_CHANOPRIVSNEEDED, userId);
 					return (false);
@@ -209,7 +209,7 @@ namespace
 				if (buffer <= 0 || buffer > std::numeric_limits<unsigned int>::max()
 						|| buffer < channelDB.GetCurrentUsersInChannel(channelId))
 				{
-					userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+					userDB.SendErrorMessageToUser(channelDB.GetChannelName(channelId)
 												+ " :Invalid parameter value for +l",
 												  userId, M_ERR_NEEDMOREPARAMS, userId);
 					return (false);
@@ -220,7 +220,7 @@ namespace
 			{
 				if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_MAX_USER_LIMIT_ON) == 0)
 				{
-					userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+					userDB.SendErrorMessageToUser(channelDB.GetChannelName(channelId)
 												+ " :User limit is net set",
 												  userId, M_ERR_CHANOPRIVSNEEDED, userId);
 					return (false);
@@ -230,7 +230,7 @@ namespace
 			{
 				if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_INVITE_ONLY) == 0)
 				{
-					userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+					userDB.SendErrorMessageToUser(channelDB.GetChannelName(channelId)
 												+ " :Invite only mode is not set",
 												  userId, M_ERR_CHANOPRIVSNEEDED, userId);
 					return (false);
@@ -240,7 +240,7 @@ namespace
 			{
 				if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY) != 0)
 				{
-					userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+					userDB.SendErrorMessageToUser(channelDB.GetChannelName(channelId)
 												+ " :Topic operator only mode is already set",
 												  userId, M_ERR_CHANOPRIVSNEEDED, userId);
 					return (false);
@@ -250,7 +250,7 @@ namespace
 			{
 				if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY) == 0)
 				{
-					userDB.SendErrorMessageToUser("#" + channelDB.GetChannelName(channelId)
+					userDB.SendErrorMessageToUser(channelDB.GetChannelName(channelId)
 												+ " :Topic operator only mode is not set",
 												  userId, M_ERR_CHANOPRIVSNEEDED, userId);
 					return (false);

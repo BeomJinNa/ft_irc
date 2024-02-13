@@ -59,10 +59,12 @@ namespace
 			return false;
 	}
 
-	bool compareChannelKey(int channelid, std::string& parsedKeys)
+	bool compareChannelKey(int channelid, std::string parsedKey)
 	{
 		ChannelDB&	channelDB = ChannelDB::GetInstance();
-		if(channelDB.GetChannelPassword(channelid) == parsedKeys)
+		// std::cout << "channel pwd: " << channelDB.GetChannelPassword(channelid) << std::endl;
+		// std::cout << "input pwd: " << parsedKeys << std::endl;
+		if(channelDB.GetChannelPassword(channelid) == parsedKey)
 			return true;
 		else
 			return false;
@@ -94,6 +96,7 @@ void	HookFunctionJoin(const Message& message)
 	const std::string&			nickname = userDB.GetNickName(userId);
 	std::vector<std::string>	parsedChannelNames;
 	std::vector<std::string>	parsedKeys;
+	size_t						keyCount = 0;
 
 	if (message.GetParameters().size() < 1)
 	{
@@ -102,7 +105,8 @@ void	HookFunctionJoin(const Message& message)
 	}
 	//파씽 채널명이랑 키파씽하기.
 	parseParameters(message.GetParameters().at(0), parsedChannelNames);
-	// parseParameters(message.GetParameters().at(1), parsedKeys); //TODO: 살리기
+	if (message.GetParameters().size() == 2)
+		keyCount = parseParameters(message.GetParameters().at(1), parsedKeys); //TODO: 살리기
 	for(size_t i = 0; i < parsedChannelNames.size(); i++)
 	{
 		const std::string&	channelName = parsedChannelNames[i];
@@ -133,7 +137,7 @@ void	HookFunctionJoin(const Message& message)
 				}
 			//key가 있는 채널인지 확인후, 키가 맞는지 확인하고 아니면 에러메세지를 보내고 continue
 			if(doesChannelRequirePassword(channelId))
-				if(compareChannelKey(channelId, parsedKeys[i]) == false) //i
+				if(compareChannelKey(channelId, keyCount <= i ? "" : parsedKeys[i]) == false) //i
 				{
 					//127.000.000.001.06667-127.000.000.001.54044: :irc.local 475 user1 #1 :Cannot join channel (incorrect channel key)
 					userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+k)", userId, M_ERR_BADCHANNELKEY, userId);

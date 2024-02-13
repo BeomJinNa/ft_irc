@@ -25,6 +25,7 @@ namespace
 
 void	HookFunctionNick(const Message& message)
 {
+	Server&		server = Server::GetInstance();
 	UserDB&		userDB = UserDB::GetInstance();
 	int			userId = message.GetUserId();
 
@@ -38,14 +39,16 @@ void	HookFunctionNick(const Message& message)
 
 	if (!isValidName(nickname))
 	{
-		userDB.SendErrorMessageToUser(nickname + " :Erroneus nickname", userId, M_ERR_ERRONEUSNICKNAME, userId);
+		userDB.SendErrorMessageToUser(":Erroneus nickname", userId, M_ERR_ERRONEUSNICKNAME, userId);
 		return ;
 	}
 	if (userDB.GetUserIdByNickName(nickname) != -1)
 	{
-		userDB.SendErrorMessageToUser(nickname + " :Nickname is already in use", userId, M_ERR_NICKNAMEINUSE, userId);
+		userDB.SendErrorMessageToUser(":Nickname is already in use", userId, M_ERR_NICKNAMEINUSE, userId);
 		return ;
 	}
 
 	userDB.SetNickName(userId, nickname);
+	if (userDB.IsUserAuthorized(userId))
+		userDB.SendErrorMessageToUser(":Welcome to the " + server.GetHostAddress() + " Network, " + nickname, userId, M_RPL_WELCOME, userId);
 }
