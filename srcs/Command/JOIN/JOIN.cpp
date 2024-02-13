@@ -171,6 +171,7 @@ void	HookFunctionJoin(const Message& message)
 		std::string topic = channelDB.GetChannelTopic(channelId);
 		if (topic != "")
 			userDB.SendErrorMessageToUser(channelName + " :" + topic, userId, M_RPL_TOPIC, userId);
+		channelDB.SendFormattedMessageToChannel("TOPIC " + channelName + " " + topic, channelId);
 
 		//send name reply
 		const ChannelDB::UserList& userList = channelDB.GetUserListInChannel(channelId);
@@ -192,6 +193,7 @@ void	HookFunctionJoin(const Message& message)
 		// channelDB.SendErrorMessageToChannel(channelName + " :End of /NAMES list", channelId, M_RPL_ENDOFNAMES, userId);
 		userDB.SendErrorMessageToUser("= " + channelName + " :" + userNames, userId, M_RPL_NAMREPLY, userId);
 		userDB.SendErrorMessageToUser(channelName + " :End of /NAMES list", userId, M_RPL_ENDOFNAMES, userId);
+
 	}
 }
 
