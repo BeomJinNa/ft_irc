@@ -264,6 +264,7 @@ namespace
 	{
 		UserDB&		userDB = UserDB::GetInstance();
 		ChannelDB&	channelDB = ChannelDB::GetInstance();
+		std::string	channelName = channelDB.GetChannelName(channelId);
 
 		Tokens::const_iterator	pit = parameter.begin();
 
@@ -272,50 +273,92 @@ namespace
 			if (*it == "+i")
 			{
 				channelDB.AddChannelFlag(channelId, M_FLAG_CHANNEL_INVITE_ONLY);
+				channelDB.SendFormattedMessageToChannel(
+						"NOTICE #" + channelName + " :" + userDB.GetNickName(userId)
+						+ " has set mode +i on #" + channelName
+						,channelId, userId);
 			}
 			else if (*it == "-i")
 			{
 				channelDB.RemoveChannelFlag(channelId, M_FLAG_CHANNEL_INVITE_ONLY);
+				channelDB.SendFormattedMessageToChannel(
+						"NOTICE #" + channelName + " :" + userDB.GetNickName(userId)
+						+ " has removed mode +i on #" + channelName
+						,channelId, userId);
 			}
 			else if (*it == "+t")
 			{
 				channelDB.AddChannelFlag(channelId, M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY);
+				channelDB.SendFormattedMessageToChannel(
+						"NOTICE #" + channelName + " :" + userDB.GetNickName(userId)
+						+ " has set mode +t on #" + channelName
+						,channelId, userId);
 			}
 			else if (*it == "-t")
 			{
 				channelDB.RemoveChannelFlag(channelId, M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY);
+				channelDB.SendFormattedMessageToChannel(
+						"NOTICE #" + channelName + " :" + userDB.GetNickName(userId)
+						+ " has removed mode -t on #" + channelName
+						,channelId, userId);
 			}
 			else if (*it == "+k")
 			{
 				channelDB.AddChannelFlag(channelId, M_FLAG_CHANNEL_PASSWORD_CHECK_ON);
 				channelDB.SetChannelPassword(channelId, *pit++);
+				channelDB.SendFormattedMessageToChannel(
+						"NOTICE #" + channelName + " :" + userDB.GetNickName(userId)
+						+ " has set mode +k on #" + channelName
+						,channelId, userId);
 			}
 			else if (*it == "-k")
 			{
 				channelDB.RemoveChannelFlag(channelId, M_FLAG_CHANNEL_PASSWORD_CHECK_ON);
 				channelDB.SetChannelPassword(channelId, "");
+				channelDB.SendFormattedMessageToChannel(
+						"NOTICE #" + channelName + " :" + userDB.GetNickName(userId)
+						+ " has removed mode -k on #" + channelName
+						,channelId, userId);
 			}
 			else if (*it == "+o")
 			{
-				channelDB.AddOperatorIntoChannel(channelId, userDB.GetUserIdByNickName(*pit++));
+				channelDB.AddOperatorIntoChannel(channelId, userDB.GetUserIdByNickName(*pit));
+				channelDB.SendFormattedMessageToChannel(
+						"NOTICE #" + channelName + " :" + userDB.GetNickName(userId)
+						+ " has given channel operator status to " + *pit + " on #" + channelName
+						,channelId, userId);
+				++pit;
 			}
 			else if (*it == "-o")
 			{
 				channelDB.RemoveOperatorIntoChannel(channelId, userDB.GetUserIdByNickName(*pit++));
+				channelDB.SendFormattedMessageToChannel(
+						"NOTICE #" + channelName + " :" + userDB.GetNickName(userId)
+						+ " has taken channel operator status to " + *pit + " on #" + channelName
+						,channelId, userId);
 			}
 			else if (*it == "+l")
 			{
-				std::istringstream	iss(*pit++);
+				std::istringstream	iss(*pit);
 				unsigned int		limit;
 
 				iss >> limit;
 				channelDB.AddChannelFlag(channelId, M_FLAG_CHANNEL_MAX_USER_LIMIT_ON);
 				channelDB.SetMaxUsersInChannel(channelId, limit);
+				channelDB.SendFormattedMessageToChannel(
+						"NOTICE #" + channelName + " :" + userDB.GetNickName(userId)
+						+ " has set mode +l " + *pit + " on #" + channelName
+						,channelId, userId);
+				++pit;
 			}
 			else if (*it == "-l")
 			{
 				channelDB.RemoveChannelFlag(channelId, M_FLAG_CHANNEL_MAX_USER_LIMIT_ON);
 				channelDB.SetMaxUsersInChannel(channelId, std::numeric_limits<unsigned int>::max());
+				channelDB.SendFormattedMessageToChannel(
+						"NOTICE #" + channelName + " :" + userDB.GetNickName(userId)
+						+ " has removed mode -l on #" + channelName
+						,channelId, userId);
 			}
 		}
 	}
