@@ -79,7 +79,7 @@ Server::Server(int port)
 		close(mKq);
 		throw std::runtime_error("getsockname failed");
 	}
-	mHostAddress = inet_ntoa(address_input.sin_addr);
+	mHostAddress = "localhost"; //TODO: edit later
 	mHostPort = ntohs(address_input.sin_port);
 
 	std::ostringstream	oss;
@@ -142,8 +142,8 @@ void	Server::CloseAllClientConnection(void)
 
 void		Server::SetServerPassword(const std::string& password) { mPassword = password; }
 std::string	Server::GetServerPassword(void) { return (mPassword); }
-std::string	Server::GetHostAddress(void) const { return (mHostAddress); }
 uint16_t	Server::GetHostPortNumber(void) const { return (mHostPort); }
+std::string	Server::GetHostAddress(void) const { return (mHostAddress); }
 std::string	Server::GetHostPort(void) const { return (mHostPortString); }
 
 Server& Server::GetInstance(void)
@@ -306,8 +306,3 @@ Server::Server(void) {}
 Server::Server(const Server& source) { (void)source; }
 Server&	Server::operator=(const Server& source)
 { if (this != &source) {} return (*this); }
-
-void Server::SetHostAddress(std::string& hostAddress)
-{
-	mHostAddress = hostAddress;
-}

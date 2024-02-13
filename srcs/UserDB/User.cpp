@@ -76,6 +76,14 @@ void				User::SetNickName(const std::string& name)
 std::string&		User::GetNickName(void) { return (mNickName); }
 const std::string&	User::GetNickName(void) const { return (mNickName); }
 
+void				User::SetHostName(const std::string& name) { mHostName = name; }
+std::string&		User::GetHostName(void) { return (mHostName); }
+const std::string&	User::GetHostName(void) const { return (mHostName); }
+
+void				User::SetHostAddress(const std::string& addr) { mHostAddress = addr; }
+std::string&		User::GetHostAddress(void) { return (mHostAddress); }
+const std::string&	User::GetHostAddress(void) const { return  (mHostAddress); }
+
 void				User::SetFlagUserNameSet(bool value) { mIsUserNameSet = value; }
 bool				User::GetFlagUserNameSet(void) const { return (mIsUserNameSet); }
 

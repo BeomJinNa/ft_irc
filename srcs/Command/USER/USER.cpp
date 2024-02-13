@@ -9,7 +9,6 @@
 
 void	HookFunctionUser(const Message& message)
 {
-	Server&			server = Server::GetInstance();
 	UserDB&			userDB = UserDB::GetInstance();
 	int				userId = message.GetUserId();
 
@@ -25,14 +24,16 @@ void	HookFunctionUser(const Message& message)
 	}
 
 	std::string userName = message.GetParameters().at(0);
+	std::string hostName = message.GetParameters().at(1);
 	std::string hostAddress = message.GetParameters().at(2);
 	userDB.SetUserName(userId, userName); // TODO: add other attributes in User class
-	server.SetHostAddress(hostAddress);
+	userDB.SetHostName(userId, hostName); // TODO: add other attributes in User class
+	userDB.SetHostAddress(userId, hostAddress);
 
 	const std::string&	nickname = UserDB::GetInstance().GetNickName(userId);
 
 	if (userDB.IsUserAuthorized(userId))
-		userDB.SendErrorMessageToUser(":Welcome to the " + server.GetHostAddress() + " Network, " + nickname, userId, M_RPL_WELCOME, userId);
+		userDB.SendErrorMessageToUser(":Welcome to the " + userDB.GetHostAddress(userId) + " Network, " + nickname, userId, M_RPL_WELCOME, userId);
 }
 
 /*

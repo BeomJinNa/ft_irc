@@ -6,7 +6,6 @@
 
 void	HookFunctionQuit(const Message& message)
 {
-	Server&				server = Server::GetInstance();
 	UserDB&				userDB = UserDB::GetInstance();
 	ChannelDB&			channelDB = ChannelDB::GetInstance();
 	int					userId = message.GetUserId();
@@ -27,7 +26,7 @@ void	HookFunctionQuit(const Message& message)
 	std::string	quitMessage
 		= ":" + userDB.GetNickName(userId)
 		+ "!" + userDB.GetUserName(userId)
-		+ "@" + server.GetHostAddress();
+		+ "@" + userDB.GetHostAddress(userId)
 		+ " QUIT " + trailing;
 
 	std::set<int>	sendingUserList;
