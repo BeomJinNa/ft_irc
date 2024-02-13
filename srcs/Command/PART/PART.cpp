@@ -81,7 +81,12 @@ void	HookFunctionPart(const Message& message)
 		// if (message.GetTrailing() != " ")
 		// 	sendMessage += " " + message.GetTrailing();
 
-		channelDB.SendFormattedMessageToChannel(sendMessage, channelId);
+/*
+	PART #new
+	:hcho2!codespace@127.0.0.1 PART :#new
+	:hcho2!hcho2@localhost PART :#new
+*/
+		channelDB.SendFormattedMessageToChannel(sendMessage, channelId, userId);
 		channelDB.RemoveUserIntoChannel(channelId, userId);
 		// userDB.SendFormattedMessageToUser(sendMessage, userId, userId);
 		// remove user from the channel

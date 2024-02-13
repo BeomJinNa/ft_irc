@@ -40,8 +40,8 @@ namespace
 	}
 }
 
-// KICK <channel> <user> *( "," <user> ) [<comment>]
 
+// KICK <channel> <user> *( "," <user> ) [<comment>]
 void	HookFunctionKick(const Message& message)
 {
 	ChannelDB&			channelDB = ChannelDB::GetInstance();
@@ -87,16 +87,23 @@ void	HookFunctionKick(const Message& message)
 
 	for (it = kickUsers.begin(); it != kickUsers.end(); it++)
 	{
-		std::string&	kickUserName = it->second;
+		std::string&	kickUserNick = it->second;
 		int				kickUserId = it->first;
 
 		if (kickUserId == -1 || !channelDB.IsUserInChannel(channelId, kickUserId)) //No such user in channel
 		{
-			userDB.SendErrorMessageToUser(kickUserName + " " + channelName + " :They aren't on that channel", userId, M_ERR_NOTONCHANNEL, userId);
+			userDB.SendErrorMessageToUser(kickUserNick + " " + channelName + " :They aren't on that channel", userId, M_ERR_USERNOTINCHANNEL, userId);
 			continue ;
 		}
-		std::string sendMessage = "KICK " + kickUserName + " " + comment;
-		channelDB.SendFormattedMessageToChannel(sendMessage, channelId);
+/*
+	:hyun!hcho2@localhost KICK #new jsun :
+	:WiZ!jto@tolsun.oulu.fi KICK #Finnish John
+                                   ; KICK message on channel #Finnish
+                                   from WiZ to remove John from channel
+*/
+		std::string sendMessage = "KICK " + channelName + " " + kickUserNick + " " + comment;
+
+		channelDB.SendFormattedMessageToChannel(sendMessage, channelId, userId);
 		channelDB.RemoveUserIntoChannel(channelId, kickUserId);
 	}
 }

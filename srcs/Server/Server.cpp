@@ -220,7 +220,6 @@ void Server::handleRead(int clientFd)
 		mReadSocketBuffers[clientFd].buffer[bytes_read] = '\0';
 		mReadBuffers[clientFd].append(mReadSocketBuffers[clientFd].buffer);
 
-		std::cout << mReadBuffers[clientFd] << std::endl;
 		size_t	end_of_msg = mReadBuffers[clientFd].find("\r\n");
 		while (end_of_msg != std::string::npos)
 		{
@@ -230,7 +229,7 @@ void Server::handleRead(int clientFd)
 				return ;
 			}
 			std::string message = mReadBuffers[clientFd].substr(0, end_of_msg);
-			std::cout << "message: " << message << std::endl;
+			std::cout << "<recv> " << message << std::endl;
 			mReadBuffers[clientFd].erase(0, end_of_msg + 2);
 			executeHooks(UserDB::GetInstance().GetUserIdBySocketId(clientFd), message);
 			end_of_msg = mReadBuffers[clientFd].find("\r\n");
@@ -307,3 +306,8 @@ Server::Server(void) {}
 Server::Server(const Server& source) { (void)source; }
 Server&	Server::operator=(const Server& source)
 { if (this != &source) {} return (*this); }
+
+void Server::SetHostAddress(std::string& hostAddress)
+{
+	mHostAddress = hostAddress;
+}

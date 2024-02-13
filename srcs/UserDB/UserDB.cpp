@@ -1,5 +1,6 @@
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 #include "UserDB.hpp"
 #include "User.hpp"
 #include "Server.hpp"
@@ -190,11 +191,11 @@ void	UserDB::SendMessageToUser(const std::string& message, int userId) const
 		return ;
 	}
 	std::string	sendingMessage = message + "\r\n";
+	std::cout << "<send> " << sendingMessage;
 	Server::GetInstance().SendMessageToClient(it->second.GetSocketFd(),
 											  sendingMessage.c_str(),
 											  sendingMessage.size());
 }
-
 void	UserDB::SendCodeMessageToUser(const std::string& message, int userId,
 									   int code, int targetUserID) const
 {

@@ -28,6 +28,7 @@ class Server
 		void			CloseClientConnection(int clientFd);
 		void			CloseAllClientConnection(void);
 		void			SetServerPassword(const std::string& password);
+		void			SetHostAddress(std::string& hostAddress); //TODO: added
 		std::string		GetServerPassword(void);
 		std::string		GetHostAddress(void) const;
 		uint16_t		GetHostPortNumber(void) const;
