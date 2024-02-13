@@ -26,6 +26,7 @@ SRCS	= srcs/main.cpp \
 		  srcs/Command/PING/PING.cpp \
 		  srcs/Command/TOPIC/TOPIC.cpp \
 		  srcs/Command/QUIT/QUIT.cpp \
+		  srcs/Command/MODE/MODE.cpp \
 		  srcs/ConstString.cpp \
 		  srcs/IndexManager/IndexManager.cpp \
 		  srcs/Server/FixedBufferArray.cpp \
