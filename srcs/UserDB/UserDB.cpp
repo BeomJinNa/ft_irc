@@ -1,5 +1,6 @@
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 #include "UserDB.hpp"
 #include "User.hpp"
 #include "Server.hpp"
@@ -190,11 +191,11 @@ void	UserDB::SendMessageToUser(const std::string& message, int userId) const
 		return ;
 	}
 	std::string	sendingMessage = message + "\r\n";
+	std::cout << "<send> " << sendingMessage;
 	Server::GetInstance().SendMessageToClient(it->second.GetSocketFd(),
 											  sendingMessage.c_str(),
 											  sendingMessage.size());
 }
-#include <iostream> // TODO: delete
 void	UserDB::SendCodeMessageToUser(const std::string& message, int userId,
 									   int code, int targetUserID) const
 {
@@ -207,7 +208,6 @@ void	UserDB::SendCodeMessageToUser(const std::string& message, int userId,
 		<< std::setw(3) << code
 		<< " " << uDB.GetNickName(userId)
 		<< " " << message << std::endl;
-	std::cout << oss.str() << "\n"; //TODO: delete
 	uDB.SendMessageToUser(oss.str(), targetUserID);
 }
 
@@ -217,7 +217,6 @@ void	UserDB::SendErrorMessageToUser(const std::string& message, int userId,
 	SendCodeMessageToUser(message, userId, code, targetUserID);
 }
 
-#include <iostream>//TODO: delete
 void	UserDB::SendFormattedMessageToUser(const std::string& message, int userId,
 										   int targetUserID) const
 {
@@ -229,7 +228,6 @@ void	UserDB::SendFormattedMessageToUser(const std::string& message, int userId,
 		+ "!" + uDB.GetUserName(userId)
 		+ "@" + serv.GetHostAddress()
 		+ " " + message;
-	std::cout << sendingMessage << "\n";
 	uDB.SendMessageToUser(sendingMessage, targetUserID);
 }
 

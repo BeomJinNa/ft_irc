@@ -179,12 +179,13 @@ void	HookFunctionJoin(const Message& message)
 		// {
 		// 	userNames += userDB.GetUserName(*it) + " ";
 		// }
+		// std::cout << "User count: " << userList.size() << "\n";
 		std::ostringstream oss;
-		ChannelDB::UserList::const_iterator it = userList.begin();
-		oss << userDB.GetUserName(*it);
 
-		for (++it; it != userList.end(); ++it) {
-			oss << " " << userDB.GetNickName(*it);
+		for (ChannelDB::UserList::const_iterator it = userList.begin(); it != userList.end(); ++it) {
+			if (channelDB.IsUserOperator(channelId, *it))
+				oss << "@";
+			oss << userDB.GetNickName(*it) << " ";
 		}
 		userNames = oss.str();
 		// channelDB.SendErrorMessageToChannel(nickname + " = " + channelName + " :" + userNames, channelId, M_RPL_NAMREPLY, userId);
