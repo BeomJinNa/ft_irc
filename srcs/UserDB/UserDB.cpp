@@ -191,10 +191,12 @@ void	UserDB::SendMessageToUser(const std::string& message, int userId) const
 		return ;
 	}
 	std::string	sendingMessage = message + "\r\n";
-	std::cout << "<send> " << sendingMessage;
 	Server::GetInstance().SendMessageToClient(it->second.GetSocketFd(),
 											  sendingMessage.c_str(),
 											  sendingMessage.size());
+#ifdef _DEBUG
+	std::cout << "<send> " <<message << std::endl;
+#endif
 }
 void	UserDB::SendCodeMessageToUser(const std::string& message, int userId,
 									   int code, int targetUserID) const
@@ -343,6 +345,27 @@ std::string	UserDB::GetNickName(int userId) const
 		return ("");
 	}
 	return (it->second.GetNickName());
+}
+
+void	UserDB::SetHostAddress(int userId, const std::string& address)
+{
+	const DB::iterator&	it = mDataBase.find(userId);
+
+	if (it != mDataBase.end())
+	{
+		it->second.SetHostAddress(address);
+	}
+}
+
+std::string	UserDB::GetHostAddress(int userId) const
+{
+	const DB::const_iterator&	it = mDataBase.find(userId);
+
+	if (it == mDataBase.end())
+	{
+		return ("");
+	}
+	return (it->second.GetHostAddress());
 }
 
 UserDB& UserDB::GetInstance(void)

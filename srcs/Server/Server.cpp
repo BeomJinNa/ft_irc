@@ -229,10 +229,12 @@ void Server::handleRead(int clientFd)
 				return ;
 			}
 			std::string message = mReadBuffers[clientFd].substr(0, end_of_msg);
-			std::cout << "<recv> " << message << std::endl;
 			mReadBuffers[clientFd].erase(0, end_of_msg + 2);
 			executeHooks(UserDB::GetInstance().GetUserIdBySocketId(clientFd), message);
 			end_of_msg = mReadBuffers[clientFd].find("\r\n");
+#ifdef _DEBUG
+			std::cout << "<recv> " << message << std::endl;
+#endif
 		}
 	}
 	else if (bytes_read == 0 || (bytes_read == -1 && errno == ECONNRESET))

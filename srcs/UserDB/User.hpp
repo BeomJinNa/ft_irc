@@ -40,6 +40,9 @@ class User
 		void				SetFlagNickNameSet(bool value);
 		bool				GetFlagNickNameSet(void) const;
 
+		void				SetHostAddress(const std::string& address);
+		std::string			GetHostAddress(void) const;
+
 		std::vector<int>	GetChannelList(void) const;
 		void				AddChannelInJoinnedList(int channelId);
 		bool				RemoveChannelInJoinnedList(int channelId);
@@ -53,6 +56,7 @@ class User
 		bool			mIsNickNameSet;
 		std::string		mUserName;
 		std::string		mNickName;
+		std::string		mHostAddress;
 		std::set<int>	mJoinedChannels;
 };
 #endif
