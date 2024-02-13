@@ -201,12 +201,15 @@ void	UserDB::SendCodeMessageToUser(const std::string& message, int userId,
 {
 	Server&	serv = Server::GetInstance();
 	UserDB&	uDB = UserDB::GetInstance();
+	std::string	nickOrWildcard = uDB.GetNickName(userId);
+	if (nickOrWildcard == "")
+		nickOrWildcard = "*";
 
 	std::ostringstream	oss;
 	oss << ":" << serv.GetHostAddress()
 		<< " " << std::setfill('0')
 		<< std::setw(3) << code
-		<< " " << uDB.GetNickName(userId)
+		<< " " << nickOrWildcard
 		<< " " << message << std::endl;
 	uDB.SendMessageToUser(oss.str(), targetUserID);
 }
