@@ -28,6 +28,7 @@ enum ReplyCodes
     M_RPL_CHANNELMODEIS = 324, // 채널의 현재 모드 표시 (MODE)
     M_RPL_NOTOPIC = 331, // 채널에 토픽이 설정되지 않았을 때 (TOPIC)
     M_RPL_TOPIC = 332, // 채널의 현재 토픽 (TOPIC)
+    M_RPL_TOPICWHOTIME = 333,
     M_RPL_INVITING = 341, // INVITE 요청에 대한 응답, 초대중인 사용자 (INVITE)
     M_RPL_SUMMONING = 342, // SUMMON 요청에 대한 응답 (SUMMON)
     M_RPL_VERSION = 351, // VERSION 요청에 대한 응답, 서버의 버전 정보 (VERSION)

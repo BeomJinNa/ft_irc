@@ -15,7 +15,7 @@ Channel::Channel(int channelId, const std::string& channelName)
 	: mChannelId(channelId)
 	, mName(channelName)
 	, mChannelMode(0)
-	, mMaxActiveUsers(0)
+	, mMaxActiveUsers(INT32_MAX)
 	, mCurrentActiveUsers(0)
 	, mTopicSetUser(-1)
 	, mCreatedTime(std::time(NULL))
@@ -96,12 +96,18 @@ bool	Channel::AddActiveUser(int userId)
 	return (false);
 }
 
-void	Channel::RemoveUserData(int userId)
+bool	Channel::RemoveUserData(int userId)
 {
-	RemoveActiveUser(userId);
+	DB::iterator	it = mActiveUserList.find(userId);
+
+	if (it == mActiveUserList.end())
+	{
+		return (false);
+	}
 	RemoveOperator(userId);
 	RemoveInvitedUser(userId);
 	RemoveBanUser(userId);
+	return (true);
 }
 
 void	Channel::RemoveActiveUser(int userId)
