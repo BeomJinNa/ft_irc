@@ -194,8 +194,8 @@ void	UserDB::SendMessageToUser(const std::string& message, int userId) const
 	Server::GetInstance().SendMessageToClient(it->second.GetSocketFd(),
 											  sendingMessage.c_str(),
 											  sendingMessage.size());
-#ifdef _DEBUG
-	std::cout << "<send> " <<message << std::endl;
+#ifndef NDEBUG
+	std::cout << "\033[32m<send> " << message << "\033[0m" << std::endl;
 #endif
 }
 void	UserDB::SendCodeMessageToUser(const std::string& message, int userId,
@@ -212,7 +212,7 @@ void	UserDB::SendCodeMessageToUser(const std::string& message, int userId,
 		<< " " << std::setfill('0')
 		<< std::setw(3) << code
 		<< " " << nickOrWildcard
-		<< " " << message << std::endl;
+		<< " " << message;
 	uDB.SendMessageToUser(oss.str(), targetUserID);
 }
 

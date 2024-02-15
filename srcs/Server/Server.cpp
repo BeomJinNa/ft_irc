@@ -219,6 +219,19 @@ void Server::handleRead(int clientFd)
 	{
 		mReadSocketBuffers[clientFd].buffer[bytes_read] = '\0';
 		mReadBuffers[clientFd].append(mReadSocketBuffers[clientFd].buffer);
+#ifndef NDEBUG
+		std::string	dubugMessage(mReadSocketBuffers[clientFd].buffer);
+		std::size_t	pos = dubugMessage.find("\r\n");
+		if (pos == std::string::npos)
+		{
+			std::cout << "<socket:recv> " << dubugMessage << std::endl;
+		}
+		else
+		{
+			dubugMessage = dubugMessage.substr(0, pos);
+			std::cout << "<socket:recv> " << dubugMessage << std::endl;
+		}
+#endif
 
 		size_t	end_of_msg = mReadBuffers[clientFd].find("\r\n");
 		while (end_of_msg != std::string::npos)
@@ -232,8 +245,8 @@ void Server::handleRead(int clientFd)
 			mReadBuffers[clientFd].erase(0, end_of_msg + 2);
 			executeHooks(UserDB::GetInstance().GetUserIdBySocketId(clientFd), message);
 			end_of_msg = mReadBuffers[clientFd].find("\r\n");
-#ifdef _DEBUG
-			std::cout << "<recv> " << message << std::endl;
+#ifndef NDEBUG
+			std::cout << "\033[33m<recv> " << message << "\033[0m" << std::endl;
 #endif
 		}
 	}
