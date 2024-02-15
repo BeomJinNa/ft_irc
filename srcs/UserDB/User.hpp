@@ -34,6 +34,14 @@ class User
 		std::string&		GetNickName(void);
 		const std::string&	GetNickName(void) const;
 
+		void				SetHostName(const std::string& name);
+		std::string&		GetHostName(void);
+		const std::string&	GetHostName(void) const;
+
+		void				SetHostAddress(const std::string& name);
+		std::string&		GetHostAddress(void);
+		const std::string&	GetHostAddress(void) const;
+
 		void				SetFlagUserNameSet(bool value);
 		bool				GetFlagUserNameSet(void) const;
 
@@ -50,12 +58,12 @@ class User
 	private:
 		int				mUserId;
 		int				mSocketFd;
-		// bool			mIsOper;
 		bool			mIsLoggedIn;
 		bool			mIsUserNameSet;
 		bool			mIsNickNameSet;
 		std::string		mUserName;
 		std::string		mNickName;
+		std::string		mHostName;
 		std::string		mHostAddress;
 		std::set<int>	mJoinedChannels;
 };

@@ -225,25 +225,24 @@ void	UserDB::SendErrorMessageToUser(const std::string& message, int userId,
 void	UserDB::SendFormattedMessageToUser(const std::string& message, int userId,
 										   int targetUserID) const
 {
-	Server&	serv = Server::GetInstance();
 	UserDB&	uDB = UserDB::GetInstance();
 
 	std::string	sendingMessage
 		= ":" + uDB.GetNickName(userId)
 		+ "!" + uDB.GetUserName(userId)
-		+ "@" + serv.GetHostAddress()
+		+ "@" + uDB.GetHostAddress(userId)
 		+ " " + message;
 	uDB.SendMessageToUser(sendingMessage, targetUserID);
 }
 
 std::string	UserDB::GetErrorMessage(const std::string& message, int userId, int code) const
 {
-	Server&	serv = Server::GetInstance();
 	UserDB&	uDB = UserDB::GetInstance();
 
 	std::ostringstream	oss;
-	oss << ":" << serv.GetHostAddress()
-		<< " " << std::setw(3) << code
+	oss << ":" << uDB.GetHostAddress(userId)
+		<< " " << std::setfill('0')
+		<< std::setw(3) << code
 		<< " " << uDB.GetNickName(userId)
 		<< " " << message;
 	return (oss.str());
@@ -251,13 +250,12 @@ std::string	UserDB::GetErrorMessage(const std::string& message, int userId, int 
 
 std::string	UserDB::GetFormattedMessage(const std::string& message, int userId) const
 {
-	Server&	serv = Server::GetInstance();
 	UserDB&	uDB = UserDB::GetInstance();
 
 	std::string	sendingMessage
 		= ":" + uDB.GetNickName(userId)
 		+ "!" + uDB.GetUserName(userId)
-		+ "@" + serv.GetHostAddress()
+		+ "@" + uDB.GetHostAddress(userId)
 		+ " " + message;
 	return (sendingMessage);
 }
@@ -350,14 +348,37 @@ std::string	UserDB::GetNickName(int userId) const
 	return (it->second.GetNickName());
 }
 
-void	UserDB::SetHostAddress(int userId, const std::string& address)
+void	UserDB::SetHostName(int userId, const std::string& name)
 {
 	const DB::iterator&	it = mDataBase.find(userId);
 
-	if (it != mDataBase.end())
+	if (it == mDataBase.end())
 	{
-		it->second.SetHostAddress(address);
+		return ;
 	}
+	it->second.SetHostName(name);
+}
+
+std::string	UserDB::GetHostName(int userId) const
+{
+	const DB::const_iterator&	it = mDataBase.find(userId);
+
+	if (it == mDataBase.end())
+	{
+		return ("");
+	}
+	return (it->second.GetHostName());
+}
+
+void	UserDB::SetHostAddress(int userId, const std::string& addr)
+{
+	const DB::iterator&	it = mDataBase.find(userId);
+
+	if (it == mDataBase.end())
+	{
+		return ;
+	}
+		it->second.SetHostAddress(addr);
 }
 
 std::string	UserDB::GetHostAddress(int userId) const
@@ -379,6 +400,7 @@ UserDB& UserDB::GetInstance(void)
 		throw std::runtime_error("User Database Not Found");
 	return (*output);
 }
+
 
 namespace
 {

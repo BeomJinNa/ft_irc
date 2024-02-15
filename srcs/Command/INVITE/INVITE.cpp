@@ -82,8 +82,10 @@ void	HookFunctionInvite(const Message& message)
 	// 127.000.000.001.06667-127.000.000.001.53540: :irc.local 341 hcho2_ yujin :#new2
 	// 127.000.000.001.06667-127.000.000.001.40210: :hcho2_!codespace@127.0.0.1 INVITE yujin :#new2
 
-	userDB.SendErrorMessageToUser(inviteeNickname + " " + channelName, userId, M_RPL_INVITING, userId);
-	userDB.SendFormattedMessageToUser("INVITE " + inviteeNickname + " :" + channelName, userId, inviteeId);
+	userDB.SendErrorMessageToUser(inviteeNickname + " " + channelName,
+										userId, M_RPL_INVITING, userId);
+	userDB.SendFormattedMessageToUser("INVITE " + inviteeNickname + " :" + channelName,
+																		userId, inviteeId);
 
 }
 

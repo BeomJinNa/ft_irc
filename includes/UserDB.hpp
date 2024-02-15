@@ -39,6 +39,11 @@ class UserDB
 		void			SetHostAddress(int userId, const std::string& name);
 		std::string		GetHostAddress(int userId) const;
 
+		void			SetHostName(int userId, const std::string& name);
+		std::string		GetHostName(int userId) const;
+		void			SetHostAddress(int userId, const std::string& name);
+		std::string		GetHostAddress(int userId) const;
+
 		ChannelList		GetJoinnedChannelList(int userId) const;
 
 		int				GetUserIdByUserName(const std::string& userName) const;

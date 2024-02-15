@@ -28,10 +28,9 @@ class Server
 		void			CloseClientConnection(int clientFd);
 		void			CloseAllClientConnection(void);
 		void			SetServerPassword(const std::string& password);
-		void			SetHostAddress(std::string& hostAddress); //TODO: added
 		std::string		GetServerPassword(void);
-		std::string		GetHostAddress(void) const;
 		uint16_t		GetHostPortNumber(void) const;
+		std::string		GetHostAddress(void) const;
 		std::string		GetHostPort(void) const;
 
 		static Server&	GetInstance(void);
@@ -56,8 +55,8 @@ class Server
 		std::vector<struct kevent>		mWriteEvents;
 
 		std::string						mPassword;
-		std::string						mHostAddress;
 		uint16_t						mHostPort;
+		std::string						mHostAddress;
 		std::string						mHostPortString;
 };
 #endif
