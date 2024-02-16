@@ -90,9 +90,6 @@ bool				User::GetFlagUserNameSet(void) const { return (mIsUserNameSet); }
 void				User::SetFlagNickNameSet(bool value) { mIsNickNameSet = value; }
 bool				User::GetFlagNickNameSet(void) const { return (mIsNickNameSet); }
 
-void				User::SetHostAddress(const std::string& address) { mHostAddress = address; }
-std::string			User::GetHostAddress(void) const { return (mHostAddress); }
-
 std::vector<int>	User::GetChannelList(void) const
 {
 	return (std::vector<int>(mJoinedChannels.begin(), mJoinedChannels.end()));

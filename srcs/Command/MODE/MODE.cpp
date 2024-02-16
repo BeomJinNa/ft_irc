@@ -7,6 +7,7 @@
 #include "ChannelDB.hpp"
 #include "ChannelMode.hpp"
 #include "ErrorCodes.hpp"
+#include "ReplyCodes.hpp"
 
 typedef std::vector<std::string>	Tokens;
 
@@ -56,12 +57,6 @@ namespace
 		ChannelDB&	channelDB = ChannelDB::GetInstance();
 		int			userId = message.GetUserId();
 
-		if (message.GetParameters().size() < 2)
-		{
-			userDB.SendErrorMessageToUser("Not enough parameters for MODE command",
-										  userId, M_ERR_NEEDMOREPARAMS, userId);
-			return ;
-		}
 		std::string	channelName = message.GetParameters()[0];
 
 		int	channelId = channelDB.GetChannelIdByName(channelName);
@@ -70,6 +65,28 @@ namespace
 			userDB.SendErrorMessageToUser(channelDB.GetChannelName(channelId)
 										+ " :No such channel",
 										  userId, M_ERR_NOSUCHCHANNEL, userId);
+			return ;
+		}
+
+		if (message.GetParameters().size() < 2)
+		{
+			std::string	modeis;
+			unsigned int	flags = channelDB.GetChannelFlag(channelId);
+			if (flags != 0)
+				modeis = "+";
+			if (flags & M_FLAG_CHANNEL_INVITE_ONLY)
+				modeis = modeis + "i";
+			if (flags & M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY)
+				modeis = modeis + "t";
+			if (flags & M_FLAG_CHANNEL_PASSWORD_CHECK_ON)
+				modeis = modeis + "k";
+			if (flags & M_FLAG_CHANNEL_MAX_USER_LIMIT_ON)
+				modeis = modeis + "l";
+			userDB.SendErrorMessageToUser(channelName + " " + modeis,
+										  userId, M_RPL_CHANNELMODEIS, userId);
+			userDB.SendErrorMessageToUser(channelName + " "
+										+ channelDB.GetCreatedTimeStampOfChannel(channelId),
+										  userId, M_RPL_CREATIONTIME, userId);
 			return ;
 		}
 

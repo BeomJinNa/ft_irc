@@ -3,7 +3,7 @@
 CXX			= c++
 
 COMMONFLAGS	=
-CXXFLAGS	= $(COMMONFLAGS) -Wall -Wextra -Werror -std=c++98 -g -o2
+CXXFLAGS	= $(COMMONFLAGS) -Wall -Wextra -Werror -std=c++98 -o2
 LDFLAGS		= $(COMMONFLAGS)
 
 NAME	= ircserv
@@ -15,18 +15,18 @@ SRCS	= srcs/main.cpp \
 		  srcs/ChannelDB/Channel.cpp \
 		  srcs/ChannelDB/ChannelDB.cpp \
 		  srcs/Command/Command.cpp \
-		  srcs/Command/JOIN/JOIN.cpp \
-		  srcs/Command/NICK/NICK.cpp \
-		  srcs/Command/PASS/PASS.cpp \
-		  srcs/Command/USER/USER.cpp \
-		  srcs/Command/PRIVMSG/PRIVMSG.cpp \
 		  srcs/Command/INVITE/INVITE.cpp \
+		  srcs/Command/JOIN/JOIN.cpp \
 		  srcs/Command/KICK/KICK.cpp \
-		  srcs/Command/PART/PART.cpp \
-		  srcs/Command/PING/PING.cpp \
-		  srcs/Command/TOPIC/TOPIC.cpp \
-		  srcs/Command/QUIT/QUIT.cpp \
 		  srcs/Command/MODE/MODE.cpp \
+		  srcs/Command/NICK/NICK.cpp \
+		  srcs/Command/PART/PART.cpp \
+		  srcs/Command/PASS/PASS.cpp \
+		  srcs/Command/PING/PING.cpp \
+		  srcs/Command/PRIVMSG/PRIVMSG.cpp \
+		  srcs/Command/QUIT/QUIT.cpp \
+		  srcs/Command/TOPIC/TOPIC.cpp \
+		  srcs/Command/USER/USER.cpp \
 		  srcs/ConstString.cpp \
 		  srcs/IndexManager/IndexManager.cpp \
 		  srcs/Server/FixedBufferArray.cpp \

@@ -26,6 +26,7 @@ enum ReplyCodes
     M_RPL_LIST = 322, // LIST, 채널과 그 채널의 사용자 수 (LIST)
     M_RPL_LISTEND = 323, // LIST 요청 종료 (LIST)
     M_RPL_CHANNELMODEIS = 324, // 채널의 현재 모드 표시 (MODE)
+	M_RPL_CREATIONTIME = 329, // 채널의 생성 시간 표시 (MODE)
     M_RPL_NOTOPIC = 331, // 채널에 토픽이 설정되지 않았을 때 (TOPIC)
     M_RPL_TOPIC = 332, // 채널의 현재 토픽 (TOPIC)
     M_RPL_TOPICWHOTIME = 333,
