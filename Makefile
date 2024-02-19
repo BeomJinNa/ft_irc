@@ -14,7 +14,6 @@ INCLUDE	= includes/
 SRCS	= srcs/main.cpp \
 		  srcs/ChannelDB/Channel.cpp \
 		  srcs/ChannelDB/ChannelDB.cpp \
-		  srcs/Command/CONNECT/CONNECT.cpp \
 		  srcs/Command/Command.cpp \
 		  srcs/Command/INVITE/INVITE.cpp \
 		  srcs/Command/JOIN/JOIN.cpp \
