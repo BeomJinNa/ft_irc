@@ -101,10 +101,6 @@ namespace
 		}
 		return true;
 	}
-
-	std::string getBotName()
-
-	}
 }
 
 void	HookFunctionJoin(const Message& message)
@@ -190,7 +186,8 @@ void	HookFunctionJoin(const Message& message)
 									  userId, M_RPL_NAMREPLY, userId);
 		userDB.SendErrorMessageToUser(channelName + " :End of /NAMES list", userId,
 									  M_RPL_ENDOFNAMES, userId);
-		channelDB.SendMessageToChannel("PRIVMSG " + channelName + " :bot!bot@localhost :Hello filthy humans!",
-									   channelId);
+		channelDB.SendMessageToChannel(":bot!bot@localhost PRIVMSG " + channelName
+									 + " :Hello welcom ugly " + nickname + "!", channelId);
+	}
 
 }
