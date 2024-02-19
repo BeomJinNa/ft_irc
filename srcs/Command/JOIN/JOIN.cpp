@@ -13,8 +13,7 @@ namespace
 	{
 		if(channelName[0] == '#' && channelName.length() > 1 && channelName.length() <= 200)
 			return true;
-		else
-			return false;
+		return false;
 	}
 
 	bool CheckInviteOnly(int channelid)
@@ -22,8 +21,7 @@ namespace
 		ChannelDB&	channelDB = ChannelDB::GetInstance();
 		if(channelDB.GetChannelFlag(channelid) & M_FLAG_CHANNEL_INVITE_ONLY)
 			return true;
-		else
-			return false;
+		return false;
 	}
 
 	bool doesChannelRequirePassword(int channelId)
@@ -31,8 +29,7 @@ namespace
 		ChannelDB&	channelDB = ChannelDB::GetInstance();
 		if(channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_PASSWORD_CHECK_ON)
 			return true;
-		else
-			return false;
+		return false;
 	}
 
 	bool isMaxUserLimitOn(int channelId)
@@ -40,8 +37,7 @@ namespace
 		ChannelDB&	channelDB = ChannelDB::GetInstance();
 		if(channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_MAX_USER_LIMIT_ON)
 			return true;
-		else
-			return false;
+		return false;
 	}
 
 	bool compareChannelKey(int channelid, std::string parsedKey)
@@ -49,8 +45,7 @@ namespace
 		ChannelDB&	channelDB = ChannelDB::GetInstance();
 		if(channelDB.GetChannelPassword(channelid) == parsedKey)
 			return true;
-		else
-			return false;
+		return false;
 	}
 
 	size_t parseParameters(const std::string& parameters, std::vector<std::string>& list)
@@ -65,9 +60,11 @@ namespace
 		return list.size();
 	}
 
-	bool CheckInviteOnlyAndHandle(ChannelDB& channelDB, UserDB& userDB, int channelId,
-								  int userId, const std::string& channelName)
+	bool CheckInviteOnly(int channelId, int userId, const std::string& channelName)
 	{
+		ChannelDB&					channelDB = ChannelDB::GetInstance();
+		UserDB&						userDB = UserDB::GetInstance();
+
 		if(CheckInviteOnly(channelId) == true
 		&& channelDB.IsUserInvited(channelId, userId) == false)
 		{
@@ -78,19 +75,21 @@ namespace
 		return true;
 	}
 
-	// bool CheckChannelKeyAndHandle(int channelId, int userId, const std::string& channelName, int keyCount, int i, const std::vector<std::string>& parsedKeys)
-	// {
-	// 	if (doesChannelRequirePassword(channelId) && compareChannelKey(channelId, keyCount <= i ? "" : parsedKeys[i]) == false)
-	// 	{
-	// 		UserDB::GetInstance().SendErrorMessageToUser(channelName + " :Cannot join channel (+k)", userId, M_ERR_BADCHANNELKEY, userId);
-	// 		return false;
-	// 	}
-	// 	return true;
-	// }
-
-	bool CheckUserLimitAndHandle(ChannelDB& channelDB, UserDB& userDB, int channelId,
-								 int userId, const std::string& channelName)
+	bool CheckChannelKey(int channelId, int userId, const std::string& channelName, const std::string& parsedKey)
 	{
+		if (doesChannelRequirePassword(channelId) && compareChannelKey(channelId, parsedKey) == false)
+		{
+			UserDB::GetInstance().SendErrorMessageToUser(channelName + " :Cannot join channel (+k)", userId, M_ERR_BADCHANNELKEY, userId);
+			return false;
+		}
+		return true;
+	}
+
+	bool CheckUserLimit(int channelId, int userId, const std::string& channelName)
+	{
+		ChannelDB&					channelDB = ChannelDB::GetInstance();
+		UserDB&						userDB = UserDB::GetInstance();
+
 		if(isMaxUserLimitOn(channelId)
 		&& channelDB.GetCurrentUsersInChannel(channelId)
 		>= channelDB.GetMaxUsersInChannel(channelId))
@@ -100,6 +99,24 @@ namespace
 			return false;
 		}
 		return true;
+	}
+
+	std::string getUserNames(int channelId)
+	{
+		ChannelDB&					channelDB = ChannelDB::GetInstance();
+		UserDB&						userDB = UserDB::GetInstance();
+		const ChannelDB::UserList& userList = channelDB.GetUserListInChannel(channelId);
+		std::string userNames = "";
+		std::ostringstream oss;
+
+		for (ChannelDB::UserList::const_iterator it = userList.begin();
+			 it != userList.end(); ++it)
+		{
+			if (channelDB.IsUserOperator(channelId, *it))
+				oss << "@";
+			oss << userDB.GetNickName(*it) << " ";
+		}
+		return oss.str();
 	}
 }
 
@@ -142,20 +159,12 @@ void	HookFunctionJoin(const Message& message)
 		}
 		else
 		{
-			if(CheckInviteOnlyAndHandle(channelDB, userDB, channelId, userId, channelName)
-					== false)
-				continue;
-			if (doesChannelRequirePassword(channelId)
-			 && compareChannelKey(channelId, keyCount <= i ? "" : parsedKeys[i]) == false)
-			{
-				UserDB::GetInstance().SendErrorMessageToUser(
-						channelName + " :Cannot join channel (+k)",
-						userId, M_ERR_BADCHANNELKEY, userId);
-				continue;
-			}
-			if (CheckUserLimitAndHandle(channelDB, userDB, channelId, userId, channelName)
-					== false)
-				continue;
+			if(CheckInviteOnly(channelId, userId, channelName) == false)
+				continue ;
+			if (CheckChannelKey(channelId, userId, channelName, keyCount <= i ? "" : parsedKeys[i]) == false)
+				continue ;
+			if (CheckUserLimit(channelId, userId, channelName) == false)
+				continue ;
 		}
 		//add new user to a channel
 		channelDB.AddUserIntoChannel(channelId, userId);
@@ -169,25 +178,13 @@ void	HookFunctionJoin(const Message& message)
 		channelDB.SendFormattedMessageToChannel("TOPIC " + channelName + " " + topic,
 												channelId);
 
-		//send name reply
-		const ChannelDB::UserList& userList = channelDB.GetUserListInChannel(channelId);
-		std::string userNames = "";
-		std::ostringstream oss;
-
-		for (ChannelDB::UserList::const_iterator it = userList.begin();
-			 it != userList.end(); ++it)
-		{
-			if (channelDB.IsUserOperator(channelId, *it))
-				oss << "@";
-			oss << userDB.GetNickName(*it) << " ";
-		}
-		userNames = oss.str();
+		std::string userNames = getUserNames(channelId);
 		userDB.SendErrorMessageToUser("= " + channelName + " :" + userNames,
 									  userId, M_RPL_NAMREPLY, userId);
 		userDB.SendErrorMessageToUser(channelName + " :End of /NAMES list", userId,
 									  M_RPL_ENDOFNAMES, userId);
-		channelDB.SendMessageToChannel(":bot!bot@localhost PRIVMSG " + channelName
-									 + " :Hello welcom ugly " + nickname + "!", channelId);
+		channelDB.SendMessageToChannel(":welcome_bot!bot@localhost PRIVMSG " + channelName
+									 + " :Welcome " + nickname + "!", channelId);
 	}
 
 }
