@@ -14,6 +14,7 @@ INCLUDE	= includes/
 SRCS	= srcs/main.cpp \
 		  srcs/ChannelDB/Channel.cpp \
 		  srcs/ChannelDB/ChannelDB.cpp \
+		  srcs/Command/CONNECT/CONNECT.cpp \
 		  srcs/Command/Command.cpp \
 		  srcs/Command/INVITE/INVITE.cpp \
 		  srcs/Command/JOIN/JOIN.cpp \
@@ -29,6 +30,7 @@ SRCS	= srcs/main.cpp \
 		  srcs/Command/USER/USER.cpp \
 		  srcs/ConstString.cpp \
 		  srcs/IndexManager/IndexManager.cpp \
+		  srcs/Server/FileContainer.cpp \
 		  srcs/Server/FixedBufferArray.cpp \
 		  srcs/Server/Message/Message.cpp \
 		  srcs/Server/Server.cpp \

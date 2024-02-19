@@ -1,92 +1,66 @@
-#include <sys/socket.h>
-#include <sys/event.h>
-#include <sys/types.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <ctime>
 #include <cerrno>
+#include <ctime>
+#include <fcntl.h>
+#include <iostream>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sstream>
 #include <stdexcept>
 #include <string>
-#include <netdb.h>
-#include <sstream>
+#include <sys/event.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include "Command.hpp"
+#include "Constant.hpp"
+#include "FileContainer.hpp"
+#include "FixedBufferArray.hpp"
+#include "Message.hpp"
 #include "Server.hpp"
 #include "UserDB.hpp"
-#include "Message.hpp"
-#include "Command.hpp"
-#include "FixedBufferArray.hpp"
-#include "Constant.hpp"
-#include <iostream>
 
 namespace
 {
-	int				xKevent(int mKq, const struct kevent *changelist,
-							int nchanges, struct kevent *eventlist,
-							int nevents, const struct timespec *timeout);
-	Server*			TouchInstanceData(Server* address);
+	int			xKevent(int mKq, const struct kevent *changelist,
+						int nchanges, struct kevent *eventlist,
+						int nevents, const struct timespec *timeout);
+	Server*		TouchInstanceData(Server* address);
+	int			getServerSocket(void);
+	void		setSocketAddress(struct sockaddr_in& address, int port);
+	void		bindServerSocket(int fd, struct sockaddr_in& address);
+	void		listenServerSocket(int fd);
+	int			getKqueue(void);
+	void		setKqueue(struct kevent& kevent, int fdServer, int fdKqueue);
+	uint16_t	getSocketPort(int socketFd);
 }
 
 Server::Server(int port)
 {
-	mServerFd = socket(AF_INET, SOCK_STREAM, 0);
-	if (mServerFd == -1)
-	{
-		throw std::runtime_error("Socket creation failed");
-	}
-	fcntl(mServerFd, F_SETFL, O_NONBLOCK);
+	FileContainer	FC;
+	mServerFd = getServerSocket();
+	FC.AddFd(mServerFd);
 
 	struct sockaddr_in	address;
-	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = INADDR_ANY;
-	address.sin_port = htons(port);
+	setSocketAddress(address, port);
+	bindServerSocket(mServerFd, address);
+	listenServerSocket(mServerFd);
 
-	if (bind(mServerFd, (struct sockaddr*)&address, sizeof(address)) < 0)
-	{
-		close(mServerFd);
-		throw std::runtime_error("Bind failed");
-	}
-
-	if (listen(mServerFd, M_SERVER_LISTEN_BACKLOG_QUEUE_SIZE) < 0)
-	{
-		close(mServerFd);
-		throw std::runtime_error("Listen failed");
-	}
-
-	mKq = kqueue();
-	if (mKq == -1)
-	{
-		close(mServerFd);
-		throw std::runtime_error("Failed to create mKqueue");
-	}
+	mKq = getKqueue();
+	FC.AddFd(mKq);
 
 	struct kevent	ev;
-	EV_SET(&ev, mServerFd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
-	if (xKevent(mKq, &ev, 1, NULL, 0, NULL) == -1)
-	{
-		close(mServerFd);
-		close(mKq);
-		throw std::runtime_error("Failed to add server socket event to mKqueue");
-	}
+	setKqueue(ev, mServerFd, mKq);
 
-	struct sockaddr_in	address_input;
-	socklen_t			address_input_len = sizeof(address_input);
-
-	if (getsockname(mServerFd, (struct sockaddr *)&address_input,
-					&address_input_len) == -1)
-	{
-		close(mServerFd);
-		close(mKq);
-		throw std::runtime_error("getsockname failed");
-	}
-	mHostAddress = "localhost"; //TODO: edit later
-	mHostPort = ntohs(address_input.sin_port);
+	mHostAddress = "localhost";
+	mHostPort = getSocketPort(mServerFd);
 
 	std::ostringstream	oss;
 	oss << mHostPort;
 	mHostPortString = oss.str();
 
 	TouchInstanceData(this);
+	FC.SetSuccess();
 }
 
 Server::~Server(void)
@@ -198,7 +172,6 @@ void Server::acceptConnection(void)
 		EV_SET(&ev, clientFd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
 		xKevent(mKq, &ev, 1, NULL, 0, NULL);
 		mClientFds.insert(clientFd);
-		std::cout << clientFd << " has been connected!" << std::endl;
 
 		bool isConnectionAvailable = UserDB::GetInstance().ConnectUser(clientFd);
 		if (isConnectionAvailable == false)
@@ -219,19 +192,6 @@ void Server::handleRead(int clientFd)
 	{
 		mReadSocketBuffers[clientFd].buffer[bytes_read] = '\0';
 		mReadBuffers[clientFd].append(mReadSocketBuffers[clientFd].buffer);
-#ifndef NDEBUG
-		std::string	dubugMessage(mReadSocketBuffers[clientFd].buffer);
-		std::size_t	pos = dubugMessage.find("\r\n");
-		if (pos == std::string::npos)
-		{
-			std::cout << "<socket:recv> " << dubugMessage << std::endl;
-		}
-		else
-		{
-			dubugMessage = dubugMessage.substr(0, pos);
-			std::cout << "<socket:recv> " << dubugMessage << std::endl;
-		}
-#endif
 
 		size_t	end_of_msg = mReadBuffers[clientFd].find("\r\n");
 		while (end_of_msg != std::string::npos)
@@ -245,9 +205,6 @@ void Server::handleRead(int clientFd)
 			mReadBuffers[clientFd].erase(0, end_of_msg + 2);
 			executeHooks(UserDB::GetInstance().GetUserIdBySocketId(clientFd), message);
 			end_of_msg = mReadBuffers[clientFd].find("\r\n");
-#ifndef NDEBUG
-			std::cout << "\033[33m<recv> " << message << "\033[0m" << std::endl;
-#endif
 		}
 	}
 	else if (bytes_read == 0 || (bytes_read == -1 && errno == ECONNRESET))
@@ -307,12 +264,77 @@ namespace
 		static Server*	ServerGlobal = NULL;
 
 		if (address != NULL)
-		{
-			ServerGlobal = address;
+		{ ServerGlobal = address;
 			return (NULL);
 		}
 
 		return (ServerGlobal);
+	}
+
+	int	getServerSocket(void)
+	{
+		int	fd = socket(AF_INET, SOCK_STREAM, 0);
+		if (fd == -1)
+		{
+			throw std::runtime_error("Socket creation failed");
+		}
+		fcntl(fd, F_SETFL, O_NONBLOCK);
+		return (fd);
+	}
+
+	void	setSocketAddress(struct sockaddr_in& address, int port)
+	{
+		address.sin_family = AF_INET;
+		address.sin_addr.s_addr = INADDR_ANY;
+		address.sin_port = htons(port);
+	}
+
+	void	bindServerSocket(int fd, struct sockaddr_in& address)
+	{
+		if (bind(fd, (struct sockaddr*)&address, sizeof(address)) < 0)
+		{
+			throw std::runtime_error("Bind failed");
+		}
+	}
+
+	void	listenServerSocket(int fd)
+	{
+		if (listen(fd, M_SERVER_LISTEN_BACKLOG_QUEUE_SIZE) < 0)
+		{
+			throw std::runtime_error("Listen failed");
+		}
+	}
+
+	int		getKqueue(void)
+	{
+		int fd = kqueue();
+		if (fd == -1)
+		{
+			throw std::runtime_error("Failed to create mKqueue");
+		}
+		return (fd);
+	}
+
+	void	setKqueue(struct kevent& kevent, int fdServer, int fdKqueue)
+	{
+		EV_SET(&kevent, fdServer, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+		if (xKevent(fdKqueue, &kevent, 1, NULL, 0, NULL) == -1)
+		{
+			throw std::runtime_error("Failed to add server socket event to mKqueue");
+		}
+	}
+
+	uint16_t	getSocketPort(int socketFd)
+	{
+		struct sockaddr_in	address_input;
+		socklen_t			address_input_len = sizeof(address_input);
+
+		if (getsockname(socketFd, (struct sockaddr *)&address_input,
+					&address_input_len) == -1)
+		{
+			throw std::runtime_error("getsockname failed");
+		}
+		return (ntohs(address_input.sin_port));
 	}
 }
 
