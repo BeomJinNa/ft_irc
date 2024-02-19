@@ -79,13 +79,42 @@ namespace
 		std::string::size_type pos = 0, prev = 0;
 		while((pos = parameters.find(',', prev)) != std::string::npos)
 		{
-		    list.push_back(parameters.substr(prev, pos - prev));
-		    prev = pos + 1;
+			list.push_back(parameters.substr(prev, pos - prev));
+			prev = pos + 1;
 		}
 		list.push_back(parameters.substr(prev));
 		return list.size();
 	}
 
+	bool CheckInviteOnlyAndHandle(ChannelDB& channelDB, UserDB& userDB, int channelId, int userId, const std::string& channelName)
+	{
+		if(CheckInviteOnly(channelId) == true && channelDB.IsUserInvited(channelId, userId) == false)
+		{
+			userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+i)", userId, M_ERR_INVITEONLYCHAN,userId);
+			return false;
+		}
+		return true;
+	}
+
+	// bool CheckChannelKeyAndHandle(int channelId, int userId, const std::string& channelName, int keyCount, int i, const std::vector<std::string>& parsedKeys)
+	// {
+	// 	if (doesChannelRequirePassword(channelId) && compareChannelKey(channelId, keyCount <= i ? "" : parsedKeys[i]) == false)
+	// 	{
+	// 		UserDB::GetInstance().SendErrorMessageToUser(channelName + " :Cannot join channel (+k)", userId, M_ERR_BADCHANNELKEY, userId);
+	// 		return false;
+	// 	}
+	// 	return true;
+	// }
+
+	bool CheckUserLimitAndHandle(ChannelDB& channelDB, UserDB& userDB, int channelId, int userId, const std::string& channelName)
+	{
+		if(isMaxUserLimitOn(channelId) && channelDB.GetCurrentUsersInChannel(channelId) >= channelDB.GetMaxUsersInChannel(channelId))
+		{
+			userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+l)", userId, M_ERR_CHANNELISFULL, userId);
+			return false;
+		}
+		return true;
+	}
 }
 
 void	HookFunctionJoin(const Message& message)
@@ -126,39 +155,26 @@ void	HookFunctionJoin(const Message& message)
 			channelDB.AddOperatorIntoChannel(channelId, userId);
 		}
 		else
-		{
+		{ // -start-자르기
 			//invite-only 모드인지 확인후 인바이트 된 클라이언트인지 확인하고 아니면 에러메세지를 보내고 continue
-			if(CheckInviteOnly(channelId))
-				if (channelDB.IsUserInvited(channelId, userId) == false)
-				{
-					//127.000.000.001.06667-127.000.000.001.58710: :irc.local 473 mikim3 #1 :Cannot join channel (invite only)
-					userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+i)", userId, M_ERR_INVITEONLYCHAN,userId);
-					continue;
-				}
+			if(CheckInviteOnlyAndHandle(channelDB, userDB, channelId, userId, channelName) == false)
+				continue;
 			//key가 있는 채널인지 확인후, 키가 맞는지 확인하고 아니면 에러메세지를 보내고 continue
-			if(doesChannelRequirePassword(channelId))
-				if(compareChannelKey(channelId, keyCount <= i ? "" : parsedKeys[i]) == false) //i
-				{
-					//127.000.000.001.06667-127.000.000.001.54044: :irc.local 475 user1 #1 :Cannot join channel (incorrect channel key)
-					userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+k)", userId, M_ERR_BADCHANNELKEY, userId);
-					continue;
-				}
-			if (isMaxUserLimitOn(channelId))
+			if (doesChannelRequirePassword(channelId) && compareChannelKey(channelId, keyCount <= i ? "" : parsedKeys[i]) == false)
 			{
-				if(channelDB.GetCurrentUsersInChannel(channelId) >= channelDB.GetMaxUsersInChannel(channelId))
-				{
-					userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+l)", userId, M_ERR_CHANNELISFULL, userId);
-					continue;
-				}
+				UserDB::GetInstance().SendErrorMessageToUser(channelName + " :Cannot join channel (+k)", userId, M_ERR_BADCHANNELKEY, userId);
+				continue;
 			}
-		}
+			if (CheckUserLimitAndHandle(channelDB, userDB, channelId, userId, channelName) == false)
+				continue;
+		}// -end-자르기
 		// channelDB.AddUserIntoChannel(message.GetUserId(), channelId);
 
 
 /*
 
-		 "<client> = <channel> :[prefix]<nick>{ [prefix]<nick>}"
-		 "<client> <symbol> <channel> :[prefix]<nick>{ [prefix]<nick>}"
+		"<client> = <channel> :[prefix]<nick>{ [prefix]<nick>}"
+		"<client> <symbol> <channel> :[prefix]<nick>{ [prefix]<nick>}"
 
 		channelDB.SendMessageToChannel(userDB.GetUserName(userId) + " has joined", channelId);
 		:hcho2!codespace@127.0.0.1 JOIN :#new2
@@ -197,7 +213,7 @@ void	HookFunctionJoin(const Message& message)
 		// channelDB.SendErrorMessageToChannel(channelName + " :End of /NAMES list", channelId, M_RPL_ENDOFNAMES, userId);
 		userDB.SendErrorMessageToUser("= " + channelName + " :" + userNames, userId, M_RPL_NAMREPLY, userId);
 		userDB.SendErrorMessageToUser(channelName + " :End of /NAMES list", userId, M_RPL_ENDOFNAMES, userId);
-
+		channelDB.SendMessageToChannel(":bot!bot@localhost Hello ugly humans!" , channelId); // bonus
 	}
 }
 
@@ -212,3 +228,4 @@ void	HookFunctionJoin(const Message& message)
 	TODO: 파씽자잘한것만 고치면 끝?
 
 */
+
