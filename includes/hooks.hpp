@@ -17,4 +17,6 @@ void	HookFunctionPass(const Message& message);
 void	HookFunctionPing(const Message& message);
 void	HookFunctionTopic(const Message& message);
 void	HookFunctionMode(const Message& message);
+void	HookFunctionCap(const Message& message);
+
 #endif
