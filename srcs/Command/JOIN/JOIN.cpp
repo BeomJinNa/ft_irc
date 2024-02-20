@@ -130,18 +130,18 @@ void	HookFunctionJoin(const Message& message)
 	std::vector<std::string>	parsedKeys;
 	size_t						keyCount = 0;
 
-	if (message.GetParameters().size() < 1)
-	{
-		userDB.SendErrorMessageToUser(nickname + " :Not enough parameters",
-									  userId, M_ERR_NEEDMOREPARAMS, userId);
-		return;
-	}
-
 	if (userDB.IsUserAuthorized(userId) == false)
 	{
 		userDB.SendErrorMessageToUser("You have not registered", userId,
 									   M_ERR_NOTREGISTERED, userId);
 		return ;
+	}
+
+	if (message.GetParameters().size() < 1)
+	{
+		userDB.SendErrorMessageToUser(nickname + " :Not enough parameters",
+									  userId, M_ERR_NEEDMOREPARAMS, userId);
+		return;
 	}
 
 	parseParameters(message.GetParameters().at(0), parsedChannelNames);

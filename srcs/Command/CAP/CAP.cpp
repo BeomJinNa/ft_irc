@@ -12,5 +12,6 @@ void	HookFunctionCap(const Message& message)
 	UserDB&			userDB = UserDB::GetInstance();
 	int				userId = message.GetUserId();
 
-	userDB.SendMessageToUser(":localhost CAP * LS :multi-prefix away-notify extended-join chghost", userId);
+	userDB.SendMessageToUser(":localhost CAP * LS :None", userId);
+	// userDB.SendErrorMessageToUser("CAP * LS :multi-prefix away-notify extended-join chghost", userId, 410, userId);
 }
