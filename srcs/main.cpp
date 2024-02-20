@@ -155,5 +155,6 @@ namespace
 		Command::RegisterCommand("KICK", HookFunctionKick);
 		Command::RegisterCommand("INVITE", HookFunctionInvite);
 		Command::RegisterCommand("MODE", HookFunctionMode);
+		Command::RegisterCommand("CAP", HookFunctionCap);
 	}
 }
