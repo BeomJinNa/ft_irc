@@ -139,7 +139,12 @@ void	Server::waitEvent(void)
 	mWriteEvents.clear();
 	for (int i = 0; i < nev; i++)
 	{
-		if (events[i].filter == EVFILT_READ)
+		if (events[i].flags & (EV_EOF | EV_ERROR))
+		{
+			UserDB::GetInstance().RemoveUserData(events[i].ident);
+			CloseClientConnection(events[i].ident);
+		}
+		else if (events[i].filter == EVFILT_READ)
 		{
 			if (events[i].ident == static_cast<uintptr_t>(mServerFd))
 			{
@@ -150,7 +155,7 @@ void	Server::waitEvent(void)
 				handleRead(events[i].ident);
 			}
 		}
-		if (events[i].filter == EVFILT_WRITE)
+		else if (events[i].filter == EVFILT_WRITE)
 		{
 			handleWrite(events[i].ident);
 		}
