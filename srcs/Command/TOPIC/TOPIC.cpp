@@ -1,27 +1,11 @@
 #include <ctime>
-#include <set>
-#include <sstream>
 #include <string>
-#include "Server.hpp"
 #include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "Message.hpp"
 #include "ErrorCodes.hpp"
 #include "ReplyCodes.hpp"
 #include "ChannelMode.hpp"
-
-/*
-namespace
-{
-	std::string TimeToString(time_t time)
-	{
-		const int size = 20;
-		char buffer[size];
-		strftime(buffer, size, "%Y-%m-%d-%H-%M-%S", gmtime(&time));
-		return std::string(buffer);
-	}
-}
-*/
 
 void	HookFunctionTopic(const Message& message)
 {

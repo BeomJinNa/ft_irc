@@ -1,5 +1,4 @@
 #include <set>
-#include "Server.hpp"
 #include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "Message.hpp"

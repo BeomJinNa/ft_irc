@@ -135,11 +135,17 @@ void	Server::waitEvent(void)
 	struct kevent	events[MAX_EVENTS];
 	int				nev = xKevent(mKq, &mWriteEvents[0], mWriteEvents.size(),
 								  events, MAX_EVENTS, NULL);
+	UserDB&			userDB = UserDB::GetInstance();
 
 	mWriteEvents.clear();
 	for (int i = 0; i < nev; i++)
 	{
-		if (events[i].filter == EVFILT_READ)
+		if (events[i].flags & (EV_EOF | EV_ERROR))
+		{
+			userDB.RemoveUserData(userDB.GetUserIdBySocketId(events[i].ident));
+			CloseClientConnection(events[i].ident);
+		}
+		else if (events[i].filter == EVFILT_READ)
 		{
 			if (events[i].ident == static_cast<uintptr_t>(mServerFd))
 			{
@@ -150,7 +156,7 @@ void	Server::waitEvent(void)
 				handleRead(events[i].ident);
 			}
 		}
-		if (events[i].filter == EVFILT_WRITE)
+		else if (events[i].filter == EVFILT_WRITE)
 		{
 			handleWrite(events[i].ident);
 		}
@@ -187,6 +193,7 @@ void Server::handleRead(int clientFd)
 	ssize_t					bytes_read = read(clientFd,
 											  mReadSocketBuffers[clientFd].buffer,
 											  bufferSize - 1);
+	UserDB&					userDB = UserDB::GetInstance();
 
 	if (bytes_read > 0)
 	{
@@ -203,13 +210,13 @@ void Server::handleRead(int clientFd)
 			}
 			std::string message = mReadBuffers[clientFd].substr(0, end_of_msg);
 			mReadBuffers[clientFd].erase(0, end_of_msg + 2);
-			executeHooks(UserDB::GetInstance().GetUserIdBySocketId(clientFd), message);
+			executeHooks(userDB.GetUserIdBySocketId(clientFd), message);
 			end_of_msg = mReadBuffers[clientFd].find("\r\n");
 		}
 	}
 	else if (bytes_read == 0 || (bytes_read == -1 && errno == ECONNRESET))
 	{
-		UserDB::GetInstance().RemoveUserData(clientFd);
+		userDB.RemoveUserData(userDB.GetUserIdBySocketId(clientFd));
 		CloseClientConnection(clientFd);
 	}
 }
