@@ -1,11 +1,7 @@
-#include <set>
 #include <string>
-#include "Server.hpp"
 #include "UserDB.hpp"
-#include "ChannelDB.hpp"
 #include "Message.hpp"
 #include "ErrorCodes.hpp"
-#include "ReplyCodes.hpp"
 
 void	HookFunctionPing(const Message& message)
 {
@@ -30,5 +26,3 @@ void	HookFunctionPing(const Message& message)
 		+ " " + token;
 	userDB.SendMessageToUser(sendingMessage, userId);
 }
-
-

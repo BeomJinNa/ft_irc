@@ -1,9 +1,5 @@
-#include <set>
 #include <string>
 #include <vector>
-#include <sstream>
-#include <utility>
-#include "Server.hpp"
 #include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "ChannelMode.hpp"
@@ -69,14 +65,4 @@ void	HookFunctionInvite(const Message& message)
 										userId, M_RPL_INVITING, userId);
 	userDB.SendFormattedMessageToUser("INVITE " + inviteeNickname + " :" + channelName,
 																		userId, inviteeId);
-
 }
-
-
-/*
-
-inspircd --runasroot --nofork
-irssi -c 127.0.0.1 -p 6667 -n nickname
-tcpflow -i lo port 6667 -c
-
-*/

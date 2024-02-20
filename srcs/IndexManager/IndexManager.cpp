@@ -1,4 +1,3 @@
-#include <climits>
 #include "IndexManager.hpp"
 
 namespace

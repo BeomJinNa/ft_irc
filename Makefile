@@ -27,7 +27,6 @@ SRCS	= srcs/main.cpp \
 		  srcs/Command/QUIT/QUIT.cpp \
 		  srcs/Command/TOPIC/TOPIC.cpp \
 		  srcs/Command/USER/USER.cpp \
-		  srcs/ConstString.cpp \
 		  srcs/IndexManager/IndexManager.cpp \
 		  srcs/Server/FileContainer.cpp \
 		  srcs/Server/FixedBufferArray.cpp \

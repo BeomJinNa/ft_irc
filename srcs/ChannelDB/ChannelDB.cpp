@@ -1,8 +1,6 @@
 #include <stdexcept>
 #include <cstddef>
 #include <sstream>
-#include <iomanip>
-#include "Server.hpp"
 #include "ChannelDB.hpp"
 #include "Channel.hpp"
 #include "UserDB.hpp"
