@@ -121,7 +121,7 @@ void	UserDB::RemoveChannelInUserList(int userId, int channelId)
 
 	if (it->second.RemoveChannelInJoinnedList(channelId))
 	{
-		ChannelDB::GetInstance().RemoveUserIntoChannel(channelId, userId);
+		ChannelDB::GetInstance().RemoveUserFromChannel(channelId, userId);
 	}
 }
 

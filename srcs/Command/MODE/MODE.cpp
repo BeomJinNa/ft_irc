@@ -291,7 +291,7 @@ namespace
 			if (*it == "+i")
 			{
 				channelDB.AddChannelFlag(channelId, M_FLAG_CHANNEL_INVITE_ONLY);
-				channelDB.SendFormattedMessageToChannel(
+				channelDB.AnnounceFormattedToChannel(
 						"NOTICE " + channelName + " :" + userDB.GetNickName(userId)
 						+ " has set mode +i on " + channelName
 						,channelId, userId);
@@ -299,7 +299,7 @@ namespace
 			else if (*it == "-i")
 			{
 				channelDB.RemoveChannelFlag(channelId, M_FLAG_CHANNEL_INVITE_ONLY);
-				channelDB.SendFormattedMessageToChannel(
+				channelDB.AnnounceFormattedToChannel(
 						"NOTICE " + channelName + " :" + userDB.GetNickName(userId)
 						+ " has removed mode +i on " + channelName
 						,channelId, userId);
@@ -307,7 +307,7 @@ namespace
 			else if (*it == "+t")
 			{
 				channelDB.AddChannelFlag(channelId, M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY);
-				channelDB.SendFormattedMessageToChannel(
+				channelDB.AnnounceFormattedToChannel(
 						"NOTICE " + channelName + " :" + userDB.GetNickName(userId)
 						+ " has set mode +t on " + channelName
 						,channelId, userId);
@@ -315,7 +315,7 @@ namespace
 			else if (*it == "-t")
 			{
 				channelDB.RemoveChannelFlag(channelId, M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY);
-				channelDB.SendFormattedMessageToChannel(
+				channelDB.AnnounceFormattedToChannel(
 						"NOTICE " + channelName + " :" + userDB.GetNickName(userId)
 						+ " has removed mode -t on " + channelName
 						,channelId, userId);
@@ -324,7 +324,7 @@ namespace
 			{
 				channelDB.AddChannelFlag(channelId, M_FLAG_CHANNEL_PASSWORD_CHECK_ON);
 				channelDB.SetChannelPassword(channelId, *pit++);
-				channelDB.SendFormattedMessageToChannel(
+				channelDB.AnnounceFormattedToChannel(
 						"NOTICE " + channelName + " :" + userDB.GetNickName(userId)
 						+ " has set mode +k on " + channelName
 						,channelId, userId);
@@ -333,7 +333,7 @@ namespace
 			{
 				channelDB.RemoveChannelFlag(channelId, M_FLAG_CHANNEL_PASSWORD_CHECK_ON);
 				channelDB.SetChannelPassword(channelId, "");
-				channelDB.SendFormattedMessageToChannel(
+				channelDB.AnnounceFormattedToChannel(
 						"NOTICE " + channelName + " :" + userDB.GetNickName(userId)
 						+ " has removed mode -k on " + channelName
 						,channelId, userId);
@@ -341,7 +341,7 @@ namespace
 			else if (*it == "+o")
 			{
 				channelDB.AddOperatorIntoChannel(channelId, userDB.GetUserIdByNickName(*pit));
-				channelDB.SendFormattedMessageToChannel(
+				channelDB.AnnounceFormattedToChannel(
 						"NOTICE " + channelName + " :" + userDB.GetNickName(userId)
 						+ " has given channel operator status to " + *pit + " on " + channelName
 						,channelId, userId);
@@ -349,8 +349,8 @@ namespace
 			}
 			else if (*it == "-o")
 			{
-				channelDB.RemoveOperatorIntoChannel(channelId, userDB.GetUserIdByNickName(*pit++));
-				channelDB.SendFormattedMessageToChannel(
+				channelDB.RemoveOperatorFromChannel(channelId, userDB.GetUserIdByNickName(*pit++));
+				channelDB.AnnounceFormattedToChannel(
 						"NOTICE " + channelName + " :" + userDB.GetNickName(userId)
 						+ " has taken channel operator status to " + *pit + " on " + channelName
 						,channelId, userId);
@@ -363,7 +363,7 @@ namespace
 				iss >> limit;
 				channelDB.AddChannelFlag(channelId, M_FLAG_CHANNEL_MAX_USER_LIMIT_ON);
 				channelDB.SetMaxUsersInChannel(channelId, limit);
-				channelDB.SendFormattedMessageToChannel(
+				channelDB.AnnounceFormattedToChannel(
 						"NOTICE " + channelName + " :" + userDB.GetNickName(userId)
 						+ " has set mode +l " + *pit + " on " + channelName
 						,channelId, userId);
@@ -373,7 +373,7 @@ namespace
 			{
 				channelDB.RemoveChannelFlag(channelId, M_FLAG_CHANNEL_MAX_USER_LIMIT_ON);
 				channelDB.SetMaxUsersInChannel(channelId, std::numeric_limits<unsigned int>::max());
-				channelDB.SendFormattedMessageToChannel(
+				channelDB.AnnounceFormattedToChannel(
 						"NOTICE " + channelName + " :" + userDB.GetNickName(userId)
 						+ " has removed mode -l on " + channelName
 						,channelId, userId);

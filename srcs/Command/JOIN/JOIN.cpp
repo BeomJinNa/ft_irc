@@ -168,14 +168,14 @@ void	HookFunctionJoin(const Message& message)
 		}
 
 		channelDB.AddUserIntoChannel(channelId, userId);
-		channelDB.SendFormattedMessageToChannel("JOIN :" + channelName, channelId, userId);
+		channelDB.AnnounceFormattedToChannel("JOIN :" + channelName, channelId, userId);
 
 
 		std::string topic = channelDB.GetChannelTopic(channelId);
 		if (topic != "")
 			userDB.SendErrorMessageToUser(channelName + " :" + topic,
 										  userId, M_RPL_TOPIC, userId);
-		channelDB.SendFormattedMessageToChannel("TOPIC " + channelName + " " + topic,
+		channelDB.AnnounceFormattedToChannel("TOPIC " + channelName + " " + topic,
 												channelId);
 
 		std::string userNames = getUserNames(channelId);
@@ -183,7 +183,7 @@ void	HookFunctionJoin(const Message& message)
 									  userId, M_RPL_NAMREPLY, userId);
 		userDB.SendErrorMessageToUser(channelName + " :End of /NAMES list", userId,
 									  M_RPL_ENDOFNAMES, userId);
-		channelDB.SendMessageToChannel(":welcome_bot!bot@localhost PRIVMSG " + channelName
+		channelDB.AnnounceToChannel(":welcome_bot!bot@localhost PRIVMSG " + channelName
 									 + " :Welcome " + nickname + "!", channelId);
 	}
 

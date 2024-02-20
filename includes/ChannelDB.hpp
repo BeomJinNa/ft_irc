@@ -27,19 +27,15 @@ class ChannelDB
 		bool			IsUserInChannel(int channelId, int userId) const;
 
 		bool			AddUserIntoChannel(int channelId, int userId);
-		void			RemoveUserIntoChannel(int channelId, int userId);
+		void			RemoveUserFromChannel(int channelId, int userId);
 
 		bool			AddOperatorIntoChannel(int channelId, int userId);
-		void			RemoveOperatorIntoChannel(int channelId, int userId);
+		void			RemoveOperatorFromChannel(int channelId, int userId);
 		bool			IsUserOperator(int channelId, int userId) const;
 
 		void			AddInvitedUserIntoChannel(int channelId, int userId);
-		void			RemoveInvitedUserIntoChannel(int channelId, int userId);
+		void			RemoveInvitedUserFromChannel(int channelId, int userId);
 		bool			IsUserInvited(int channelId, int userId) const;
-
-		void			AddBanIntoChannel(int channelId, int userId);
-		void			RemoveBanIntoChannel(int channelId, int userId);
-		bool			IsUserBanned(int channelId, int userId) const;
 
 		int				GetChannelIdByName(const std::string& name) const;
 
@@ -74,16 +70,16 @@ class ChannelDB
 		UserList		GetOperatorListInChannel(int channelId) const;
 		UserList		GetBanListInChannel(int channelId) const;
 
-		void			SendMessageToChannel(const std::string& message,
+		void			AnnounceToChannel(const std::string& message,
 											 int channelId) const;
-		void			SendErrorMessageToChannel(const std::string& message,
+		void			AnnounceErrorToChannel(const std::string& message,
 												  int channelId, int code) const;
-		void			SendFormattedMessageToChannel(const std::string& message,
+		void			AnnounceFormattedToChannel(const std::string& message,
 													  int channelId) const;
-		void			SendErrorMessageToChannel(const std::string& message,
+		void			AnnounceErrorToChannel(const std::string& message,
 												  int channelId, int code,
 												  int userId) const;
-		void			SendFormattedMessageToChannel(const std::string& message,
+		void			AnnounceFormattedToChannel(const std::string& message,
 													  int channelId,
 													  int userId) const;
 

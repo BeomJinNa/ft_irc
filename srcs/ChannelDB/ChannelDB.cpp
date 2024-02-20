@@ -103,7 +103,7 @@ bool	ChannelDB::AddUserIntoChannel(int channelId, int userId)
 	return (isUserInChannel);
 }
 
-void	ChannelDB::RemoveUserIntoChannel(int channelId, int userId)
+void	ChannelDB::RemoveUserFromChannel(int channelId, int userId)
 {
 	DB::iterator	it = mDataBase.find(channelId);
 
@@ -132,7 +132,7 @@ bool	ChannelDB::AddOperatorIntoChannel(int channelId, int userId)
 	return (isUserOperator);
 }
 
-void	ChannelDB::RemoveOperatorIntoChannel(int channelId, int userId)
+void	ChannelDB::RemoveOperatorFromChannel(int channelId, int userId)
 {
 	DB::iterator	it = mDataBase.find(channelId);
 
@@ -166,7 +166,7 @@ void	ChannelDB::AddInvitedUserIntoChannel(int channelId, int userId)
 	it->second.AddInvitedUser(userId);
 }
 
-void	ChannelDB::RemoveInvitedUserIntoChannel(int channelId, int userId)
+void	ChannelDB::RemoveInvitedUserFromChannel(int channelId, int userId)
 {
 	DB::iterator	it = mDataBase.find(channelId);
 
@@ -186,39 +186,6 @@ bool	ChannelDB::IsUserInvited(int channelId, int userId) const
 		return (false);
 	}
 	return (it->second.IsUserInvited(userId));
-}
-
-void	ChannelDB::AddBanIntoChannel(int channelId, int userId)
-{
-	DB::iterator	it = mDataBase.find(channelId);
-
-	if (it == mDataBase.end())
-	{
-		return ;
-	}
-	it->second.AddBanUser(userId);
-}
-
-void	ChannelDB::RemoveBanIntoChannel(int channelId, int userId)
-{
-	DB::iterator	it = mDataBase.find(channelId);
-
-	if (it == mDataBase.end())
-	{
-		return ;
-	}
-	it->second.RemoveBanUser(userId);
-}
-
-bool	ChannelDB::IsUserBanned(int channelId, int userId) const
-{
-	DB::const_iterator	it = mDataBase.find(channelId);
-
-	if (it == mDataBase.end())
-	{
-		return (false);
-	}
-	return (it->second.IsUserBanned(userId));
 }
 
 void	ChannelDB::DeleteUserInAllChannels(int userId)
@@ -407,7 +374,7 @@ ChannelDB::UserList	ChannelDB::GetBanListInChannel(int channelId) const
 	return (it->second.GetBanUserList());
 }
 
-void	ChannelDB::SendMessageToChannel(const std::string& message,
+void	ChannelDB::AnnounceToChannel(const std::string& message,
 										int channelId) const
 {
 	DB::const_iterator	it = mDataBase.find(channelId);
@@ -424,7 +391,7 @@ void	ChannelDB::SendMessageToChannel(const std::string& message,
 	}
 }
 
-void	ChannelDB::SendErrorMessageToChannel(const std::string& message,
+void	ChannelDB::AnnounceErrorToChannel(const std::string& message,
 											 int channelId, int code) const
 {
 	DB::const_iterator	it = mDataBase.find(channelId);
@@ -441,7 +408,7 @@ void	ChannelDB::SendErrorMessageToChannel(const std::string& message,
 	}
 }
 
-void	ChannelDB::SendErrorMessageToChannel(const std::string& message,
+void	ChannelDB::AnnounceErrorToChannel(const std::string& message,
 											 int channelId, int code,
 											 int userId) const
 {
@@ -459,7 +426,7 @@ void	ChannelDB::SendErrorMessageToChannel(const std::string& message,
 	}
 }
 
-void	ChannelDB::SendFormattedMessageToChannel(const std::string& message,
+void	ChannelDB::AnnounceFormattedToChannel(const std::string& message,
 												 int channelId) const
 {
 	DB::const_iterator	it = mDataBase.find(channelId);
@@ -476,7 +443,7 @@ void	ChannelDB::SendFormattedMessageToChannel(const std::string& message,
 	}
 }
 
-void	ChannelDB::SendFormattedMessageToChannel(const std::string& message,
+void	ChannelDB::AnnounceFormattedToChannel(const std::string& message,
 												 int channelId, int userId) const
 {
 	DB::const_iterator	it = mDataBase.find(channelId);

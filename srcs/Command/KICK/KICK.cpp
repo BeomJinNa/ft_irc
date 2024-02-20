@@ -84,7 +84,7 @@ void	HookFunctionKick(const Message& message)
 
 		std::string sendMessage = "KICK " + channelName + " " + kickUserNick + " " + comment;
 
-		channelDB.SendFormattedMessageToChannel(sendMessage, channelId, userId);
-		channelDB.RemoveUserIntoChannel(channelId, kickUserId);
+		channelDB.AnnounceFormattedToChannel(sendMessage, channelId, userId);
+		channelDB.RemoveUserFromChannel(channelId, kickUserId);
 	}
 }
