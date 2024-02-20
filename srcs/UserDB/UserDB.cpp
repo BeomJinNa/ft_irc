@@ -194,6 +194,10 @@ void	UserDB::SendMessageToUser(const std::string& message, int userId) const
 	Server::GetInstance().SendMessageToClient(it->second.GetSocketFd(),
 											  sendingMessage.c_str(),
 											  sendingMessage.size());
+
+#ifdef LOG_ON
+	std::cout << "\033[32m<send> " << message << "\033[0m" << std::endl;
+#endif
 }
 void	UserDB::SendCodeMessageToUser(const std::string& message, int userId,
 									   int code, int targetUserID) const
@@ -284,7 +288,8 @@ bool	UserDB::IsUserAuthorized(int userId) const
 
 	if (it != mDataBase.end())
 		return (it->second.GetFlagUserNameSet()
-				&& it->second.GetFlagNickNameSet());
+				&& it->second.GetFlagNickNameSet()
+				&& it->second.GetLoginStatus());
 	return (false);
 }
 

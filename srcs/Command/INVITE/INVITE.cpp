@@ -18,7 +18,6 @@ void	HookFunctionInvite(const Message& message)
 	UserDB&				userDB = UserDB::GetInstance();
 	int					userId = message.GetUserId();
 
-
 	if (message.GetParameters().size() < 2)
 	{
 		userDB.SendErrorMessageToUser("INVITE :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);

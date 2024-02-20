@@ -3,7 +3,7 @@
 CXX			= c++
 
 COMMONFLAGS	=
-CXXFLAGS	= $(COMMONFLAGS) -Wall -Wextra -Werror -std=c++98 -o2
+CXXFLAGS	= $(COMMONFLAGS) -Wall -Wextra -Werror -std=c++98 -o2 $(LOG_ON_FLAG)
 LDFLAGS		= $(COMMONFLAGS)
 
 NAME	= ircserv
@@ -39,6 +39,11 @@ OBJS	= $(SRCS:.cpp=.o)
 
 TARGET_OBJS = $(OBJS)
 
+ifdef LOG_ON
+	LOG_ON_FLAG = -D LOG_ON
+else
+endif
+
 #rules=========================================================================
 
 .PHONY: all
@@ -47,6 +52,10 @@ all :
 
 $(NAME) : $(TARGET_OBJS)
 	$(CXX) -o $@ $(TARGET_OBJS) $(LDFLAGS)
+
+.PHONY: logon
+logon :
+	make $(NAME) LOG_ON=0
 
 #const options=================================================================
 
@@ -66,3 +75,8 @@ fclean :
 re :
 	make fclean
 	make all
+
+.PHONY: lre
+lre :
+	make fclean
+	make logon

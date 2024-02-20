@@ -1,5 +1,4 @@
 #include <arpa/inet.h>
-#include <cerrno>
 #include <ctime>
 #include <fcntl.h>
 #include <iostream>
@@ -142,8 +141,11 @@ void	Server::waitEvent(void)
 	{
 		if (events[i].flags & (EV_EOF | EV_ERROR))
 		{
-			userDB.RemoveUserData(userDB.GetUserIdBySocketId(events[i].ident));
-			CloseClientConnection(events[i].ident);
+			if (events[i].ident == static_cast<uintptr_t>(mServerFd))
+			{
+				userDB.RemoveUserData(userDB.GetUserIdBySocketId(events[i].ident));
+				CloseClientConnection(events[i].ident);
+			}
 		}
 		else if (events[i].filter == EVFILT_READ)
 		{
@@ -200,6 +202,20 @@ void Server::handleRead(int clientFd)
 		mReadSocketBuffers[clientFd].buffer[bytes_read] = '\0';
 		mReadBuffers[clientFd].append(mReadSocketBuffers[clientFd].buffer);
 
+#ifdef LOG_ON
+		std::string	dubugMessage(mReadSocketBuffers[clientFd].buffer);
+		std::size_t	pos = dubugMessage.find("\r\n");
+		if (pos == std::string::npos)
+		{
+			std::cout << "<socket:recv> " << dubugMessage << std::endl;
+		}
+		else
+		{
+			dubugMessage = dubugMessage.substr(0, pos);
+			std::cout << "<socket:recv> " << dubugMessage << std::endl;
+		}
+#endif
+
 		size_t	end_of_msg = mReadBuffers[clientFd].find("\r\n");
 		while (end_of_msg != std::string::npos)
 		{
@@ -212,9 +228,12 @@ void Server::handleRead(int clientFd)
 			mReadBuffers[clientFd].erase(0, end_of_msg + 2);
 			executeHooks(userDB.GetUserIdBySocketId(clientFd), message);
 			end_of_msg = mReadBuffers[clientFd].find("\r\n");
+#ifdef LOG_ON
+			std::cout << "\033[33m<recv> " << message << "\033[0m" << std::endl;
+#endif
 		}
 	}
-	else if (bytes_read == 0 || (bytes_read == -1 && errno == ECONNRESET))
+	else
 	{
 		userDB.RemoveUserData(userDB.GetUserIdBySocketId(clientFd));
 		CloseClientConnection(clientFd);
@@ -261,7 +280,7 @@ namespace
 		int	retval = kevent(mKq, changelist, nchanges, eventlist, nevents, timeout);
 		if (retval == -1)
 		{
-			throw std::runtime_error("kevent failed: " + std::string(strerror(errno)));
+			throw std::runtime_error("kevent failed");
 		}
 		return (retval);
 	}

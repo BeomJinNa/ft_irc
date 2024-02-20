@@ -82,6 +82,11 @@ bool	Message::ParseMessage(int userId, std::string& message)
 		}
 	}
 
+	for (std::size_t i = 0; i < mCommand.size(); ++i)
+	{
+		mCommand[i] = std::toupper(mCommand[i]);
+	}
+
 	return (true);
 }
 
