@@ -45,6 +45,6 @@ void	HookFunctionNick(const Message& message)
 	}
 
 	userDB.SetNickName(userId, nickname);
-	if (userDB.IsUserAuthorized(userId) && userDB.GetLoginStatus(userId))
+	if (userDB.IsUserAuthorized(userId))
 		userDB.SendErrorMessageToUser(":Welcome to the " + userDB.GetHostAddress(userId) + " Network, " + nickname, userId, M_RPL_WELCOME, userId);
 }

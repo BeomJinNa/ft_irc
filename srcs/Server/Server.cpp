@@ -225,12 +225,12 @@ void Server::handleRead(int clientFd)
 				return ;
 			}
 			std::string message = mReadBuffers[clientFd].substr(0, end_of_msg);
-			mReadBuffers[clientFd].erase(0, end_of_msg + 2);
-			executeHooks(userDB.GetUserIdBySocketId(clientFd), message);
-			end_of_msg = mReadBuffers[clientFd].find("\r\n");
 #ifdef LOG_ON
 			std::cout << "\033[33m<recv> " << message << "\033[0m" << std::endl;
 #endif
+			mReadBuffers[clientFd].erase(0, end_of_msg + 2);
+			executeHooks(userDB.GetUserIdBySocketId(clientFd), message);
+			end_of_msg = mReadBuffers[clientFd].find("\r\n");
 		}
 	}
 	else

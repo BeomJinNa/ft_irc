@@ -29,6 +29,6 @@ void	HookFunctionUser(const Message& message)
 
 	const std::string&	nickname = UserDB::GetInstance().GetNickName(userId);
 
-	if (userDB.IsUserAuthorized(userId) && userDB.GetLoginStatus(userId))
+	if (userDB.IsUserAuthorized(userId))
 		userDB.SendErrorMessageToUser(":Welcome to the " + userDB.GetHostAddress(userId) + " Network, " + nickname, userId, M_RPL_WELCOME, userId);
 }

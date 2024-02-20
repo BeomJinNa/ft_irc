@@ -3,6 +3,7 @@
 #include "UserDB.hpp"
 #include "Message.hpp"
 #include "ErrorCodes.hpp"
+#include "ReplyCodes.hpp"
 
 void	HookFunctionPass(const Message& message)
 {
@@ -28,9 +29,10 @@ void	HookFunctionPass(const Message& message)
 	if (server.GetServerPassword() != inputPassword)
 	{
 		userDB.SendErrorMessageToUser(":Password incorrect", userId, M_ERR_PASSWDMISMATCH, userId);
-		userDB.DisconnectUser(userId);
 		return ;
 	}
 
 	userDB.SetLoginStatus(userId, true);
+	if (userDB.IsUserAuthorized(userId))
+		userDB.SendErrorMessageToUser(":Welcome to the " + userDB.GetHostAddress(userId) + " Network, " + UserDB::GetInstance().GetNickName(userId), userId, M_RPL_WELCOME, userId);
 }
