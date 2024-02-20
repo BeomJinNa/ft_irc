@@ -18,7 +18,7 @@ void	HookFunctionPass(const Message& message)
 		userDB.SendErrorMessageToUser("PASS :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
 		return ;
 	}
-	//
+
 	if (userDB.GetLoginStatus(userId))
 	{
 		userDB.SendErrorMessageToUser(":You may not reregister", userId, M_ERR_ALREADYREGISTRED, userId);

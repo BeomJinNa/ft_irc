@@ -19,8 +19,8 @@ void split(const std::string& str, char delimiter, std::vector<std::string>& res
 	}
 }
 
-// prefix : sender
-// <receiver>{,<receiver>} <text to be sent>
+
+
 void	HookFunctionPrivmsg(const Message& message)
 {
 	UserDB&				userDB = UserDB::GetInstance();
@@ -29,7 +29,7 @@ void	HookFunctionPrivmsg(const Message& message)
 
 	if (message.GetParameters().size() == 0)
 	{
-		// no receiver
+
 		userDB.SendErrorMessageToUser(":Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
 		return;
 	}
@@ -37,7 +37,7 @@ void	HookFunctionPrivmsg(const Message& message)
 	split(message.GetParameters()[0], ',', receivers);
 	if (receivers.size() == 0)
 	{
-		// no receiver
+
 		userDB.SendErrorMessageToUser(":Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
 		return;
 	}
@@ -45,28 +45,28 @@ void	HookFunctionPrivmsg(const Message& message)
 	{
 		if (it->empty())
 		{
-			// empty receiver
+
 			continue;
 		}
 		const std::string		&receiver = *it;
 		const std::string		&msg = message.GetTrailing();
 		if (receiver[0] == '#')
 		{
-			// send to channel
+
 			int channelId = channelDB.GetChannelIdByName(receiver);
 			if (channelId == -1)
 			{
-				// no such channel
+
 				userDB.SendErrorMessageToUser(receiver + " :No such channel", userId, M_ERR_NOSUCHCHANNEL, userId);
 				continue;
 			}
 
-			// channelDB.SendMessageToChannel(msg, channelId);
-			// send to user in channel except sender
+
+
 			ChannelDB::UserList	list = channelDB.GetUserListInChannel(channelId);
 			for (ChannelDB::UserList::const_iterator user_iter = list.cbegin(); user_iter != list.cend(); ++user_iter)
 			{
-				// :hcho2__!codespace@127.0.0.1 PRIVMSG #new :fassdf
+
 				if (*user_iter == userId)
 					continue;
 				userDB.SendFormattedMessageToUser("PRIVMSG " + receiver + " " + msg, userId, *user_iter);
@@ -74,11 +74,11 @@ void	HookFunctionPrivmsg(const Message& message)
 		}
 		else
 		{
-			// send to user
+
 			int receiverId = userDB.GetUserIdByNickName(receiver);
 			if (receiverId == -1)
 			{
-				// no such nick
+
 				userDB.SendErrorMessageToUser(receiver + " :No such nick/channel", userId, M_ERR_NOSUCHNICK, userId);
 				continue;
 			}
@@ -140,7 +140,7 @@ Server send msg to A, B and who joined #ch1
 Server send msg to A
 Server send msg to B
 > result
-Server send msg to B who joined #ch1. But not to A. // why?
+Server send msg to B who joined #ch1. But not to A.
 Server send msg to A.
 Server send msg to B.
 > analysis

@@ -95,8 +95,8 @@ bool	ChannelDB::AddUserIntoChannel(int channelId, int userId)
 	bool isUserInChannel = it->second.AddActiveUser(userId);
 	if (isUserInChannel)
 	{
-		//User가 가지고 있는 입장 채널 목록은 std::map으로 관리되므로
-		//이미 입장되어 있는 상태에서도 중복 추가되는 문제가 발생하지 않음.
+
+
 		UserDB::GetInstance().WriteChannelInUserData(userId, channelId);
 	}
 
@@ -114,7 +114,7 @@ void	ChannelDB::RemoveUserIntoChannel(int channelId, int userId)
 
 	if (it->second.RemoveUserData(userId))
 	{
-		//만약 Ban 구현시 유저가 서버 종료할 경우와 채널에서 나갈 경우 구분 필요
+
 		UserDB::GetInstance().RemoveChannelInUserList(userId, channelId);
 	}
 }

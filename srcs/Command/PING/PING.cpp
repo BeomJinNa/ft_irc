@@ -31,4 +31,4 @@ void	HookFunctionPing(const Message& message)
 	userDB.SendMessageToUser(sendingMessage, userId);
 }
 
-// TODO: check message format again. hostname?
+

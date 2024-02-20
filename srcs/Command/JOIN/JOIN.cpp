@@ -166,11 +166,11 @@ void	HookFunctionJoin(const Message& message)
 			if (CheckUserLimit(channelId, userId, channelName) == false)
 				continue ;
 		}
-		//add new user to a channel
+
 		channelDB.AddUserIntoChannel(channelId, userId);
 		channelDB.SendFormattedMessageToChannel("JOIN :" + channelName, channelId, userId);
 
-		//check topic
+
 		std::string topic = channelDB.GetChannelTopic(channelId);
 		if (topic != "")
 			userDB.SendErrorMessageToUser(channelName + " :" + topic,

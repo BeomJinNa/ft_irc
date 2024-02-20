@@ -26,8 +26,8 @@ void	HookFunctionUser(const Message& message)
 	std::string userName = message.GetParameters().at(0);
 	std::string hostName = message.GetParameters().at(1);
 	std::string hostAddress = message.GetParameters().at(2);
-	userDB.SetUserName(userId, userName); // TODO: add other attributes in User class
-	userDB.SetHostName(userId, hostName); // TODO: add other attributes in User class
+	userDB.SetUserName(userId, userName);
+	userDB.SetHostName(userId, hostName);
 	userDB.SetHostAddress(userId, hostAddress);
 
 	const std::string&	nickname = UserDB::GetInstance().GetNickName(userId);

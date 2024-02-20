@@ -22,7 +22,7 @@ void	HookFunctionQuit(const Message& message)
 		trailing = ":" + userDB.GetNickName(userId) + " has quit.";
 	}
 
-	//:NickName!UserName@Host QUIT :trailing(message)
+
 	std::string	quitMessage
 		= ":" + userDB.GetNickName(userId)
 		+ "!" + userDB.GetUserName(userId)

@@ -25,7 +25,7 @@
 :irc.local 372 nickname : *  issues.                                       *
 :irc.local 372 nickname : **************************************************
 :irc.local 372 nickname : *  The software was provided as a package of     *
-:irc.local 372 nickname : *  Debian GNU/Linux <https://www.debian.org/>.   *
+:irc.local 372 nickname : *  Debian GNU/Linux <https:
 :irc.local 372 nickname : *  However, Debian has no control over this      *
 :irc.local 372 nickname : *  server.                                       *
 :irc.local 372 nickname : **************************************************

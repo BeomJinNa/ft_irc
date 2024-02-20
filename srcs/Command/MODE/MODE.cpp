@@ -118,7 +118,7 @@ namespace
 			return ;
 		}
 
-		executeChannelMode(commandVec, parametersVec, userId, channelId);//코드 실행
+		executeChannelMode(commandVec, parametersVec, userId, channelId);
 	}
 
 	bool	divideCommands(Tokens* vec, const std::string& commands, int userId)

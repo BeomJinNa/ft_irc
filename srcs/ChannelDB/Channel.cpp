@@ -85,7 +85,7 @@ bool	Channel::AddActiveUser(int userId)
 			return (false);
 		}
 		std::pair<DB::iterator, bool>	it =  mActiveUserList.insert(userId);
-		if (it.second == false) //이미 채널에 존재할 경우
+		if (it.second == false)
 		{
 			return (true);
 		}

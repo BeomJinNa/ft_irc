@@ -45,14 +45,14 @@ bool	Message::ParseMessage(int userId, std::string& message)
 
 	mRawMessage = message;
 	mUserId = userId;
-	//prefix가 존재할 경우 파싱
+
 	if (!message.empty() && message[0] == ':')
 	{
 		std::getline(iss, mPrefix, ' ');
 		mPrefix = mPrefix.substr(1);
 	}
 
-	//Command 파싱, Command는 필수이므로 없는 경우 즉시 에러 반환
+
 	if (!std::getline(iss, mCommand, ' ')
 	 || mCommand.empty() || mCommand[0] == ':')
 	{
@@ -63,8 +63,8 @@ bool	Message::ParseMessage(int userId, std::string& message)
 	std::getline(iss, mMessage);
 	std::istringstream	iss2(mMessage);
 
-	//parameters 파싱
-	//콜론`:`으로 시작하는 토큰 발견시 줄 끝까지 trailing으로 처리 후 종료
+
+
 	while (std::getline(iss2, token, ' '))
 	{
 		if (!token.empty())

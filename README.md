@@ -41,7 +41,7 @@ OSI 모델은 네트워크 통신을 이해하는 데 중요한 참조 모델입
 
 ### 소켓이란?
 
-소켓은 네트워크상에서 서로 다른 시스템 간의 통신을 가능하게 하는 인터페이스입니다. 데이터를 교환하기 위한 두 프로그램 사이의 논리적 연결점으로, 네트워크 통신의 근간을 이룹니다. 
+소켓은 네트워크상에서 서로 다른 시스템 간의 통신을 가능하게 하는 인터페이스입니다. 데이터를 교환하기 위한 두 프로그램 사이의 논리적 연결점으로, 네트워크 통신의 근간을 이룹니다.
 
 ### 소켓의 역할
 
@@ -320,7 +320,7 @@ close(): 소켓 종료                             close(): 소켓 종료
 - **예시**:
   ```c
   uint16_t port = htons(8080);
-  uint32_t addr = htonl(0xC0A80001); // 192.168.0.1
+  uint32_t addr = htonl(0xC0A80001);
   ```
 - **코드 설명**: `htons`는 16비트 값을, `htonl`은 32비트 값을 네트워크 바이트 순서로 변환합니다.
 - **필요한 헤더**:
@@ -397,7 +397,7 @@ close(): 소켓 종료                             close(): 소켓 종료
   - `kqueue()`와 `epoll()`은 각각 BSD와 리눅스에서 제공하는 향상된 I/O 이벤트 알림 메커니즘입니다.
 - **예시**:
   ```c
-  // poll() 사용 예
+
   struct pollfd fds[2];
   fds[0].fd = sockfd1;
   fds[0].events = POLLIN;
@@ -409,10 +409,10 @@ close(): 소켓 종료                             close(): 소켓 종료
 - **주의점**: 이 함수들은 소켓 상태 변화를 효율적으로 감지할 수 있지만, 사용법이 복잡할 수 있습니다.
 - **필요한 헤더**:
   ```c
-  #include <poll.h>    // poll()
-  #include <sys/select.h> // select()
-  #include <sys/epoll.h>  // epoll()
-  #include <sys/event.h>  // kqueue()
+  #include <poll.h>
+  #include <sys/select.h>
+  #include <sys/epoll.h>
+  #include <sys/event.h>
   ```
 
 ### kqueue 및 kevent 시스템
@@ -441,7 +441,7 @@ close(): 소켓 종료                             close(): 소켓 종료
 
 #### kevent 함수
 - **기능**: kevent 함수는 kqueue에 이벤트를 등록하거나, 이벤트 발생을 기다립니다.
-- **사용법**: 
+- **사용법**:
   - 이벤트 등록: 입력 kevent 배열을 사용해 이벤트를 등록합니다.
   - 이벤트 대기: 반환 kevent 배열과 timespec 구조체를 사용해 이벤트 발생을 대기합니다.
 - **인자**:
@@ -500,7 +500,7 @@ close(): 소켓 종료                             close(): 소켓 종료
    ```c
    int sockfd;
    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-   fcntl(sockfd, F_SETFL, O_NONBLOCK);  // 소켓을 비차단 모드로 설정
+   fcntl(sockfd, F_SETFL, O_NONBLOCK);
    ```
 
 2. **이벤트 루프**:
@@ -585,11 +585,11 @@ IRC 프로토콜상 메시지 규격은 일반적으로 `:접두사 명령어 �
 
 ```cpp
 void handleJoinCommand(const Message& message) {
-    // message 객체에서 필요한 정보 추출
+
     std::string channel = message.GetParameters()[0];
     std::string user = message.GetPrefix();
 
-    // 채널 입장 로직 처리
+
     std::cout << user << " joined " << channel << std::endl;
 }
 ```
@@ -602,12 +602,12 @@ void handleJoinCommand(const Message& message) {
 
 ```cpp
 int main() {
-    // 서버 인스턴스 생성 및 설정 코드...
 
-    // 커맨드 후킹 함수 등록
+
+
     Command::RegisterCommand("JOIN", handleJoinCommand);
 
-    // 서버 실행 코드...
+
 }
 ```
 
@@ -892,7 +892,7 @@ IRC 네트워크에서는 다양한 명령어를 사용하여 통신과 상호�
 - **기능**: 채널 또는 사용자의 모드를 설정합니다.
 - **형식**: `MODE <채널명/유저명> <모드 설정>`
 - **예시**: `MODE #general +t`
-- **모드 옵션**: 
+- **모드 옵션**:
   - `i`: 초대 전용 채널
   - `t`: 주제 설정은 관리자만 가능
   - `k`: 채널에 비밀번호 설정
@@ -920,7 +920,7 @@ IRC에서의 연결 종료는 단순하지만 중요한 부분입니다. 사용�
 - `QUIT` 명령어는 언제든지 사용자가 연결을 종료할 수 있는 가장 간단한 방법을 제공합니다.
 
 **클라이언트가 정상적으로 `QUIT` 명령어를 통해 연결을 종료하는 경우**: 이때는 클라이언트가 6-7계층에서 자원을 정리한 후 서버에 연결 해제를 요청합니다. 서버는 이 요청에 응답하여 연결을 종료하고 관련 자원을 해제합니다.
-  
+
 **클라이언트 연결이 갑자기 끊어지는 경우**: 이 경우 서버의 4-5계층에서 EOF 신호를 받고 read 값이 0이면, 서버는 연결을 종료하고 자원을 해제합니다. 하지만 6-7계층에서는 클라이언트의 자원이 여전히 남아있을 수 있으므로, 이 경우 서버는 6-7계층에게 해당 유저의 자원을 정리하도록 요청해야 합니다.
 
-이러한 상황에서 6-7계층의 IRC 프로토콜 구현부는 서버로부터 연결 해제 요청을 받거나 `QUIT` 명령어를 처리할 때 모두 적절한 자원 정리를 수행해야 합니다. 이는 구현 시 두 계층 간의 상호 작용을 고려하여 설계해야 함을 의미합니다. 
+이러한 상황에서 6-7계층의 IRC 프로토콜 구현부는 서버로부터 연결 해제 요청을 받거나 `QUIT` 명령어를 처리할 때 모두 적절한 자원 정리를 수행해야 합니다. 이는 구현 시 두 계층 간의 상호 작용을 고려하여 설계해야 함을 의미합니다.

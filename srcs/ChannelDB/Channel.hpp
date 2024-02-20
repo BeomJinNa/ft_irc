@@ -18,23 +18,23 @@ class Channel
 		Channel&	operator=(const Channel& source);
 		~Channel(void);
 
-							//성공 여부 반환
+
 		bool				SetMaxActiveUsers(unsigned int maxUsers);
 		unsigned int		GetMaxActiveUsers(void) const;
 		unsigned int		GetCurrentActiveUsers(void) const;
 
 		bool				RemoveUserData(int userId);
-							//성공 여부 반환
+
 		bool				AddActiveUser(int userId);
 		void				RemoveActiveUser(int userId);
 		bool				IsUserActive(int userId) const;
 
-							//성공 여부 반환
+
 		bool				AddOperator(int userId);
 		void				RemoveOperator(int userId);
 		bool				IsUserOperator(int userId) const;
 
-							//성공 여부 반환
+
 		void				AddInvitedUser(int userId);
 		void				RemoveInvitedUser(int userId);
 		bool				IsUserInvited(int userId) const;

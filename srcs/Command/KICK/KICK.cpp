@@ -10,16 +10,6 @@
 #include "ErrorCodes.hpp"
 #include "ReplyCodes.hpp"
 
-/*
-
-    ERR_NEEDMOREPARAMS (461)
-    ERR_NOSUCHCHANNEL (403)
-    ERR_CHANOPRIVSNEEDED (482)
-    ERR_USERNOTINCHANNEL (441)
-    ERR_NOTONCHANNEL (442)
-
-*/
-
 namespace
 {
 	typedef std::vector<std::pair<int, std::string> > UserList;
@@ -40,8 +30,6 @@ namespace
 	}
 }
 
-
-// KICK <channel> <user> *( "," <user> ) [<comment>]
 void	HookFunctionKick(const Message& message)
 {
 	ChannelDB&			channelDB = ChannelDB::GetInstance();
@@ -50,25 +38,23 @@ void	HookFunctionKick(const Message& message)
 	const std::string&	channelName = channelDB.GetChannelName(channelId);
 	int					userId = message.GetUserId();
 
-	// check if parameters are enough
+
 	if (message.GetParameters().size() < 2)
 	{
 		userDB.SendErrorMessageToUser("KICK :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
 		return ;
 	}
-	// check if channel exists
 	if (channelId == -1)
 	{
 		userDB.SendErrorMessageToUser(channelName + " :No such channel", userId, M_ERR_NOSUCHCHANNEL, userId);
 		return ;
 	}
-	//check if sender is on the channel
+
 	if (!channelDB.IsUserInChannel(channelId, userId))
 	{
 		userDB.SendErrorMessageToUser(channelName + " :You're not on that channel", userId, M_ERR_NOTONCHANNEL, userId);
 		return ;
 	}
-	//check if sender is the operator of the channel
 	if (!channelDB.IsUserOperator(channelId, userId))
 	{
 		userDB.SendErrorMessageToUser(channelName + " :You're not channel operator", userId, M_ERR_CHANOPRIVSNEEDED, userId);
@@ -78,7 +64,7 @@ void	HookFunctionKick(const Message& message)
 	UserList				kickUsers;
 	const std::string& 		user = message.GetParameters().at(1);
 	std::string 			comment = message.GetTrailing();
-	if (comment == "") // if trailing is not presented, send default message
+	if (comment == "")
 		comment = ":";
 
 	getUserList(user, kickUsers);
@@ -90,17 +76,12 @@ void	HookFunctionKick(const Message& message)
 		std::string&	kickUserNick = it->second;
 		int				kickUserId = it->first;
 
-		if (kickUserId == -1 || !channelDB.IsUserInChannel(channelId, kickUserId)) //No such user in channel
+		if (kickUserId == -1 || !channelDB.IsUserInChannel(channelId, kickUserId))
 		{
 			userDB.SendErrorMessageToUser(kickUserNick + " " + channelName + " :They aren't on that channel", userId, M_ERR_USERNOTINCHANNEL, userId);
 			continue ;
 		}
-/*
-	:hyun!hcho2@localhost KICK #new jsun :
-	:WiZ!jto@tolsun.oulu.fi KICK #Finnish John
-                                   ; KICK message on channel #Finnish
-                                   from WiZ to remove John from channel
-*/
+
 		std::string sendMessage = "KICK " + channelName + " " + kickUserNick + " " + comment;
 
 		channelDB.SendFormattedMessageToChannel(sendMessage, channelId, userId);
