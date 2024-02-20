@@ -35,6 +35,12 @@ void	HookFunctionKick(const Message& message)
 	const std::string&	channelName = channelDB.GetChannelName(channelId);
 	int					userId = message.GetUserId();
 
+	if (userDB.IsUserAuthorized(userId) == false)
+	{
+		userDB.SendErrorMessageToUser("You have not registered", userId,
+									   M_ERR_NOTREGISTERED, userId);
+		return ;
+	}
 
 	if (message.GetParameters().size() < 2)
 	{

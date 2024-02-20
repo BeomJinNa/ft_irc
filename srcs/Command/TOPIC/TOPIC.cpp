@@ -19,6 +19,13 @@ void	HookFunctionTopic(const Message& message)
 		return ;
 	}
 
+	if (userDB.IsUserAuthorized(userId) == false)
+	{
+		userDB.SendErrorMessageToUser("You have not registered", userId,
+									   M_ERR_NOTREGISTERED, userId);
+		return ;
+	}
+
 	std::string channelName = message.GetParameters().at(0);
 	int	channelId = channelDB.GetChannelIdByName(channelName);
 

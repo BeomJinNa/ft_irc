@@ -136,6 +136,14 @@ void	HookFunctionJoin(const Message& message)
 									  userId, M_ERR_NEEDMOREPARAMS, userId);
 		return;
 	}
+
+	if (userDB.IsUserAuthorized(userId) == false)
+	{
+		userDB.SendErrorMessageToUser("You have not registered", userId,
+									   M_ERR_NOTREGISTERED, userId);
+		return ;
+	}
+
 	parseParameters(message.GetParameters().at(0), parsedChannelNames);
 	if (message.GetParameters().size() == 2)
 		keyCount = parseParameters(message.GetParameters().at(1), parsedKeys);

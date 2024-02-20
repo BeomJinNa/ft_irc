@@ -23,12 +23,20 @@ namespace
 
 void	HookFunctionMode(const Message& message)
 {
+	UserDB&	userDB = UserDB::GetInstance();
 
 	if (message.GetParameters().size() < 1)
 	{
-		UserDB::GetInstance().SendErrorMessageToUser("Not enough parameters for MODE command",
-													 message.GetUserId(), M_ERR_NEEDMOREPARAMS,
-													 message.GetUserId());
+		userDB.SendErrorMessageToUser("Not enough parameters for MODE command",
+									   message.GetUserId(), M_ERR_NEEDMOREPARAMS,
+									   message.GetUserId());
+		return ;
+	}
+
+	if (userDB.IsUserAuthorized(message.GetUserId()) == false)
+	{
+		userDB.SendErrorMessageToUser("You have not registered", message.GetUserId(),
+									   M_ERR_NOTREGISTERED, message.GetUserId());
 		return ;
 	}
 

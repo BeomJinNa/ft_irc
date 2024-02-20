@@ -42,6 +42,13 @@ void	HookFunctionPart(const Message& message)
 		return ;
 	}
 
+	if (userDB.IsUserAuthorized(userId) == false)
+	{
+		userDB.SendErrorMessageToUser("You have not registered", userId,
+									   M_ERR_NOTREGISTERED, userId);
+		return ;
+	}
+
 	ChannelList channelsToPart;
 	getChannelList(message.GetParameters().at(0), channelsToPart);
 

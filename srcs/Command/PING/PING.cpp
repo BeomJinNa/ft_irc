@@ -14,6 +14,13 @@ void	HookFunctionPing(const Message& message)
 		return ;
 	}
 
+	if (userDB.IsUserAuthorized(userId) == false)
+	{
+		userDB.SendErrorMessageToUser("You have not registered", userId,
+									   M_ERR_NOTREGISTERED, userId);
+		return ;
+	}
+
 	const std::string&	token = message.GetParameters().at(0);
 	std::string	hostname
 		= userDB.GetNickName(userId)

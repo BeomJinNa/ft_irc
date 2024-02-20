@@ -24,6 +24,13 @@ void	HookFunctionInvite(const Message& message)
 		return ;
 	}
 
+	if (userDB.IsUserAuthorized(userId) == false)
+	{
+		userDB.SendErrorMessageToUser("You have not registered", userId,
+									   M_ERR_NOTREGISTERED, userId);
+		return ;
+	}
+
 	const std::string&	inviteeNickname = message.GetParameters().at(0);
 	int					inviteeId = userDB.GetUserIdByNickName(inviteeNickname);
 	const std::string&	channelName = message.GetParameters().at(1);
