@@ -8,6 +8,7 @@
 #include "Message.hpp"
 #include "ErrorCodes.hpp"
 #include "ReplyCodes.hpp"
+#include "ChannelMode.hpp"
 
 /*
 namespace
@@ -49,7 +50,7 @@ void	HookFunctionTopic(const Message& message)
 		return ;
     }
 
-	if (!channelDB.IsUserOperator(channelId, userId))
+	if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY) &&!channelDB.IsUserOperator(channelId, userId))
 	{
 		userDB.SendErrorMessageToUser(channelName + " :You're not channel operator", userId, M_ERR_CHANOPRIVSNEEDED, userId);
 		return ;

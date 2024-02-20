@@ -49,7 +49,7 @@ void	HookFunctionInvite(const Message& message)
 
 	if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_INVITE_ONLY) && !channelDB.IsUserOperator(channelId, userId))
 	{
-		userDB.SendErrorMessageToUser(channelName + ":You're not channel operator", userId, M_ERR_CHANOPRIVSNEEDED, userId);
+		userDB.SendErrorMessageToUser(channelName + " :You're not channel operator", userId, M_ERR_CHANOPRIVSNEEDED, userId);
 		return ;
 	}
 

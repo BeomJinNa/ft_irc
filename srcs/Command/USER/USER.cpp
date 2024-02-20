@@ -32,19 +32,6 @@ void	HookFunctionUser(const Message& message)
 
 	const std::string&	nickname = UserDB::GetInstance().GetNickName(userId);
 
-	if (userDB.IsUserAuthorized(userId))
+	if (userDB.IsUserAuthorized(userId) && userDB.GetLoginStatus(userId))
 		userDB.SendErrorMessageToUser(":Welcome to the " + userDB.GetHostAddress(userId) + " Network, " + nickname, userId, M_RPL_WELCOME, userId);
 }
-
-/*
-	127.000.000.001.43300-127.000.000.001.06667: NICK hcho
-
-	127.000.000.001.43300-127.000.000.001.06667: USER codespace codespace 127.0.0.1 :Unknown
-
-	127.000.000.001.06667-127.000.000.001.43300: :irc.local NOTICE * :*** Looking up your hostname...
-
-	127.000.000.001.06667-127.000.000.001.43300: :irc.local 433 * hcho :Nickname is already in use.
-
-	127.000.000.001.43300-127.000.000.001.06667: NICK hcho_
-
-*/
