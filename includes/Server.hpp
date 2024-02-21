@@ -46,6 +46,8 @@ class Server
 		void	handleRead(int clientFd);
 		void	executeHooks(int userId, std::string message);
 		void	handleWrite(int clientFd);
+		void	setConnectionTimeout(int clientFd, int kq, int timeoutSeconds);
+		void	cancelConnectionTimeout(int clientFd, int kq);
 
 		int								mServerFd;
 		int								mKq;
@@ -53,6 +55,7 @@ class Server
 		std::map<int, FixedBufferArray>	mReadSocketBuffers;
 		std::map<int, std::string>		mReadBuffers;
 		std::map<int, std::string>		mWriteBuffers;
+		std::map<int, bool>				mKeventTimerExist;
 		std::vector<struct kevent>		mWriteEvents;
 
 		std::string						mPassword;

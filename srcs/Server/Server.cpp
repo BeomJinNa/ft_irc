@@ -32,8 +32,6 @@ namespace
 	int			getKqueue(void);
 	void		setKqueue(struct kevent& kevent, int fdServer, int fdKqueue);
 	uint16_t	getSocketPort(int socketFd);
-	void		setConnectionTimeout(int clientFd, int kq, int timeoutSeconds);
-	void		cancelConnectionTimeout(int clientFd, int kq);
 }
 
 #ifdef LOG_ON
@@ -108,16 +106,14 @@ void	Server::CloseClientConnection(int clientFd)
 
 	userDB.RemoveUserData(userDB.GetUserIdBySocketId(clientFd));
 
+	cancelConnectionTimeout(clientFd, mKq);
 	if (close(clientFd) == 0)
 	{
 		mClientFds.erase(clientFd);
 		mReadBuffers.erase(clientFd);
 		mReadSocketBuffers.erase(clientFd);
 		mWriteBuffers.erase(clientFd);
-
-		struct kevent	ev;
-		EV_SET(&ev, clientFd, EVFILT_TIMER, EV_DELETE, 0, 0, NULL);
-		xKevent(mKq, &ev, 1, NULL, 0, NULL);
+		mKeventTimerExist.erase(clientFd);
 	}
 }
 
@@ -286,8 +282,40 @@ void	Server::handleWrite(int clientFd)
 void	Server::AuthorizeUser(int userId)
 {
 	int	clientFd = UserDB::GetInstance().GetSocketIdByUserId(userId);
-
 	cancelConnectionTimeout(clientFd, mKq);
+}
+
+void	Server::setConnectionTimeout(int clientFd, int kq, int timeoutSeconds)
+{
+	std::set<int>::iterator	it = mClientFds.find(clientFd);
+
+	if (it == mClientFds.end())
+	{
+		return ;
+	}
+
+	struct kevent	ev;
+
+	EV_SET(&ev, clientFd, EVFILT_TIMER, EV_ADD | EV_ENABLE,
+			0, timeoutSeconds * 1000, NULL);
+	xKevent(kq, &ev, 1, NULL, 0, NULL);
+	mKeventTimerExist[clientFd] = true;
+}
+
+void	Server::cancelConnectionTimeout(int clientFd, int kq)
+{
+	std::set<int>::iterator	it = mClientFds.find(clientFd);
+
+	if (it == mClientFds.end() || mKeventTimerExist[clientFd] == false)
+	{
+		return ;
+	}
+
+	struct kevent	ev;
+
+	EV_SET(&ev, clientFd, EVFILT_TIMER, EV_DELETE, 0, 0, NULL);
+	xKevent(kq, &ev, 1, NULL, 0, NULL);
+	mKeventTimerExist[clientFd] = false;
 }
 
 namespace
@@ -379,23 +407,6 @@ namespace
 			throw std::runtime_error("getsockname failed");
 		}
 		return (ntohs(address_input.sin_port));
-	}
-
-	void	setConnectionTimeout(int clientFd, int kq, int timeoutSeconds)
-	{
-		struct kevent	ev;
-
-		EV_SET(&ev, clientFd, EVFILT_TIMER, EV_ADD | EV_ENABLE,
-			   0, timeoutSeconds * 1000, NULL);
-		xKevent(kq, &ev, 1, NULL, 0, NULL);
-	}
-
-	void	cancelConnectionTimeout(int clientFd, int kq)
-	{
-		struct kevent	ev;
-
-		EV_SET(&ev, clientFd, EVFILT_TIMER, EV_DELETE, 0, 0, NULL);
-		xKevent(kq, &ev, 1, NULL, 0, NULL);
 	}
 }
 
