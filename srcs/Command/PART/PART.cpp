@@ -27,9 +27,6 @@ namespace
 	}
 }
 
-
-
-
 void	HookFunctionPart(const Message& message)
 {
 	ChannelDB&			channelDB = ChannelDB::GetInstance();
@@ -38,7 +35,8 @@ void	HookFunctionPart(const Message& message)
 
 	if (message.GetParameters().size() == 0)
 	{
-		userDB.SendErrorMessageToUser("PART :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
+		userDB.SendErrorMessageToUser("PART :Not enough parameters",
+									  userId, M_ERR_NEEDMOREPARAMS, userId);
 		return ;
 	}
 
@@ -60,12 +58,14 @@ void	HookFunctionPart(const Message& message)
 		std::string&	channelName = it->second;
 		if (channelId == -1)
 		{
-			userDB.SendErrorMessageToUser(channelName + " :No such channel", userId, M_ERR_NOSUCHCHANNEL, userId);
+			userDB.SendErrorMessageToUser(channelName + " :No such channel",
+										  userId, M_ERR_NOSUCHCHANNEL, userId);
 			return ;
 		}
 		if (!channelDB.IsUserInChannel(channelId, userId))
 		{
-			userDB.SendErrorMessageToUser(channelName + " :You're not on that channel", userId, M_ERR_NOTONCHANNEL, userId);
+			userDB.SendErrorMessageToUser(channelName + " :You're not on that channel",
+										  userId, M_ERR_NOTONCHANNEL, userId);
 			return ;
 		}
 		std::string sendMessage = "PART :" + channelName;

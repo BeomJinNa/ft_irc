@@ -18,8 +18,6 @@ void split(const std::string& str, char delimiter, std::vector<std::string>& res
 	}
 }
 
-
-
 void	HookFunctionPrivmsg(const Message& message)
 {
 	UserDB&				userDB = UserDB::GetInstance();
@@ -28,8 +26,8 @@ void	HookFunctionPrivmsg(const Message& message)
 
 	if (message.GetParameters().size() == 0)
 	{
-
-		userDB.SendErrorMessageToUser(":Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
+		userDB.SendErrorMessageToUser(":Not enough parameters", userId,
+									  M_ERR_NEEDMOREPARAMS, userId);
 		return;
 	}
 
@@ -44,52 +42,50 @@ void	HookFunctionPrivmsg(const Message& message)
 	split(message.GetParameters()[0], ',', receivers);
 	if (receivers.size() == 0)
 	{
-
-		userDB.SendErrorMessageToUser(":Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
+		userDB.SendErrorMessageToUser(":Not enough parameters", userId,
+									  M_ERR_NEEDMOREPARAMS, userId);
 		return;
 	}
-	for (std::vector<std::string>::const_iterator it = receivers.begin(); it != receivers.end(); ++it)
+	for (std::vector<std::string>::const_iterator it = receivers.begin();
+		 it != receivers.end(); ++it)
 	{
 		if (it->empty())
 		{
-
 			continue;
 		}
-		const std::string		&receiver = *it;
-		const std::string		&msg = message.GetTrailing();
+		const std::string&	receiver = *it;
+		const std::string&	msg = message.GetTrailing();
 		if (receiver[0] == '#')
 		{
-
 			int channelId = channelDB.GetChannelIdByName(receiver);
 			if (channelId == -1)
 			{
-
-				userDB.SendErrorMessageToUser(receiver + " :No such channel", userId, M_ERR_NOSUCHCHANNEL, userId);
+				userDB.SendErrorMessageToUser(receiver + " :No such channel", userId,
+											  M_ERR_NOSUCHCHANNEL, userId);
 				continue;
 			}
 
-
-
 			ChannelDB::UserList	list = channelDB.GetUserListInChannel(channelId);
-			for (ChannelDB::UserList::const_iterator user_iter = list.cbegin(); user_iter != list.cend(); ++user_iter)
+			for (ChannelDB::UserList::const_iterator user_iter = list.cbegin();
+				 user_iter != list.cend(); ++user_iter)
 			{
-
 				if (*user_iter == userId)
 					continue;
-				userDB.SendFormattedMessageToUser("PRIVMSG " + receiver + " " + msg, userId, *user_iter);
+				userDB.SendFormattedMessageToUser("PRIVMSG " + receiver + " " + msg,
+												  userId, *user_iter);
 			}
 		}
 		else
 		{
-
 			int receiverId = userDB.GetUserIdByNickName(receiver);
 			if (receiverId == -1)
 			{
-
-				userDB.SendErrorMessageToUser(receiver + " :No such nick/channel", userId, M_ERR_NOSUCHNICK, userId);
+				userDB.SendErrorMessageToUser(receiver + " :No such nick/channel",
+											  userId, M_ERR_NOSUCHNICK, userId);
 				continue;
 			}
-			userDB.SendFormattedMessageToUser("PRIVMSG " + receiver + " " + msg, userId, receiverId);
+			userDB.SendFormattedMessageToUser("PRIVMSG " + receiver + " " + msg,
+											  userId, receiverId);
 		}
 	}
 }

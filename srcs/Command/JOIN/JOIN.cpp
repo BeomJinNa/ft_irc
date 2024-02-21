@@ -8,10 +8,10 @@
 
 namespace
 {
-
 	bool CheckParse(std::string channelName)
 	{
-		if(channelName[0] == '#' && channelName.length() > 1 && channelName.length() <= 200)
+		if(channelName[0] == '#' && channelName.length() > 1
+		&& channelName.length() <= 200)
 			return true;
 		return false;
 	}
@@ -48,7 +48,8 @@ namespace
 		return false;
 	}
 
-	size_t parseParameters(const std::string& parameters, std::vector<std::string>& list)
+	size_t parseParameters(const std::string& parameters,
+						   std::vector<std::string>& list)
 	{
 		std::string::size_type pos = 0, prev = 0;
 		while((pos = parameters.find(',', prev)) != std::string::npos)
@@ -62,24 +63,29 @@ namespace
 
 	bool CheckInviteOnly(int channelId, int userId, const std::string& channelName)
 	{
-		ChannelDB&					channelDB = ChannelDB::GetInstance();
-		UserDB&						userDB = UserDB::GetInstance();
+		ChannelDB&	channelDB = ChannelDB::GetInstance();
+		UserDB&	  	userDB = UserDB::GetInstance();
 
 		if(CheckInviteOnly(channelId) == true
 		&& channelDB.IsUserInvited(channelId, userId) == false)
 		{
 			userDB.SendErrorMessageToUser(channelName + " :Cannot join channel (+i)",
-			userId, M_ERR_INVITEONLYCHAN,userId);
+										  userId, M_ERR_INVITEONLYCHAN, userId);
 			return false;
 		}
 		return true;
 	}
 
-	bool CheckChannelKey(int channelId, int userId, const std::string& channelName, const std::string& parsedKey)
+	bool CheckChannelKey(int channelId, int userId, const std::string& channelName,
+						 const std::string& parsedKey)
 	{
-		if (doesChannelRequirePassword(channelId) && compareChannelKey(channelId, parsedKey) == false)
+		if (doesChannelRequirePassword(channelId)
+		 && compareChannelKey(channelId, parsedKey) == false)
 		{
-			UserDB::GetInstance().SendErrorMessageToUser(channelName + " :Cannot join channel (+k)", userId, M_ERR_BADCHANNELKEY, userId);
+			UserDB::GetInstance().SendErrorMessageToUser(channelName
+													   + " :Cannot join channel (+k)",
+													     userId, M_ERR_BADCHANNELKEY,
+														 userId);
 			return false;
 		}
 		return true;
@@ -87,8 +93,8 @@ namespace
 
 	bool CheckUserLimit(int channelId, int userId, const std::string& channelName)
 	{
-		ChannelDB&					channelDB = ChannelDB::GetInstance();
-		UserDB&						userDB = UserDB::GetInstance();
+		ChannelDB&	channelDB = ChannelDB::GetInstance();
+		UserDB&	  	userDB = UserDB::GetInstance();
 
 		if(isMaxUserLimitOn(channelId)
 		&& channelDB.GetCurrentUsersInChannel(channelId)
@@ -105,7 +111,7 @@ namespace
 	{
 		ChannelDB&					channelDB = ChannelDB::GetInstance();
 		UserDB&						userDB = UserDB::GetInstance();
-		const ChannelDB::UserList& userList = channelDB.GetUserListInChannel(channelId);
+		const ChannelDB::UserList&	userList = channelDB.GetUserListInChannel(channelId);
 		std::string userNames = "";
 		std::ostringstream oss;
 
@@ -169,7 +175,9 @@ void	HookFunctionJoin(const Message& message)
 		{
 			if(CheckInviteOnly(channelId, userId, channelName) == false)
 				continue ;
-			if (CheckChannelKey(channelId, userId, channelName, keyCount <= i ? "" : parsedKeys[i]) == false)
+			if (CheckChannelKey(channelId, userId, channelName,
+								keyCount <= i ? "" : parsedKeys[i])
+				== false)
 				continue ;
 			if (CheckUserLimit(channelId, userId, channelName) == false)
 				continue ;
@@ -184,7 +192,7 @@ void	HookFunctionJoin(const Message& message)
 			userDB.SendErrorMessageToUser(channelName + " :" + topic,
 										  userId, M_RPL_TOPIC, userId);
 		channelDB.AnnounceFormattedToChannel("TOPIC " + channelName + " " + topic,
-												channelId);
+											 channelId);
 
 		std::string userNames = getUserNames(channelId);
 		userDB.SendErrorMessageToUser("= " + channelName + " :" + userNames,
@@ -192,7 +200,6 @@ void	HookFunctionJoin(const Message& message)
 		userDB.SendErrorMessageToUser(channelName + " :End of /NAMES list", userId,
 									  M_RPL_ENDOFNAMES, userId);
 		channelDB.AnnounceToChannel(":welcome_bot!bot@localhost PRIVMSG " + channelName
-									 + " :Welcome " + nickname + "!", channelId);
+								  + " :Welcome " + nickname + "!", channelId);
 	}
-
 }

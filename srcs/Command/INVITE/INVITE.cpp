@@ -7,20 +7,16 @@
 #include "ErrorCodes.hpp"
 #include "ReplyCodes.hpp"
 
-namespace
-{
-
-}
-
 void	HookFunctionInvite(const Message& message)
 {
-	ChannelDB&			channelDB = ChannelDB::GetInstance();
-	UserDB&				userDB = UserDB::GetInstance();
-	int					userId = message.GetUserId();
+	ChannelDB&	channelDB = ChannelDB::GetInstance();
+	UserDB&		userDB = UserDB::GetInstance();
+	int			userId = message.GetUserId();
 
 	if (message.GetParameters().size() < 2)
 	{
-		userDB.SendErrorMessageToUser("INVITE :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
+		userDB.SendErrorMessageToUser("INVITE :Not enough parameters",
+									  userId, M_ERR_NEEDMOREPARAMS, userId);
 		return ;
 	}
 
@@ -39,36 +35,38 @@ void	HookFunctionInvite(const Message& message)
 
 	if (channelId == -1)
 	{
-		userDB.SendErrorMessageToUser(channelName + " :No such channel", userId, M_ERR_NOSUCHCHANNEL, userId);
+		userDB.SendErrorMessageToUser(channelName + " :No such channel",
+									  userId, M_ERR_NOSUCHCHANNEL, userId);
 		return ;
 	}
 
 	if (!channelDB.IsUserInChannel(channelId, userId))
 	{
-		userDB.SendErrorMessageToUser(channelName + " :You're not on that channel", userId, M_ERR_NOTONCHANNEL, userId);
+		userDB.SendErrorMessageToUser(channelName + " :You're not on that channel",
+									  userId, M_ERR_NOTONCHANNEL, userId);
 		return ;
 	}
 
-	if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_INVITE_ONLY) && !channelDB.IsUserOperator(channelId, userId))
+	if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_INVITE_ONLY)
+	 && !channelDB.IsUserOperator(channelId, userId))
 	{
-		userDB.SendErrorMessageToUser(channelName + " :You're not channel operator", userId, M_ERR_CHANOPRIVSNEEDED, userId);
+		userDB.SendErrorMessageToUser(channelName + " :You're not channel operator",
+									  userId, M_ERR_CHANOPRIVSNEEDED, userId);
 		return ;
 	}
 
 	if (channelDB.IsUserInChannel(channelId, inviteeId))
 	{
-		userDB.SendErrorMessageToUser(inviteeNickname + channelName + " :is already on channel", userId, M_ERR_NOTONCHANNEL, userId);
+		userDB.SendErrorMessageToUser(inviteeNickname + channelName
+									+ " :is already on channel",
+									  userId, M_ERR_NOTONCHANNEL, userId);
 		return ;
 	}
 
 	channelDB.AddInvitedUserIntoChannel(channelId, inviteeId);
-
-
-
-
-
 	userDB.SendErrorMessageToUser(inviteeNickname + " " + channelName,
-										userId, M_RPL_INVITING, userId);
-	userDB.SendFormattedMessageToUser("INVITE " + inviteeNickname + " :" + channelName,
-																		userId, inviteeId);
+								  userId, M_RPL_INVITING, userId);
+	userDB.SendFormattedMessageToUser("INVITE " + inviteeNickname
+									+ " :" + channelName,
+									  userId, inviteeId);
 }

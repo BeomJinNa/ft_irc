@@ -9,13 +9,14 @@
 
 void	HookFunctionTopic(const Message& message)
 {
-    ChannelDB&      channelDB = ChannelDB::GetInstance();
-	UserDB&			userDB = UserDB::GetInstance();
-	int				userId = message.GetUserId();
+    ChannelDB& channelDB = ChannelDB::GetInstance();
+	UserDB&	   userDB = UserDB::GetInstance();
+	int		   userId = message.GetUserId();
 
 	if (message.GetParameters().size() == 0)
 	{
-		userDB.SendErrorMessageToUser("TOPIC :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
+		userDB.SendErrorMessageToUser("TOPIC :Not enough parameters", userId,
+									  M_ERR_NEEDMOREPARAMS, userId);
 		return ;
 	}
 
@@ -31,19 +32,23 @@ void	HookFunctionTopic(const Message& message)
 
     if (channelId == -1)
     {
-		userDB.SendErrorMessageToUser(channelName + " :No such channel", userId, M_ERR_NOSUCHCHANNEL, userId);
+		userDB.SendErrorMessageToUser(channelName + " :No such channel", userId,
+									  M_ERR_NOSUCHCHANNEL, userId);
 		return ;
     }
 
     if (!channelDB.IsUserInChannel(channelId, userId))
     {
-		userDB.SendErrorMessageToUser(channelName + " :You're not on that channel", userId, M_ERR_NOTONCHANNEL, userId);
+		userDB.SendErrorMessageToUser(channelName + " :You're not on that channel",
+									  userId, M_ERR_NOTONCHANNEL, userId);
 		return ;
     }
 
-	if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY) &&!channelDB.IsUserOperator(channelId, userId))
+	if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_TOPIC_OPERATOR_ONLY)
+	 && !channelDB.IsUserOperator(channelId, userId))
 	{
-		userDB.SendErrorMessageToUser(channelName + " :You're not channel operator", userId, M_ERR_CHANOPRIVSNEEDED, userId);
+		userDB.SendErrorMessageToUser(channelName + " :You're not channel operator",
+									  userId, M_ERR_CHANOPRIVSNEEDED, userId);
 		return ;
 	}
 
@@ -53,18 +58,24 @@ void	HookFunctionTopic(const Message& message)
 
 		if (topic == "")
 		{
-			userDB.SendErrorMessageToUser(channelName + " :No topic is set", userId, M_RPL_NOTOPIC, userId);
+			userDB.SendErrorMessageToUser(channelName + " :No topic is set",
+										  userId, M_RPL_NOTOPIC, userId);
 			return ;
 		}
 
-		userDB.SendErrorMessageToUser(channelName + " " + topic, userId, M_RPL_TOPIC, userId);
+		userDB.SendErrorMessageToUser(channelName + " " + topic, userId,
+									  M_RPL_TOPIC, userId);
 
-		std::string reply = channelName + " " + userDB.GetNickName(channelDB.GetChannelTopicSetUser(channelId)) + " :" + std::to_string(std::time(0));
+		std::string reply = channelName + " "
+						  + userDB.GetNickName(channelDB.GetChannelTopicSetUser(channelId))
+						  + " :" + std::to_string(std::time(0));
 		userDB.SendErrorMessageToUser(reply, userId, M_RPL_TOPICWHOTIME, userId);
 		return;
 	}
 
 	channelDB.SetChannelTopic(channelId, message.GetTrailing(), userId);
 
-	channelDB.AnnounceFormattedToChannel("TOPIC " + channelName + " " + channelDB.GetChannelTopic(channelId), channelId);
+	channelDB.AnnounceFormattedToChannel("TOPIC " + channelName + " "
+									   + channelDB.GetChannelTopic(channelId),
+									     channelId);
 }

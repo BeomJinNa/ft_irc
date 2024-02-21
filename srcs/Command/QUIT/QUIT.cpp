@@ -5,10 +5,10 @@
 
 void	HookFunctionQuit(const Message& message)
 {
-	UserDB&				userDB = UserDB::GetInstance();
-	ChannelDB&			channelDB = ChannelDB::GetInstance();
-	int					userId = message.GetUserId();
-	std::string			trailing = message.GetTrailing();
+	UserDB&		userDB = UserDB::GetInstance();
+	ChannelDB&	channelDB = ChannelDB::GetInstance();
+	int			userId = message.GetUserId();
+	std::string	trailing = message.GetTrailing();
 
 	if (userDB.IsUserAuthorized(userId) == false)
 	{
@@ -20,7 +20,6 @@ void	HookFunctionQuit(const Message& message)
 	{
 		trailing = ":" + userDB.GetNickName(userId) + " has quit.";
 	}
-
 
 	std::string	quitMessage
 		= ":" + userDB.GetNickName(userId)
