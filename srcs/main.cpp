@@ -59,7 +59,18 @@ int	main(int argc, char* argv[])
 	addHooks();
 
 	ircServer->SetServerPassword(password);
-	ircServer->RunServer();
+	try
+	{
+		ircServer->RunServer();
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << "Error: " << e.what() << std::endl;
+		delete channelDB;
+		delete userDB;
+		delete ircServer;
+		return (1);
+	}
 
 	delete channelDB;
 	delete userDB;

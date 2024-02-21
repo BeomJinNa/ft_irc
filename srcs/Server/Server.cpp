@@ -36,6 +36,13 @@ namespace
 	void		cancelConnectionTimeout(int clientFd, int kq);
 }
 
+#ifdef LOG_ON
+namespace
+{
+	void	printSocketMessage(const std::string& message);
+}
+#endif
+
 Server::Server(int port)
 {
 	FileContainer	FC;
@@ -97,12 +104,20 @@ void	Server::SendMessageToClient(int clientFd, const char* data,
 
 void	Server::CloseClientConnection(int clientFd)
 {
+	UserDB&	userDB = UserDB::GetInstance();
+
+	userDB.RemoveUserData(userDB.GetUserIdBySocketId(clientFd));
+
 	if (close(clientFd) == 0)
 	{
 		mClientFds.erase(clientFd);
 		mReadBuffers.erase(clientFd);
 		mReadSocketBuffers.erase(clientFd);
 		mWriteBuffers.erase(clientFd);
+
+		struct kevent	ev;
+		EV_SET(&ev, clientFd, EVFILT_TIMER, EV_DELETE, 0, 0, NULL);
+		xKevent(mKq, &ev, 1, NULL, 0, NULL);
 	}
 }
 
@@ -136,22 +151,19 @@ void	Server::waitEvent(void)
 	struct kevent	events[MAX_EVENTS];
 	int				nev = xKevent(mKq, &mWriteEvents[0], mWriteEvents.size(),
 								  events, MAX_EVENTS, NULL);
-	UserDB&			userDB = UserDB::GetInstance();
 
 	mWriteEvents.clear();
 	for (int i = 0; i < nev; i++)
 	{
 		if (events[i].flags & (EV_EOF | EV_ERROR))
 		{
-			if (events[i].ident == static_cast<uintptr_t>(mServerFd))
+			if (events[i].ident != static_cast<uintptr_t>(mServerFd))
 			{
-				userDB.RemoveUserData(userDB.GetUserIdBySocketId(events[i].ident));
 				CloseClientConnection(events[i].ident);
 			}
 		}
 		else if (events[i].filter == EVFILT_TIMER)
 		{
-			userDB.RemoveUserData(userDB.GetUserIdBySocketId(events[i].ident));
 			CloseClientConnection(events[i].ident);
 		}
 		else if (events[i].filter == EVFILT_READ)
@@ -169,6 +181,8 @@ void	Server::waitEvent(void)
 		{
 			handleWrite(events[i].ident);
 		}
+		else
+			continue;
 	}
 }
 
@@ -197,7 +211,7 @@ void Server::acceptConnection(void)
 	}
 }
 
-void Server::handleRead(int clientFd)
+void	Server::handleRead(int clientFd)
 {
 	static const size_t		bufferSize = M_SERVER_READ_BUFFER_SIZE;
 	ssize_t					bytes_read = read(clientFd,
@@ -211,17 +225,7 @@ void Server::handleRead(int clientFd)
 		mReadBuffers[clientFd].append(mReadSocketBuffers[clientFd].buffer);
 
 #ifdef LOG_ON
-		std::string	dubugMessage(mReadSocketBuffers[clientFd].buffer);
-		std::size_t	pos = dubugMessage.find("\r\n");
-		if (pos == std::string::npos)
-		{
-			std::cout << "<socket:recv> " << dubugMessage << std::endl;
-		}
-		else
-		{
-			dubugMessage = dubugMessage.substr(0, pos);
-			std::cout << "<socket:recv> " << dubugMessage << std::endl;
-		}
+		printSocketMessage(mReadSocketBuffers[clientFd].buffer);
 #endif
 
 		size_t	end_of_msg = mReadBuffers[clientFd].find("\r\n");
@@ -243,7 +247,6 @@ void Server::handleRead(int clientFd)
 	}
 	else
 	{
-		userDB.RemoveUserData(userDB.GetUserIdBySocketId(clientFd));
 		CloseClientConnection(clientFd);
 	}
 }
@@ -384,7 +387,7 @@ namespace
 
 		EV_SET(&ev, clientFd, EVFILT_TIMER, EV_ADD | EV_ENABLE,
 			   0, timeoutSeconds * 1000, NULL);
-		kevent(kq, &ev, 1, NULL, 0, NULL);
+		xKevent(kq, &ev, 1, NULL, 0, NULL);
 	}
 
 	void	cancelConnectionTimeout(int clientFd, int kq)
@@ -392,7 +395,7 @@ namespace
 		struct kevent	ev;
 
 		EV_SET(&ev, clientFd, EVFILT_TIMER, EV_DELETE, 0, 0, NULL);
-		kevent(kq, &ev, 1, NULL, 0, NULL);
+		xKevent(kq, &ev, 1, NULL, 0, NULL);
 	}
 }
 
@@ -401,3 +404,23 @@ Server::Server(void) {}
 Server::Server(const Server& source) { (void)source; }
 Server&	Server::operator=(const Server& source)
 { if (this != &source) {} return (*this); }
+
+#ifdef LOG_ON
+namespace
+{
+	void	printSocketMessage(const std::string& message)
+	{
+		std::string	debugMessage(message);
+		std::size_t	pos = debugMessage.find("\r\n");
+		if (pos == std::string::npos)
+		{
+			std::cout << "<socket:recv> " << debugMessage << std::endl;
+		}
+		else
+		{
+			debugMessage = debugMessage.substr(0, pos);
+			std::cout << "<socket:recv> " << debugMessage << std::endl;
+		}
+	}
+}
+#endif

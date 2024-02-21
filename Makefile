@@ -41,7 +41,7 @@ OBJS	= $(SRCS:.cpp=.o)
 TARGET_OBJS = $(OBJS)
 
 ifdef LOG_ON
-	LOG_ON_FLAG = -D LOG_ON
+	LOG_ON_FLAG = -DLOG_ON
 else
 endif
 
