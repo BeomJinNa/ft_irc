@@ -14,13 +14,15 @@ void	HookFunctionPass(const Message& message)
 
 	if (message.GetParameters().size() == 0)
 	{
-		userDB.SendErrorMessageToUser("PASS :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
+		userDB.SendErrorMessageToUser("PASS :Not enough parameters", userId,
+									  M_ERR_NEEDMOREPARAMS, userId);
 		return ;
 	}
 
 	if (userDB.GetLoginStatus(userId))
 	{
-		userDB.SendErrorMessageToUser(":You may not reregister", userId, M_ERR_ALREADYREGISTRED, userId);
+		userDB.SendErrorMessageToUser(":You may not reregister", userId,
+									  M_ERR_ALREADYREGISTRED, userId);
 		return ;
 	}
 
@@ -28,11 +30,19 @@ void	HookFunctionPass(const Message& message)
 
 	if (server.GetServerPassword() != inputPassword)
 	{
-		userDB.SendErrorMessageToUser(":Password incorrect", userId, M_ERR_PASSWDMISMATCH, userId);
+		userDB.SendErrorMessageToUser(":Password incorrect", userId,
+									  M_ERR_PASSWDMISMATCH, userId);
 		return ;
 	}
 
 	userDB.SetLoginStatus(userId, true);
 	if (userDB.IsUserAuthorized(userId))
-		userDB.SendErrorMessageToUser(":Welcome to the " + userDB.GetHostAddress(userId) + " Network, " + UserDB::GetInstance().GetNickName(userId), userId, M_RPL_WELCOME, userId);
+	{
+		server.AuthorizeUser(userId);
+		userDB.SendErrorMessageToUser(":Welcome to the "
+									+ userDB.GetHostAddress(userId)
+									+ " Network, "
+									+ UserDB::GetInstance().GetNickName(userId),
+									userId, M_RPL_WELCOME, userId);
+	}
 }

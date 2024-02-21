@@ -32,6 +32,8 @@ namespace
 	int			getKqueue(void);
 	void		setKqueue(struct kevent& kevent, int fdServer, int fdKqueue);
 	uint16_t	getSocketPort(int socketFd);
+	void		setConnectionTimeout(int clientFd, int kq, int timeoutSeconds);
+	void		cancelConnectionTimeout(int clientFd, int kq);
 }
 
 Server::Server(int port)
@@ -147,6 +149,11 @@ void	Server::waitEvent(void)
 				CloseClientConnection(events[i].ident);
 			}
 		}
+		else if (events[i].filter == EVFILT_TIMER)
+		{
+			userDB.RemoveUserData(userDB.GetUserIdBySocketId(events[i].ident));
+			CloseClientConnection(events[i].ident);
+		}
 		else if (events[i].filter == EVFILT_READ)
 		{
 			if (events[i].ident == static_cast<uintptr_t>(mServerFd))
@@ -180,11 +187,12 @@ void Server::acceptConnection(void)
 		EV_SET(&ev, clientFd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
 		xKevent(mKq, &ev, 1, NULL, 0, NULL);
 		mClientFds.insert(clientFd);
+		setConnectionTimeout(clientFd, mKq, M_SERVER_CONNECTION_TIMEOUT_SECONDS);
 
 		bool isConnectionAvailable = UserDB::GetInstance().ConnectUser(clientFd);
 		if (isConnectionAvailable == false)
 		{
-			close(clientFd);
+			CloseClientConnection(clientFd);
 		}
 	}
 }
@@ -270,6 +278,13 @@ void	Server::handleWrite(int clientFd)
 			xKevent(mKq, &ev, 1, NULL, 0, NULL);
 		}
 	}
+}
+
+void	Server::AuthorizeUser(int userId)
+{
+	int	clientFd = UserDB::GetInstance().GetSocketIdByUserId(userId);
+
+	cancelConnectionTimeout(clientFd, mKq);
 }
 
 namespace
@@ -361,6 +376,23 @@ namespace
 			throw std::runtime_error("getsockname failed");
 		}
 		return (ntohs(address_input.sin_port));
+	}
+
+	void	setConnectionTimeout(int clientFd, int kq, int timeoutSeconds)
+	{
+		struct kevent	ev;
+
+		EV_SET(&ev, clientFd, EVFILT_TIMER, EV_ADD | EV_ENABLE,
+			   0, timeoutSeconds * 1000, NULL);
+		kevent(kq, &ev, 1, NULL, 0, NULL);
+	}
+
+	void	cancelConnectionTimeout(int clientFd, int kq)
+	{
+		struct kevent	ev;
+
+		EV_SET(&ev, clientFd, EVFILT_TIMER, EV_DELETE, 0, 0, NULL);
+		kevent(kq, &ev, 1, NULL, 0, NULL);
 	}
 }
 

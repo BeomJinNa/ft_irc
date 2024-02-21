@@ -1,4 +1,5 @@
 #include <string>
+#include "Server.hpp"
 #include "UserDB.hpp"
 #include "Message.hpp"
 #include "ErrorCodes.hpp"
@@ -27,7 +28,8 @@ void	HookFunctionNick(const Message& message)
 
 	if (message.GetParameters().empty())
 	{
-		userDB.SendErrorMessageToUser(":No nickname given", userId, M_ERR_NONICKNAMEGIVEN, userId);
+		userDB.SendErrorMessageToUser(":No nickname given", userId,
+									  M_ERR_NONICKNAMEGIVEN, userId);
 		return ;
 	}
 
@@ -35,16 +37,24 @@ void	HookFunctionNick(const Message& message)
 
 	if (!isValidName(nickname))
 	{
-		userDB.SendErrorMessageToUser(nickname + " :Erroneus nickname", userId, M_ERR_ERRONEUSNICKNAME, userId);
+		userDB.SendErrorMessageToUser(nickname + " :Erroneus nickname",
+									  userId, M_ERR_ERRONEUSNICKNAME, userId);
 		return ;
 	}
 	if (userDB.GetUserIdByNickName(nickname) != -1)
 	{
-		userDB.SendErrorMessageToUser(nickname + " :Nickname is already in use", userId, M_ERR_NICKNAMEINUSE, userId);
+		userDB.SendErrorMessageToUser(nickname + " :Nickname is already in use",
+									  userId, M_ERR_NICKNAMEINUSE, userId);
 		return ;
 	}
 
 	userDB.SetNickName(userId, nickname);
 	if (userDB.IsUserAuthorized(userId))
-		userDB.SendErrorMessageToUser(":Welcome to the " + userDB.GetHostAddress(userId) + " Network, " + nickname, userId, M_RPL_WELCOME, userId);
+	{
+		Server::GetInstance().AuthorizeUser(userId);
+		userDB.SendErrorMessageToUser(":Welcome to the "
+									+ userDB.GetHostAddress(userId)
+									+ " Network, " + nickname, userId,
+									  M_RPL_WELCOME, userId);
+	}
 }

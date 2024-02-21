@@ -1,4 +1,5 @@
 #include <string>
+#include "Server.hpp"
 #include "UserDB.hpp"
 #include "Message.hpp"
 #include "ErrorCodes.hpp"
@@ -9,14 +10,17 @@ void	HookFunctionUser(const Message& message)
 	UserDB&			userDB = UserDB::GetInstance();
 	int				userId = message.GetUserId();
 
-	if (message.GetParameters().size() < 3 || message.GetParameters().at(0).length() == 0)
+	if (message.GetParameters().size() < 3
+	 || message.GetParameters().at(0).length() == 0)
 	{
-		userDB.SendErrorMessageToUser("USER :Not enough parameters", userId, M_ERR_NEEDMOREPARAMS, userId);
+		userDB.SendErrorMessageToUser("USER :Not enough parameters", userId,
+									  M_ERR_NEEDMOREPARAMS, userId);
 		return ;
 	}
 	if (userDB.IsUserAuthorized(userId))
 	{
-		userDB.SendErrorMessageToUser(":You may not reregister", userId, M_ERR_ALREADYREGISTRED, userId);
+		userDB.SendErrorMessageToUser(":You may not reregister", userId,
+									  M_ERR_ALREADYREGISTRED, userId);
 		return ;
 	}
 
@@ -30,5 +34,11 @@ void	HookFunctionUser(const Message& message)
 	const std::string&	nickname = UserDB::GetInstance().GetNickName(userId);
 
 	if (userDB.IsUserAuthorized(userId))
-		userDB.SendErrorMessageToUser(":Welcome to the " + userDB.GetHostAddress(userId) + " Network, " + nickname, userId, M_RPL_WELCOME, userId);
+	{
+		Server::GetInstance().AuthorizeUser(userId);
+		userDB.SendErrorMessageToUser(":Welcome to the "
+									+ userDB.GetHostAddress(userId)
+									+ " Network, " + nickname, userId,
+									  M_RPL_WELCOME, userId);
+	}
 }

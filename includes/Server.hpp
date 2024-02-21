@@ -32,6 +32,7 @@ class Server
 		uint16_t		GetHostPortNumber(void) const;
 		std::string		GetHostAddress(void) const;
 		std::string		GetHostPort(void) const;
+		void			AuthorizeUser(int userId);
 
 		static Server&	GetInstance(void);
 
