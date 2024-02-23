@@ -79,7 +79,6 @@ Server::~Server(void)
 	{
 		close(mKq);
 	}
-	Server::CloseAllClientConnection();
 }
 
 void	Server::RunServer(void)

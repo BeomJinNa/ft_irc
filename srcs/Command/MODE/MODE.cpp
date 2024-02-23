@@ -347,20 +347,41 @@ namespace
 			}
 			else if (*it == "+o")
 			{
-				channelDB.AddOperatorIntoChannel(channelId, userDB.GetUserIdByNickName(*pit));
-				channelDB.AnnounceFormattedToChannel(
-						"NOTICE " + channelName + " :" + userDB.GetNickName(userId)
-						+ " has given channel operator status to " + *pit + " on " + channelName
-						,channelId, userId);
-				++pit;
+				const int targetUserId = userDB.GetUserIdByNickName(*pit);
+				if (targetUserId == -1)
+				{
+					// 401 A X :No such nick
+					userDB.SendErrorMessageToUser(*pit + " :No such nick",
+												  userId, M_ERR_NOSUCHNICK, userId);
+				}
+				else
+				{
+					channelDB.AddOperatorIntoChannel(channelId, targetUserId);
+					channelDB.AnnounceFormattedToChannel(
+							"NOTICE " + channelName + " :" + userDB.GetNickName(userId)
+							+ " has given channel operator status to " + *pit + " on " + channelName
+							,channelId, userId);
+					++pit;
+				}
 			}
 			else if (*it == "-o")
 			{
-				channelDB.RemoveOperatorFromChannel(channelId, userDB.GetUserIdByNickName(*pit++));
-				channelDB.AnnounceFormattedToChannel(
-						"NOTICE " + channelName + " :" + userDB.GetNickName(userId)
-						+ " has taken channel operator status to " + *pit + " on " + channelName
-						,channelId, userId);
+				const int targetUserId = userDB.GetUserIdByNickName(*pit);
+				if (targetUserId == -1)
+				{
+					// 401 A X :No such nick
+					userDB.SendErrorMessageToUser(*pit + " :No such nick",
+												  userId, M_ERR_NOSUCHNICK, userId);
+				}
+				else
+				{
+					channelDB.RemoveOperatorFromChannel(channelId, targetUserId);
+					channelDB.AnnounceFormattedToChannel(
+							"NOTICE " + channelName + " :" + userDB.GetNickName(userId)
+							+ " has taken channel operator status to " + *pit + " on " + channelName
+							,channelId, userId);
+					++pit;
+				}
 			}
 			else if (*it == "+l")
 			{

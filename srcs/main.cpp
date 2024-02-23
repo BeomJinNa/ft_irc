@@ -13,6 +13,7 @@ namespace
 	bool	initUserDatabase(UserDB** Database);
 	bool	initChannelDatabase(ChannelDB** Database);
 	void	addHooks(void);
+	void 	signalHandler(int signum);
 }
 
 int	main(int argc, char* argv[])
@@ -59,6 +60,8 @@ int	main(int argc, char* argv[])
 	addHooks();
 
 	ircServer->SetServerPassword(password);
+	signal(SIGINT, signalHandler);
+	signal(SIGQUIT, signalHandler);
 	try
 	{
 		ircServer->RunServer();
@@ -66,12 +69,15 @@ int	main(int argc, char* argv[])
 	catch (std::exception& e)
 	{
 		std::cerr << "Error: " << e.what() << std::endl;
+		Server::GetInstance().CloseAllClientConnection();
 		delete channelDB;
 		delete userDB;
 		delete ircServer;
 		return (1);
 	}
 
+
+	Server::GetInstance().CloseAllClientConnection();
 	delete channelDB;
 	delete userDB;
 	delete ircServer;
@@ -167,5 +173,18 @@ namespace
 		Command::RegisterCommand("INVITE", HookFunctionInvite);
 		Command::RegisterCommand("MODE", HookFunctionMode);
 		Command::RegisterCommand("CAP", HookFunctionCap);
+	}
+
+	void signalHandler(int signum)
+	{
+		if (signum == SIGINT || signum == SIGQUIT)
+		{
+			std::cout << "Server is shutting down..." << std::endl;
+			Server::GetInstance().CloseAllClientConnection();
+			delete &ChannelDB::GetInstance();
+			delete &UserDB::GetInstance();
+			delete &Server::GetInstance();
+			exit(signum);
+		}
 	}
 }
