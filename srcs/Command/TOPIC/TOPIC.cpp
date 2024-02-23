@@ -73,9 +73,11 @@ void	HookFunctionTopic(const Message& message)
 		return;
 	}
 
-	channelDB.SetChannelTopic(channelId, message.GetTrailing(), userId);
-
-	channelDB.AnnounceFormattedToChannel("TOPIC " + channelName + " "
-									   + channelDB.GetChannelTopic(channelId),
-									     channelId);
+	if (channelDB.GetChannelTopic(channelId) != message.GetTrailing())
+	{
+		channelDB.SetChannelTopic(channelId, message.GetTrailing(), userId);
+		channelDB.AnnounceFormattedToChannel("TOPIC " + channelName + " "
+										+ channelDB.GetChannelTopic(channelId),
+											channelId, userId);
+	}
 }
