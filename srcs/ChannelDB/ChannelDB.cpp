@@ -57,6 +57,7 @@ void	ChannelDB::DeleteChannel(int channelId)
 	mIndex.DeactivateIndex(channelId);
 
 	mDataBase.erase(it);
+	mReferenceTableName.erase(it->second.GetChannelName());
 	UserDB::GetInstance().RemoveChannelInAllUsers(channelId);
 }
 
