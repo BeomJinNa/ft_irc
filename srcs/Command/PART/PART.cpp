@@ -72,5 +72,9 @@ void	HookFunctionPart(const Message& message)
 
 		channelDB.AnnounceFormattedToChannel(sendMessage, channelId, userId);
 		channelDB.RemoveUserFromChannel(channelId, userId);
+		if (channelDB.GetCurrentUsersInChannel(channelId) == 0)
+		{
+			channelDB.DeleteChannel(channelId);
+		}
 	}
 }
