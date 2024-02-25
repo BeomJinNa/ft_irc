@@ -118,10 +118,12 @@ void	Server::CloseClientConnection(int clientFd)
 
 void	Server::CloseAllClientConnection(void)
 {
-	for (std::set<int>::iterator it = mClientFds.begin();
-		 it != mClientFds.end(); ++it)
+	std::set<int>::iterator it = mClientFds.begin();
+	while (it != mClientFds.end())
 	{
-		Server::CloseClientConnection(*it);
+		std::set<int>::iterator	clientFd = it;
+		++it;
+		Server::CloseClientConnection(*clientFd);
 	}
 }
 
