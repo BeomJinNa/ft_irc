@@ -169,11 +169,10 @@ void	HookFunctionJoin(const Message& message)
 		if (channelId == -1)
 		{
 			channelId = channelDB.CreateChannel(channelName);
-			channelDB.AddOperatorIntoChannel(channelId, userId);
 		}
 		else
 		{
-			if(CheckInviteOnly(channelId, userId, channelName) == false)
+			if (CheckInviteOnly(channelId, userId, channelName) == false)
 				continue ;
 			if (CheckChannelKey(channelId, userId, channelName,
 								keyCount <= i ? "" : parsedKeys[i])
@@ -184,6 +183,10 @@ void	HookFunctionJoin(const Message& message)
 		}
 
 		channelDB.AddUserIntoChannel(channelId, userId);
+		if (channelDB.GetCurrentUsersInChannel(channelId) == 1)
+		{
+			channelDB.AddOperatorIntoChannel(channelId, userId);
+		}
 		channelDB.AnnounceFormattedToChannel("JOIN :" + channelName, channelId, userId);
 
 
