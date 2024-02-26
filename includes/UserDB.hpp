@@ -4,6 +4,7 @@
 
 # include <string>
 # include <map>
+# include <vector>
 # include "IndexManager.hpp"
 
 class User;
@@ -74,7 +75,6 @@ class UserDB
 
 		void			WriteChannelInUserData(int userId, int channelId);
 		void			RemoveChannelInAllUsers(int channelId);
-
 
 	private:
 		UserDB(const UserDB& source);

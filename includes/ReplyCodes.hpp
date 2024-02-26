@@ -55,5 +55,4 @@ enum ReplyCodes
     M_RPL_ENDOFUSERS = 394,
     M_RPL_NOUSERS = 395
 };
-
 #endif

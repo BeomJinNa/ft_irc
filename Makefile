@@ -2,8 +2,8 @@
 
 CXX			= c++
 
-COMMONFLAGS	= -fsanitize=address
-CXXFLAGS	= $(COMMONFLAGS) -Wall -Wextra -Werror -std=c++98 -g $(LOG_ON_FLAG)
+COMMONFLAGS	=
+CXXFLAGS	= $(COMMONFLAGS) -Wall -Wextra -Werror -std=c++98 -O2 $(LOG_ON_FLAG)
 LDFLAGS		= $(COMMONFLAGS)
 
 NAME	= ircserv
