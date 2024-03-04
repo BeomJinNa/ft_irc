@@ -1,17 +1,17 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include "Message.hpp"
-#include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "ChannelMode.hpp"
 #include "ErrorCodes.hpp"
+#include "Message.hpp"
 #include "ReplyCodes.hpp"
-
-typedef std::vector<std::string>	Tokens;
+#include "UserDB.hpp"
 
 namespace
 {
+	typedef std::vector<std::string>	Tokens;
+
 	void	applyUserMode(const Message& message);
 	void	applyChannelMode(const Message& message);
 	bool	divideCommands(Tokens* vec, const std::string& commands, int userId);

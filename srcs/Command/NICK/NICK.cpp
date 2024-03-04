@@ -1,9 +1,9 @@
 #include <string>
+#include "ErrorCodes.hpp"
+#include "Message.hpp"
+#include "ReplyCodes.hpp"
 #include "Server.hpp"
 #include "UserDB.hpp"
-#include "Message.hpp"
-#include "ErrorCodes.hpp"
-#include "ReplyCodes.hpp"
 
 namespace
 {
@@ -18,7 +18,6 @@ namespace
 
 		return true;
 	}
-
 }
 
 void	HookFunctionNick(const Message& message)
@@ -35,7 +34,7 @@ void	HookFunctionNick(const Message& message)
 
 	std::string nickname = message.GetParameters().at(0);
 
-	if (!isValidName(nickname))
+	if (isValidName(nickname) == false)
 	{
 		userDB.SendErrorMessageToUser(nickname + " :Erroneus nickname",
 									  userId, M_ERR_ERRONEUSNICKNAME, userId);

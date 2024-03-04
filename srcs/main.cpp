@@ -1,9 +1,9 @@
 #include <iostream>
 #include <sstream>
-#include "Server.hpp"
-#include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "Command.hpp"
+#include "Server.hpp"
+#include "UserDB.hpp"
 #include "hooks.hpp"
 
 namespace

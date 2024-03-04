@@ -31,7 +31,6 @@ namespace
 	void		listenServerSocket(int fd);
 	int			getKqueue(void);
 	void		setKqueue(struct kevent& kevent, int fdServer, int fdKqueue);
-	uint16_t	getSocketPort(int socketFd);
 }
 
 #ifdef LOG_ON
@@ -59,7 +58,7 @@ Server::Server(int port)
 	setKqueue(ev, mServerFd, mKq);
 
 	mHostAddress = "localhost";
-	mHostPort = getSocketPort(mServerFd);
+	mHostPort = port;
 
 	std::ostringstream	oss;
 	oss << mHostPort;
@@ -395,19 +394,6 @@ namespace
 		{
 			throw std::runtime_error("Failed to add server socket event to mKqueue");
 		}
-	}
-
-	uint16_t	getSocketPort(int socketFd)
-	{
-		struct sockaddr_in	address_input;
-		socklen_t			address_input_len = sizeof(address_input);
-
-		if (getsockname(socketFd, (struct sockaddr *)&address_input,
-					&address_input_len) == -1)
-		{
-			throw std::runtime_error("getsockname failed");
-		}
-		return (ntohs(address_input.sin_port));
 	}
 }
 

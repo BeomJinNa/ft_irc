@@ -1,11 +1,11 @@
-#include <string>
-#include <vector>
 #include <sstream>
+#include <string>
 #include <utility>
-#include "UserDB.hpp"
+#include <vector>
 #include "ChannelDB.hpp"
-#include "Message.hpp"
 #include "ErrorCodes.hpp"
+#include "Message.hpp"
+#include "UserDB.hpp"
 
 namespace
 {
@@ -29,9 +29,9 @@ namespace
 
 void	HookFunctionPart(const Message& message)
 {
-	ChannelDB&			channelDB = ChannelDB::GetInstance();
-	UserDB&				userDB = UserDB::GetInstance();
-	int					userId = message.GetUserId();
+	ChannelDB&	channelDB = ChannelDB::GetInstance();
+	UserDB&		userDB = UserDB::GetInstance();
+	int			userId = message.GetUserId();
 
 	if (message.GetParameters().size() == 0)
 	{
@@ -51,11 +51,11 @@ void	HookFunctionPart(const Message& message)
 	getChannelList(message.GetParameters().at(0), channelsToPart);
 
 	ChannelList::iterator it;
-
 	for (it = channelsToPart.begin(); it != channelsToPart.end(); it++)
 	{
 		int				channelId = it->first;
 		std::string&	channelName = it->second;
+
 		if (channelId == -1)
 		{
 			userDB.SendErrorMessageToUser(channelName + " :No such channel",

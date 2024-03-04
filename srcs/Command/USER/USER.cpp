@@ -1,14 +1,14 @@
 #include <string>
+#include "ErrorCodes.hpp"
+#include "Message.hpp"
+#include "ReplyCodes.hpp"
 #include "Server.hpp"
 #include "UserDB.hpp"
-#include "Message.hpp"
-#include "ErrorCodes.hpp"
-#include "ReplyCodes.hpp"
 
 void	HookFunctionUser(const Message& message)
 {
-	UserDB&			userDB = UserDB::GetInstance();
-	int				userId = message.GetUserId();
+	UserDB&	userDB = UserDB::GetInstance();
+	int		userId = message.GetUserId();
 
 	if (message.GetParameters().size() < 3
 	 || message.GetParameters().at(0).length() == 0)

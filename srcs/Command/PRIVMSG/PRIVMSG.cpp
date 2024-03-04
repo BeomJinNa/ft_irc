@@ -1,28 +1,31 @@
-#include <string>
 #include <algorithm>
-#include "UserDB.hpp"
+#include <string>
 #include "ChannelDB.hpp"
-#include "Message.hpp"
 #include "ErrorCodes.hpp"
+#include "Message.hpp"
+#include "UserDB.hpp"
 
-void split(const std::string& str, char delimiter, std::vector<std::string>& result)
+namespace
 {
-	std::string::const_iterator		start = str.begin();
-	std::string::const_iterator		end = str.begin();
-
-	while (end != str.end())
+	void split(const std::string& str, char delimiter, std::vector<std::string>& result)
 	{
-		end = std::find(start, str.end(), delimiter);
-		result.push_back(std::string(start, end));
-		start = end + 1;
+		std::string::const_iterator	start = str.begin();
+		std::string::const_iterator	end = str.begin();
+
+		while (end != str.end())
+		{
+			end = std::find(start, str.end(), delimiter);
+			result.push_back(std::string(start, end));
+			start = end + 1;
+		}
 	}
 }
 
 void	HookFunctionPrivmsg(const Message& message)
 {
-	UserDB&				userDB = UserDB::GetInstance();
-	ChannelDB&		channelDB = ChannelDB::GetInstance();
-	int						userId = message.GetUserId();
+	UserDB&		userDB = UserDB::GetInstance();
+	ChannelDB&	channelDB = ChannelDB::GetInstance();
+	int			userId = message.GetUserId();
 
 	if (message.GetParameters().size() == 0)
 	{
@@ -35,7 +38,7 @@ void	HookFunctionPrivmsg(const Message& message)
 	{
 		userDB.SendErrorMessageToUser("You have not registered", userId,
 									   M_ERR_NOTREGISTERED, userId);
-		return ;
+		return;
 	}
 
 	std::vector<std::string> receivers;

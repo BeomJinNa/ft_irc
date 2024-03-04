@@ -2,8 +2,8 @@
 #ifndef USERDB_HPP
 # define USERDB_HPP
 
-# include <string>
 # include <map>
+# include <string>
 # include <vector>
 # include "IndexManager.hpp"
 

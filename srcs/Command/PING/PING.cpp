@@ -1,7 +1,7 @@
 #include <string>
-#include "UserDB.hpp"
-#include "Message.hpp"
 #include "ErrorCodes.hpp"
+#include "Message.hpp"
+#include "UserDB.hpp"
 
 void	HookFunctionPing(const Message& message)
 {

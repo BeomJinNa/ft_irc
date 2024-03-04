@@ -1,11 +1,11 @@
 #include <string>
 #include <vector>
-#include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "ChannelMode.hpp"
-#include "Message.hpp"
 #include "ErrorCodes.hpp"
+#include "Message.hpp"
 #include "ReplyCodes.hpp"
+#include "UserDB.hpp"
 
 void	HookFunctionInvite(const Message& message)
 {
@@ -40,7 +40,7 @@ void	HookFunctionInvite(const Message& message)
 		return ;
 	}
 
-	if (!channelDB.IsUserInChannel(channelId, userId))
+	if (channelDB.IsUserInChannel(channelId, userId) == false)
 	{
 		userDB.SendErrorMessageToUser(channelName + " :You're not on that channel",
 									  userId, M_ERR_NOTONCHANNEL, userId);
@@ -48,7 +48,7 @@ void	HookFunctionInvite(const Message& message)
 	}
 
 	if ((channelDB.GetChannelFlag(channelId) & M_FLAG_CHANNEL_INVITE_ONLY)
-	 && !channelDB.IsUserOperator(channelId, userId))
+	 && channelDB.IsUserOperator(channelId, userId) == false)
 	{
 		userDB.SendErrorMessageToUser(channelName + " :You're not channel operator",
 									  userId, M_ERR_CHANOPRIVSNEEDED, userId);

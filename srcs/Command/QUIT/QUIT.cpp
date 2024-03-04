@@ -1,7 +1,7 @@
 #include <set>
-#include "UserDB.hpp"
 #include "ChannelDB.hpp"
 #include "Message.hpp"
+#include "UserDB.hpp"
 
 void	HookFunctionQuit(const Message& message)
 {

@@ -1,11 +1,11 @@
-#include <string>
-#include <vector>
 #include <sstream>
+#include <string>
 #include <utility>
-#include "UserDB.hpp"
+#include <vector>
 #include "ChannelDB.hpp"
-#include "Message.hpp"
 #include "ErrorCodes.hpp"
+#include "Message.hpp"
+#include "UserDB.hpp"
 
 namespace
 {

@@ -2,15 +2,15 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# include <sys/types.h>
+# include <fcntl.h>
+# include <map>
+# include <netinet/in.h>
+# include <set>
+# include <string>
 # include <sys/event.h>
 # include <sys/socket.h>
-# include <netinet/in.h>
+# include <sys/types.h>
 # include <unistd.h>
-# include <fcntl.h>
-# include <string>
-# include <map>
-# include <set>
 # include <vector>
 
 class FixedBufferArray;

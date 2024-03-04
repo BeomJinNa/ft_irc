@@ -1,11 +1,11 @@
 #include <ctime>
 #include <string>
-#include "UserDB.hpp"
 #include "ChannelDB.hpp"
-#include "Message.hpp"
-#include "ErrorCodes.hpp"
-#include "ReplyCodes.hpp"
 #include "ChannelMode.hpp"
+#include "ErrorCodes.hpp"
+#include "Message.hpp"
+#include "ReplyCodes.hpp"
+#include "UserDB.hpp"
 
 void	HookFunctionTopic(const Message& message)
 {

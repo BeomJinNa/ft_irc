@@ -1,16 +1,15 @@
 #include <string>
+#include "ErrorCodes.hpp"
+#include "Message.hpp"
+#include "ReplyCodes.hpp"
 #include "Server.hpp"
 #include "UserDB.hpp"
-#include "Message.hpp"
-#include "ErrorCodes.hpp"
-#include "ReplyCodes.hpp"
 
 void	HookFunctionPass(const Message& message)
 {
-
-	Server&			server = Server::GetInstance();
-	UserDB&			userDB = UserDB::GetInstance();
-	int				userId = message.GetUserId();
+	Server&	server = Server::GetInstance();
+	UserDB&	userDB = UserDB::GetInstance();
+	int		userId = message.GetUserId();
 
 	if (message.GetParameters().size() == 0)
 	{
@@ -43,6 +42,6 @@ void	HookFunctionPass(const Message& message)
 									+ userDB.GetHostAddress(userId)
 									+ " Network, "
 									+ UserDB::GetInstance().GetNickName(userId),
-									userId, M_RPL_WELCOME, userId);
+									  userId, M_RPL_WELCOME, userId);
 	}
 }
